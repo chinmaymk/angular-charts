@@ -1,0 +1,27 @@
+{
+  "name": "angular-charts",
+  "version": "0.0.1",
+  "authors": [
+    "chinmaymk"
+  ],
+  "description": "angular directives for common charts using d3",
+  "keywords": [
+    "d3",
+    "charts",
+    "angular",
+    "angularjs"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.3.10",
+    "angular": "latest",
+  }
+}
+
