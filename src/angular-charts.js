@@ -8,7 +8,7 @@
 /**
  * Pie chart
  */
- angular.module('angularCharts').directive('pieChart', function(){
+ angular.module('angularCharts').directive('pieChart', function() {
   return {
     restrict:'EA',
     link : function(scope, element, attrs) {
@@ -16,6 +16,7 @@
       height = 500,
       radius = Math.min(width, height) / 2;
       var data;
+
       console.log(attrs.pieChart);
       scope.$watch(attrs.pieChart, function(){
         data = scope.data;
@@ -29,15 +30,18 @@
       .outerRadius(radius - 10)
       .innerRadius(0);
 
+      var arcOver = d3.svg.arc()
+      .outerRadius(radius + 5)
+      .innerRadius(0);
+
       function drawChart() {
         element.html('');
-
         var svg = d3.select(element[0]).append("svg")
         .attr("width", width)
         .attr("height", height)
         .append("g")
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-        
+
         var pie = d3.layout.pie()
         .sort(null)
         .value(function(d) { return d; });
@@ -47,15 +51,26 @@
         .enter().append("g");
 
         path.transition()
-        .ease("elastic")
-        .duration(2000)
-        .attrTween("d", arcTween)
-        .attr("class", "arc");
-
-        path.append("path")
+        
+        var arcs = path.append("path")
+        .transition()
+        .duration(500)
         .attr("d", arc)
-        .style("fill", function(d, i) { return color(i); })
-        .on("mouseover", function(d) { return d.data; });
+        .attr("class", "arc")
+        .style("fill", function(d, i) { return color(i); });
+
+        path.on("mouseover", function(d) {  
+          d3.select(this).select('path').transition()
+          .duration(200)
+          .style("stroke", "white")
+          .style("stroke-width", "2px");
+        })
+        .on("mouseleave", function(d) {  
+          d3.select(this).select('path').transition()
+          .duration(200)
+          .style("stroke", "")
+          .style("stroke-width", "");
+        });
 
         path.append("text")
         .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
@@ -70,7 +85,7 @@
           return arc(i(t));
         };
       }
-    //drawChart();
+      //drawChart();
+    }
   }
-}
 });

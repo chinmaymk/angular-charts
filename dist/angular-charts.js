@@ -18,6 +18,7 @@ angular.module('angularCharts').directive('pieChart', function () {
           'rgb(0,128,0)'
         ]);
       var arc = d3.svg.arc().outerRadius(radius - 10).innerRadius(0);
+      var arcOver = d3.svg.arc().outerRadius(radius + 5).innerRadius(0);
       function drawChart() {
         element.html('');
         var svg = d3.select(element[0]).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
@@ -25,11 +26,14 @@ angular.module('angularCharts').directive('pieChart', function () {
             return d;
           });
         var path = svg.selectAll('.arc').data(pie(data)).enter().append('g');
-        path.transition().ease('elastic').duration(2000).attrTween('d', arcTween).attr('class', 'arc');
-        path.append('path').attr('d', arc).style('fill', function (d, i) {
-          return color(i);
-        }).on('mouseover', function (d) {
-          return d.data;
+        path.transition();
+        var arcs = path.append('path').transition().duration(500).attr('d', arc).attr('class', 'arc').style('fill', function (d, i) {
+            return color(i);
+          });
+        path.on('mouseover', function (d) {
+          d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
+        }).on('mouseleave', function (d) {
+          d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
         });
         path.append('text').attr('transform', function (d) {
           return 'translate(' + arc.centroid(d) + ')';
