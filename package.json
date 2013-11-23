@@ -9,9 +9,12 @@
     "grunt-contrib-uglify": "*",
     "grunt-contrib-cssmin": "*",
     "grunt-contrib-copy": "*",
-    "grunt-contrib-clean": "*"
+    "grunt-contrib-clean": "*",
+    "grunt-html2js": "~0.1.9"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

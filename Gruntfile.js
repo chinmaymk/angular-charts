@@ -15,9 +15,6 @@ module.exports = function(grunt) {
       }
     },
     uglify : {
-      options: {
-        mangle: false
-      },
       dist: {
         src: 'dist/angular-charts.js',
         dest: 'dist/angular-charts.min.js'
@@ -27,12 +24,25 @@ module.exports = function(grunt) {
     watch: {
         scripts: {
         files: ['src/**/*.js'],
-        tasks: ['ngmin', 'concat','uglify','clean'],
+        tasks: ['ngmin', 'html2js', 'concat', 'uglify', 'clean'],
         options: {
           debounceDelay: 250,
         },
       }
-    }
+    },
+    html2js: {
+      options: {
+        base : 'src/templates',
+        module : 'angularChartsTemplates',
+        rename : function(name) {
+          return name.replace('.html', '')
+        }
+      },
+      main: {
+        src: ['src/templates/*.html'],
+        dest: 'build/templates.js'
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -42,7 +52,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-html2js');
 
-  grunt.registerTask('default', ['ngmin', 'concat', 'uglify', 'clean']);
+  grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
   
 };

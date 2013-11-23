@@ -2,10 +2,17 @@
 angular.module('example', ['angularCharts']);
 
 function MainController($scope, $interval) {
-	$scope.greeting = "Hello World";
-	$scope.data = [123,43,234,140,456,170];
+	$scope.data = {
+		series: ['Computers', 'Mobiles', 'Chairs', 'Laptops', 'Keyboards'],
+		data :[{ y: [123], x: 'title', tooltip: 'One two three'},
+		{ y: [43], x: 'title', tooltip: 'Four three'},
+		{ y: [234], x: 'title'},
+		{ y: [140], x: 'title', tooltip: '140'},
+		{ y: [456], x: 'title', tooltip: '456'},
+		{ y: [170], x: 'title', tooltip: '170'}]
+	}
 
-	// $interval(function(){
-	// 	$scope.data.push(Math.random() * 1000);
-	// },500)
+	$scope.config = {
+		labels: true
+	}
 }
