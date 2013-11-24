@@ -7,10 +7,7 @@
 			font-family: "helvetica";
 			color : #333;
 		}
-		text {
-			fill:#333;
-		}
-		.charts div {
+		.chart {
 			float:left;
 			width: 50%;
 			height:400px;
@@ -18,12 +15,15 @@
 	</style>
 </head>
 <body ng-controller='MainController'>
+	
+	<select ng-model='chartType'>
+		<option value="pie">pie</option>
+		<option value="bar">bar</option>
+		<option value="line">line</option>
+	</select>
 
 	<div class='charts'>
-		<div ac-chart="pie" ac-data="data" ac-config="config" id='chart'></div>
-	</div>
-	<div>
-		<div ng-repeat="d in data.data">{{d.y}}</div>
+		<div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
 	</div>
 
 	<script type="text/javascript" src="../bower_components/jquery/jquery.min.js"></script>

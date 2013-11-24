@@ -23,7 +23,7 @@ module.exports = function(grunt) {
     clean : ["build"],
     watch: {
         scripts: {
-        files: ['src/**/*.js'],
+        files: ['src/**/*.js', 'src/**/*.html'],
         tasks: ['ngmin', 'html2js', 'concat', 'uglify', 'clean'],
         options: {
           debounceDelay: 250,

@@ -1,4 +1,3 @@
-
 <style>
 	.axis path,
 	.axis line {
@@ -8,17 +7,18 @@
 	}
 	.ac-line {
 		fill:none;
+		stroke-width:2px;
 	}
 </style>
 
 <div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{config.title}}</div>
+<div class='ac-chart' style='float:left; width:75%;'>
+</div>
 <div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{config.legend.display}}'>
 	<table style='list-style:none;margin:0px;padding:0px;'>
-	<tr ng-repeat="l in legends">
+	<tr ng-repeat="l in legends | limitTo:yMaxData">
 		<td><div style='background:{{l.color}}; height:15px;width:15px;'></div></td>
 		<td style=' display: inline-block;' ng-bind='l.title'></td>
 	</tr>
 	</table>
-</div>
-<div class='ac-chart' style='float:left; width:75%;'>
 </div>
