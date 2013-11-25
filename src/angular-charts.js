@@ -316,6 +316,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .ticks(5);
 
       var line = d3.svg.line()
+          .interpolate("cardinal")
           .x(function(d) { return x(d.x); })
           .y(function(d) { return y(d.y); });
 
@@ -373,31 +374,55 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .x(function(d) { return x(x.domain()[0]); })
             .y(function(d) { return y(0); })
 
-      point.attr("points", "points")
+      path = point.attr("points", "points")
         .append("path")
         .attr("class", "ac-line")
         .style("stroke", function(d,i) { return getColor(i); })
-        .attr("d", function(d) { return startvalueline2(d.values) })
-        .transition()
+        .attr("d", "");
+      
+      var totalLength = path.node().getTotalLength();
+      path.attr("stroke-dasharray", totalLength + " " + totalLength)
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+        .duration(2000)
         .ease("linear")
-        .duration(500)
-        .attr("d", function(d) { return line(d.values) })
+        .attr("stroke-dashoffset", 0)
+        .attr("d", function(d) { return line(d.values) });
       
-      point.on("mouseover", function(d) {
-          makeToolTip(d.series, event);
-      });
-      point.on("mouseleave", function(d) {
-          removeToolTip();
-      });
-      point.on("mousemove", function(d) {
-          updateToolTip(event);
+      angular.forEach(linedata, function(value, key){
+        var points = svg.selectAll('.circle')
+          .data(value.values)
+        .enter();
+
+        points.append("circle")
+          .attr("cx", function(d) {return x(d.x)} ) 
+          .attr("cy", function(d) {return y(d.y)} ) 
+          .attr("r", 3)
+          .style("fill", getColor(linedata.indexOf(value)))
+          .style("stroke", getColor(linedata.indexOf(value)))
+          .on("mouseover", function(d) {
+              makeToolTip(d.tooltip || d.y, event);
+          })
+          .on("mouseleave", function(d) {
+              removeToolTip();
+          })
+          .on("mousemove", function(d) {
+              updateToolTip(event);
+          });
+
+          if(config.labels) {
+            points.append("text")
+            .attr("x", function(d) {return x(d.x)} ) 
+            .attr("y", function(d) {return y(d.y)} )
+            .text(function(d){return d.y});
+          }
       });
       
+     
       point.append("text")
         .datum(function(d) { return {name: d.series, value: d.values[d.values.length - 1]}; })
         .attr("transform", function(d) { return "translate(" + x(d.value.x) + "," + y(d.value.y) + ")"; })
         .attr("x", 3)
-        .attr("dy", ".35em")
         .text(function(d) { return d.name; });
     }
 
