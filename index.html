@@ -70,13 +70,13 @@
   <div class="container" ng-controller='MainController'>
 
     <div id='#main' class="row">
-      <div>
+      <div class='col-xs-12 col-md-12'>
        <h3>angular directives for commonly used d3 charts</h3>
        <div>Charts make reading data easy, so should be coding:
        </div>
      </div>
      <hr>
-     <div class="col-xs-6">
+     <div class="col-xs-12 col-md-6">
        <div class="row" >
         <b>Chart type: </b>
         <select ng-model='chartType' class='input'>
@@ -92,7 +92,7 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-6 well">
+    <div class="col-xs-12 col-md-6 well">
       <b>Chart type:</b> {{chartType}} 
       <br>
       <b>Config:</b>
@@ -268,7 +268,8 @@ var config = {
     <li>onmouseclick</li>
   </ul>
   <div class="row">
-      <pre>
+    <div class="col-xs-12 col-md-12">
+      <pre >
         <code>
 click : function(d) {
   $scope.messages.push('clicked!');
@@ -281,12 +282,13 @@ mouseout : function(d) {
 }
         </code>
       </pre>
-    <div class='col-xs-6'>
+      </div>
+    <div class='col-xs-12 col-md-6'>
       <div class="charts">
         <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
       </div>
     </div>
-    <div class='col-xs-6'>
+    <div class='col-xs-12 col-md-6'>
       <button class='btn' ng-click="messages = []">Clear</button>
       <p></p>
       <div class="well">

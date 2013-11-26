@@ -5,20 +5,20 @@ function MainController($scope) {
 	$scope.data = {
 		series: ['Sales', 'Income', 'Expense'],
 		data : [{
-			x : "Computers",
+			x : "Jack",
 			y: [100,210, 384],
 			tooltip:"this is tooltip"
 		},
 		{
-			x : "Servers",
+			x : "John",
 			y: [300, 289, 456]
 		},
 		{
-			x : "Mobiles",
+			x : "Stacy",
 			y: [351, 170, 255]
 		},
 		{
-			x : "Laptops",
+			x : "Luke",
 			y: [54, 341, 879]
 		}]     
 	}
