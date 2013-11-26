@@ -857,7 +857,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     //add some watchers
     scope.$watch(attrs.acChart, function(){ init(); }, true);
     scope.$watch(attrs.acData, function(){ init(); }, true);
-    scope.$watch(attrs.acConfig, function(){ isAnimate = false; init(); }, true);
+    scope.$watch(attrs.acConfig, function(){ init(); }, true);
   }
 
   return {

@@ -603,7 +603,6 @@ angular.module('angularCharts').directive('acChart', [
         init();
       }, true);
       scope.$watch(attrs.acConfig, function () {
-        isAnimate = false;
         init();
       }, true);
     }
