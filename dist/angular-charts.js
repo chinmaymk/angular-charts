@@ -96,7 +96,8 @@ angular.module('angularCharts').directive('acChart', [
             'pie': pieChart,
             'bar': barChart,
             'line': lineChart,
-            'area': areaChart
+            'area': areaChart,
+            'point': pointChart
           };
         return charts[type];
       }
@@ -149,7 +150,7 @@ angular.module('angularCharts').directive('acChart', [
           x.rangeBand()
         ]);
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
-        var yAxis = d3.svg.axis().scale(y).orient('left').ticks(10);
+        var yAxis = d3.svg.axis().scale(y).orient('left').ticks(10).tickFormat(d3.format('s'));
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
@@ -160,31 +161,52 @@ angular.module('angularCharts').directive('acChart', [
             return d.nicedata;
           }).enter().append('rect');
         bars.attr('width', x0.rangeBand());
-        bars.attr('x', function (d, i) {
-          return x0(i);
-        }).attr('y', height).style('fill', function (d) {
-          return getColor(d.s);
-        }).attr('height', 0).transition().ease('cubic-in-out').duration(1000).attr('y', function (d) {
-          return y(Math.max(0, d.y));
-        }).attr('height', function (d) {
-          return Math.abs(y(d.y) - y(0));
-        });
+        if (config.animate) {
+          bars.attr('x', function (d, i) {
+            return x0(i);
+          }).attr('y', height).style('fill', function (d) {
+            return getColor(d.s);
+          }).attr('height', 0).transition().ease('cubic-in-out').duration(1000).attr('y', function (d) {
+            return y(Math.max(0, d.y));
+          }).attr('height', function (d) {
+            return Math.abs(y(d.y) - y(0));
+          });
+        } else {
+          bars.attr('x', function (d, i) {
+            return x0(i);
+          }).style('fill', function (d) {
+            return getColor(d.s);
+          }).attr('y', function (d) {
+            return y(Math.max(0, d.y));
+          }).attr('height', function (d) {
+            return Math.abs(y(d.y) - y(0));
+          });
+        }
         bars.on('mouseover', function (d) {
           makeToolTip(d.tooltip || d.y, event);
+          config.mouseover(d, event);
+          scope.$apply();
         }).on('mouseleave', function (d) {
           removeToolTip();
+          config.mouseout(d, event);
+          scope.$apply();
         }).on('mousemove', function (d) {
           updateToolTip(event);
+        }).on('click', function (d) {
+          config.click.call(d, event);
+          scope.$apply();
         });
-        barGroups.selectAll('not-a-class').data(function (d) {
-          return d.nicedata;
-        }).enter().append('text').attr('x', function (d, i) {
-          return x0(i);
-        }).attr('y', function (d) {
-          return height - Math.abs(y(d.y) - y(0));
-        }).text(function (d) {
-          return d.y;
-        });
+        if (config.labels) {
+          barGroups.selectAll('not-a-class').data(function (d) {
+            return d.nicedata;
+          }).enter().append('text').attr('x', function (d, i) {
+            return x0(i);
+          }).attr('y', function (d) {
+            return height - Math.abs(y(d.y) - y(0));
+          }).text(function (d) {
+            return d.y;
+          });
+        }
         svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
       }
       function lineChart() {
@@ -196,20 +218,20 @@ angular.module('angularCharts').directive('acChart', [
           };
         width -= margin.left - margin.right;
         height -= margin.top - margin.bottom;
-        var x = d3.scale.ordinal().rangeRoundBands([
+        var x = d3.scale.ordinal().domain(points.map(function (d) {
+            return d.x;
+          })).rangeRoundBands([
             0,
             width
-          ]).domain(points.map(function (d) {
-            return d.x;
-          }));
+          ]);
         var y = d3.scale.linear().range([
             height,
             10
           ]);
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
-        var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5);
+        var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
         var line = d3.svg.line().interpolate('cardinal').x(function (d) {
-            return x(d.x);
+            return getX(d.x);
           }).y(function (d) {
             return y(d.y);
           });
@@ -239,7 +261,6 @@ angular.module('angularCharts').directive('acChart', [
           });
           linedata.push(d);
         });
-        console.log(linedata);
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         var padding = d3.max(yData) * 0.2;
         y.domain([
@@ -249,34 +270,39 @@ angular.module('angularCharts').directive('acChart', [
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
-        var startvalueline2 = d3.svg.line().x(function (d) {
-            return x(x.domain()[0]);
-          }).y(function (d) {
-            return y(0);
-          });
         path = point.attr('points', 'points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
           return getColor(i);
-        }).attr('d', '');
-        var totalLength = path.node().getTotalLength();
-        path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(2000).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
+        }).attr('d', function (d) {
+          return line(d.values);
+        }).attr('stroke-width', '2').attr('fill', 'none');
+        var last = linedata[linedata.length - 1].values;
+        var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
+        path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(1500).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
           return line(d.values);
         });
         angular.forEach(linedata, function (value, key) {
           var points = svg.selectAll('.circle').data(value.values).enter();
           points.append('circle').attr('cx', function (d) {
-            return x(d.x);
+            return getX(d.x);
           }).attr('cy', function (d) {
             return y(d.y);
           }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
             makeToolTip(d.tooltip || d.y, event);
+            config.mouseover(d, event);
+            scope.$apply();
           }).on('mouseleave', function (d) {
             removeToolTip();
+            config.mouseout(d, event);
+            scope.$apply();
           }).on('mousemove', function (d) {
             updateToolTip(event);
+          }).on('click', function (d) {
+            config.click(d, event);
+            scope.$apply();
           });
           if (config.labels) {
             points.append('text').attr('x', function (d) {
-              return x(d.x);
+              return getX(d.x);
             }).attr('y', function (d) {
               return y(d.y);
             }).text(function (d) {
@@ -290,12 +316,94 @@ angular.module('angularCharts').directive('acChart', [
             value: d.values[d.values.length - 1]
           };
         }).attr('transform', function (d) {
-          return 'translate(' + x(d.value.x) + ',' + y(d.value.y) + ')';
+          return 'translate(' + getX(d.value.x) + ',' + y(d.value.y) + ')';
         }).attr('x', 3).text(function (d) {
           return d.name;
         });
+        function getX(d) {
+          return Math.round(x(d)) + x.rangeBand() / 2;
+        }
+        ;
+        return linedata;
       }
       function areaChart() {
+        var margin = {
+            top: 0,
+            right: 40,
+            bottom: 20,
+            left: 40
+          };
+        width -= margin.left - margin.right;
+        height -= margin.top - margin.bottom;
+        var x = d3.scale.ordinal().domain(points.map(function (d) {
+            return d.x;
+          })).rangeRoundBands([
+            0,
+            width
+          ]);
+        var y = d3.scale.linear().range([
+            height,
+            10
+          ]);
+        var xAxis = d3.svg.axis().scale(x).orient('bottom');
+        var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
+        var line = d3.svg.line().interpolate('cardinal').x(function (d) {
+            return getX(d.x);
+          }).y(function (d) {
+            return y(d.y);
+          });
+        var yData = [0];
+        var linedata = [];
+        points.forEach(function (d) {
+          d.y.map(function (e, i) {
+            yData.push(e);
+          });
+        });
+        var yMaxPoints = d3.max(points.map(function (d) {
+            return d.y.length;
+          }));
+        scope.yMaxData = yMaxPoints;
+        series.slice(0, yMaxPoints).forEach(function (value, index) {
+          var d = {};
+          d.series = value;
+          d.values = points.map(function (point) {
+            return point.y.map(function (e) {
+              return {
+                x: point.x,
+                y: e
+              };
+            })[index] || {
+              x: points[index].x,
+              y: 0
+            };
+          });
+          linedata.push(d);
+        });
+        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        var padding = d3.max(yData) * 0.2;
+        y.domain([
+          d3.min(yData),
+          d3.max(yData) + padding
+        ]);
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        svg.append('g').attr('class', 'y axis').call(yAxis);
+        var point = svg.selectAll('.points').data(linedata).enter().append('g');
+        var area = d3.svg.area().interpolate('basis').x(function (d) {
+            return getX(d.x);
+          }).y0(function (d) {
+            return y(0);
+          }).y1(function (d) {
+            return y(0 + d.y);
+          });
+        point.append('path').attr('class', 'area').attr('d', function (d) {
+          return area(d.values);
+        }).style('fill', function (d, i) {
+          return getColor(i);
+        }).style('opacity', '0.7');
+        function getX(d) {
+          return Math.round(x(d)) + x.rangeBand() / 2;
+        }
+        ;
       }
       function pieChart() {
         var radius = Math.min(width, height) / 2;
@@ -313,11 +421,18 @@ angular.module('angularCharts').directive('acChart', [
         path.on('mouseover', function (d) {
           makeToolTip(d.data.tooltip || d.data.y[0]);
           d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
+          config.onmouseover(d, event);
+          scope.$apply();
         }).on('mouseleave', function (d) {
           d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
           removeToolTip();
+          config.onmouseout(d, event);
+          scope.$apply();
         }).on('mousemove', function (d) {
           updateToolTip(event);
+        }).on('click', function (d) {
+          config.click(d, event);
+          scope.$apply();
         });
         if (!!config.labels) {
           path.append('text').attr('transform', function (d) {
@@ -336,6 +451,97 @@ angular.module('angularCharts').directive('acChart', [
             return arc(i(t));
           };
         }
+      }
+      function pointChart() {
+        var margin = {
+            top: 0,
+            right: 40,
+            bottom: 20,
+            left: 40
+          };
+        width -= margin.left - margin.right;
+        height -= margin.top - margin.bottom;
+        var x = d3.scale.ordinal().domain(points.map(function (d) {
+            return d.x;
+          })).rangeRoundBands([
+            0,
+            width
+          ]);
+        var y = d3.scale.linear().range([
+            height,
+            10
+          ]);
+        var xAxis = d3.svg.axis().scale(x).orient('bottom');
+        var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
+        var yData = [0];
+        var linedata = [];
+        points.forEach(function (d) {
+          d.y.map(function (e, i) {
+            yData.push(e);
+          });
+        });
+        var yMaxPoints = d3.max(points.map(function (d) {
+            return d.y.length;
+          }));
+        series.slice(0, yMaxPoints).forEach(function (value, index) {
+          var d = {};
+          d.series = value;
+          d.values = points.map(function (point) {
+            return point.y.map(function (e) {
+              return {
+                x: point.x,
+                y: e
+              };
+            })[index] || {
+              x: points[index].x,
+              y: 0
+            };
+          });
+          linedata.push(d);
+        });
+        var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        var padding = d3.max(yData) * 0.2;
+        y.domain([
+          d3.min(yData),
+          d3.max(yData) + padding
+        ]);
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        svg.append('g').attr('class', 'y axis').call(yAxis);
+        var point = svg.selectAll('.points').data(linedata).enter().append('g');
+        angular.forEach(linedata, function (value, key) {
+          var points = svg.selectAll('.circle').data(value.values).enter();
+          points.append('circle').attr('cx', function (d) {
+            return getX(d.x);
+          }).attr('cy', function (d) {
+            return y(d.y);
+          }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
+            makeToolTip(d.tooltip || d.y, event);
+            config.mouseover(d, event);
+            scope.$apply();
+          }).on('mouseleave', function (d) {
+            removeToolTip();
+            config.mouseout(d, event);
+            scope.$apply();
+          }).on('mousemove', function (d) {
+            updateToolTip(event);
+          }).on('click', function (d) {
+            config.click(d, event);
+            scope.$apply();
+          });
+          if (config.labels) {
+            points.append('text').attr('x', function (d) {
+              return getX(d.x);
+            }).attr('y', function (d) {
+              return y(d.y);
+            }).text(function (d) {
+              return d.y;
+            });
+          }
+        });
+        function getX(d) {
+          return Math.round(x(d)) + x.rangeBand() / 2;
+        }
+        ;
       }
       function makeToolTip(data, event) {
         if (!config.tooltips) {
@@ -365,7 +571,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if (chartType == 'bar') {
+        if (chartType == 'bar' || chartType == 'area') {
           angular.forEach(series, function (value, key) {
             scope.legends.push({
               color: colors[key],
@@ -416,11 +622,11 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
     "	.axis path,\n" +
     "	.axis line {\n" +
     "	  fill: none;\n" +
-    "	  stroke: #000;\n" +
-    "	  shape-rendering: crispEdges;\n" +
+    "	  stroke: #333;\n" +
     "	}\n" +
     "	.ac-line {\n" +
     "		fill:none;\n" +
+    "		stroke-width:2px;\n" +
     "	}\n" +
     "</style>\n" +
     "\n" +
@@ -443,8 +649,7 @@ angular.module("right", []).run(["$templateCache", function($templateCache) {
     "	.axis path,\n" +
     "	.axis line {\n" +
     "	  fill: none;\n" +
-    "	  stroke: #000;\n" +
-    "	  shape-rendering: crispEdges;\n" +
+    "	  stroke: #333;\n" +
     "	}\n" +
     "	.ac-line {\n" +
     "		fill:none;\n" +
