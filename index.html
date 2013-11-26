@@ -1,56 +1,322 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" ng-app="example">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Angular-charts : angular directives for common charts using d3" />
+  <title>Angular-charts</title>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.css" rel="stylesheet">
 
-    <title>Angular-charts</title>
-  </head>
+  <!-- Custom CSS for the 'Heroic Features' Template -->
+  <link href="css/heroic-features.css" rel="stylesheet">
+  <style type="text/css">
+  .chart {
+    height:500px;
+  }
+  .string { color: green; }
+  .number { color: darkorange; }
+  .boolean { color: blue; }
+  .null { color: magenta; }
+  .key { color: red; }
+  .section {
+    padding-top: 50px;
+  }
+  </style>
+</head>
 
-  <body>
+<body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/chinmaymk/angular-charts">View on GitHub</a>
+  <header class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Angular-charts</a>
+      </div>
+       <nav class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="#features">Features</a>
+          </li>
+          <li>
+            <a href="#install">Installation</a>
+          </li>
+          <li>
+            <a href="#config">Config</a>
+          </li>
+          <li>
+            <a href="#data">Data</a>
+          </li>
+          <li>
+            <a href="#events">Events</a>
+          </li>
+          <li>
+            <a href="">
+              <iframe 
+              src="http://ghbtns.com/github-btn.html?user=chinmaymk&repo=angular-charts&type=watch&count=true"  allowtransparency="true" 
+              frameborder="0" scrolling="0" width="90" height="20"></iframe>
+              <iframe 
+              src="http://ghbtns.com/github-btn.html?user=chinmaymk&repo=angular-charts&type=fork&count=true"  allowtransparency="true" 
+              frameborder="0" scrolling="0" width="75" height="20"></iframe>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div><!-- /.container -->
+  </header>
+  
+  <div class="container" ng-controller='MainController'>
 
-          <h1 id="project_title">Angular-charts</h1>
-          <h2 id="project_tagline">angular directives for common charts using d3</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/chinmaymk/angular-charts/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/chinmaymk/angular-charts/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+    <div id='#main' class="row">
+      <div>
+       <h3>angular directives for commonly used d3 charts</h3>
+       <div>Charts make reading data easy, so should be coding:
+       </div>
+     </div>
+     <hr>
+     <div class="col-xs-6">
+       <div class="row" >
+        <b>Chart type: </b>
+        <select ng-model='chartType' class='input'>
+          <option value="pie">Pie</option>
+          <option value="bar">Bar</option>
+          <option value="line">Line</option>
+          <option value="point">Point</option>
+          <option value="area">Area</option>
+        </select>
+        <p></p>
+        <div class='charts'>
+          <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
+        </div>
+      </div>
     </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a name="angular-charts" class="anchor" href="#angular-charts"><span class="octicon octicon-link"></span></a>angular-charts</h1>
-
-<p>angular directives for common charts using d3</p>
-
-<p>Note: this is under development, will give out a stable release by first week of december</p>
-
-<p><a href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/ChinmayMK/angular-charts/trend.png" alt="Bitdeli Badge"></a></p>
-      </section>
+    <div class="col-xs-6 well">
+      <b>Chart type:</b> {{chartType}} 
+      <br>
+      <b>Config:</b>
+      <pre ng-bind-html-unsafe="syntaxHighlight(config)"></pre>
+      <b>Series:</b>
+      <pre ng-bind-html-unsafe="syntaxHighlight(data.series)"></pre>
+      <b>Sample data:</b>
+      <pre ng-bind-html-unsafe="syntaxHighlight(sampledata)"></pre>
     </div>
+  </div><!-- /.row -->
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Angular-charts maintained by <a href="https://github.com/chinmaymk">chinmaymk</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
+  <hr>
+
+  <div id="features" class='section'>
+    <h3>Features</h3>
+    <ul class='unstyled list-group'>
+      <li class='list-group-item'>One click chart change</li>
+      <li class='list-group-item'>Tiny - 13kb minified</li>
+      <li class='list-group-item'>Auto tooltips</li>
+      <li class='list-group-item'>Auto h,w dimensions</li>
+      <li class='list-group-item'>Beautiful animations</li>
+      <li class='list-group-item'>Callback events</li>
+      <li class='list-group-item'>Simple data format</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <div id="install" class='section'>
+    <h3>Installation</h3>
+    <div>Installation is very straight forward. Grab the latest zip from <a href="https://github.com/chinmaymk/angular-charts">github</a>. Copy angular-chart.min.js in your root, and refer it in your page.</div>
+    <p class='well'>
+      <code>
+        &ltscript type='text/javascript' href='path/to/js/angular-charts.min.js'&gt&lt/script&gt
+      </code>
+    </p>
+    <p>Add as dependency in your module</p>
+    <p class='well'>
+      <code>
+        angular.module('yourApp', ['angularCharts']);
+      </code>
+    </p>
+    <div>
+      <b>Dependencies</b>
+      <ul class='unstyled'>
+        <li><a href="http://angularjs.org/">Angular</a></li>
+        <li><a href="http://d3js.org/">d3</a></li>
+        <li><a href="http://jquery.com/">JQuery</a></li>
+      </ul>
     </div>
+    Bower package coming soon.
+  </div>
 
-    
+  <hr>
 
-  </body>
+  <div id="config" class='section'>
+    <h3>Configuration</h3>
+    <b>Directive syntax</b>
+    <p class="well">
+      <code>
+        &ltdiv ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'&gt&lt/div&gt
+      </code>
+    </p>
+    <p>
+      Note: chartType, data and config are properties of scope. Not the actual values.
+    </p>
+    <table class="table">
+      <th>Attribute</th>
+      <th>Type</th>
+      <th>Values</th>
+      <tr>
+        <td>ac-chart</td>  
+        <td>string</td>  
+        <td>'pie', 'bar', 'line', 'point', 'area'</td>
+      </tr>
+      <tr>
+        <td>ac-config</td>  
+        <td>object</td>  
+        <td>
+          <pre>
+            <code>
+var config = {
+  title : '',
+  tooltips: true,
+  labels : false,
+  mouseover: function() {},
+  mouseout: function() {},
+  click: function() {},
+  legend: {
+    display: true,
+    //could be 'left, right'
+    position: 'left'
+  }
+}
+        </code>
+      </pre>
+    </td>
+  </tr>
+  <tr>
+    <td>ac-data</td>  
+    <td>array</td>  
+    <td>Refer <a href="#data">data</a> section for more details</td>
+  </tr>
+</table>
+<b>Config options</b>
+<table class='table'>
+  <th>Property</th>
+  <th>Type</th>
+  <th>Description</th>
+  <tr>
+    <td>title</td>
+    <td>string</td>
+    <td>Title for the chart</td>
+  </tr>
+  <tr>
+    <td>tooltips</td>
+    <td>bool</td>
+    <td>turn on/off tooltips</td>
+  </tr>
+  <tr>
+    <td>labels</td>
+    <td>bool</td>
+    <td>turn on/off labels for data points</td>
+  </tr>
+  <tr>
+    <td>legend</td>
+    <td>object</td>
+    <td>
+      configures legend
+      <div><code>legend.display</code> decides if to show the legend</div>
+      <div><code>legend.position</code> decides where to show the legend (left or right)</div>
+    </td>
+  </tr>
+  <tr>
+    <td>mouseover</td>
+    <td>function</td>
+    <td>
+      configures legend
+      <div><code>legend.display</code> decides if to show the legend</div>
+      <div><code>legend.position</code> decides where to show the legend (left or right)</div>
+    </td>
+  </tr>
+</table>
+</div>
+
+<div id="data" class="section">
+  <h3>Data</h3>
+  <div>
+    Data structure is very simple, it is divided in two root level objects
+    <code>series</code> and <code>data</code>
+  </div>
+  <b>Series</b>
+  <div>Series is an simple array of strings</div>
+  <pre ng-bind-html-unsafe="syntaxHighlight(data.series)"></pre>
+  <b>Data</b>
+  <pre ng-bind-html-unsafe="syntaxHighlight(sampledata)"></pre>
+  <p>x defines what goes on x axis, must be a string</p>
+  <p>y defines what goes on y axis, must be an array of numbers. These values are mapped to series by index. <code>y[0] belongs to series[0], y[1] belongs to series[1]</code> and so on.</p>
+  <p>tooltip is optional</p>
+  <div>Entire data structure looks like this</div>
+  <pre ng-bind-html-unsafe="syntaxHighlight(combinedsample)"></pre>
+  <p>Note: <code>series</code> and <code>data</code> are arrays</p>
+</div>
+
+<hr>
+
+<div id="events" class='section'>
+  <h3>Events</h3>
+  Three events are exposed via config objects.
+  <ul>
+    <li>onmouseover</li>
+    <li>onmouseout</li>
+    <li>onmouseclick</li>
+  </ul>
+  <div class="row">
+      <pre>
+        <code>
+click : function(d) {
+  $scope.messages.push('clicked!');
+},
+mouseover : function(d) {
+  $scope.messages.push('mouseover!');
+},
+mouseout : function(d) {
+  $scope.messages.push('mouseout!');
+}
+        </code>
+      </pre>
+    <div class='col-xs-6'>
+      <div class="charts">
+        <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
+      </div>
+    </div>
+    <div class='col-xs-6'>
+      <button class='btn' ng-click="messages = []">Clear</button>
+      <p></p>
+      <div class="well">
+        <div ng-repeat="m in messages track by $index">
+          {{m}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+<footer>
+  <div class="row">
+    <div class="col-lg-12">
+      <p>Copyright &copy; Chinmay Kulkarni 2013</p>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<!-- JavaScript -->
+<script src="js/jquery-1.10.2.js"></script>
+<!-- <script src="js/bootstrap.js"></script> -->
+<script src="js/angular.min.js"></script>
+<script src="js/d3.min.js"></script>
+<script src="js/angular-charts.min.js"></script>
+<script src="js/main.controller.js"></script>
+<script type="text/javascript">
+</script>
+</body>
 </html>
