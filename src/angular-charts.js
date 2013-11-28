@@ -23,20 +23,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                 "color:#fff;"].join('');
 
   var colors = ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
-
-  var config = {
-    title : '',
-    tooltips: true,
-    labels : false,
-    mouseover: function() {},
-    mouseout: function() {},
-    click: function() {},
-    legend: {
-      display: true,
-      //could be 'left, right'
-      position: 'left'
-    }
-  }
+ 
   /**
    * Utility function to call when we run out of colors!
    * @return {[type]} [description]
@@ -58,6 +45,21 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
    * @return {[type]}         [description]
    */
   function link(scope, element, attrs) {
+
+    var config = {
+      title : '',
+      tooltips: true,
+      labels : false,
+      mouseover: function() {},
+      mouseout: function() {},
+      click: function() {},
+      legend: {
+        display: true,
+        //could be 'left, right'
+        position: 'left'
+      }
+    }
+
     var totalWidth = element.width(), totalHeight = element.height();
     var data, 
     series, 
@@ -78,8 +80,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function init() {
-      data = scope[attrs.acData];
-      chartType = scope[attrs.acChart];
       prepareData();
       setHeightWidth();
       setContainers()
@@ -128,11 +128,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function prepareData() {
+      data = scope.acData;
+      chartType = scope.acChart;
       series = data.series;
       points = data.data;
       if(!!scope[attrs.acConfig]) {
-        angular.extend(config, scope[attrs.acConfig]);
-        scope.config = config;
+        angular.extend(config, scope.acConfig);
       }
     }
 
@@ -162,8 +163,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @type {Object}
        */
       var margin = {top: 0, right: 20, bottom: 30, left: 40};
-          width -=  margin.left - margin.right;
-          height -= margin.top - margin.bottom;
+          width -=  margin.left + margin.right;
+          height -= margin.top + margin.bottom;
 
       var x = d3.scale.ordinal()
           .rangeRoundBands([0, width], .1);
@@ -317,8 +318,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      */
     function lineChart() {
       var margin = {top: 0, right: 40, bottom: 20, left: 40};
-          width -= margin.left - margin.right;
-          height -=  margin.top - margin.bottom;
+          width -= margin.left + margin.right;
+          height -=  margin.top + margin.bottom;
 
       var x = d3.scale.ordinal()
             .domain(points.map(function(d) { return d.x; }))
@@ -482,8 +483,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
     function areaChart() {
       var margin = {top: 0, right: 40, bottom: 20, left: 40};
-          width -= margin.left - margin.right;
-          height -=  margin.top - margin.bottom;
+          width -= margin.left + margin.right;
+          height -=  margin.top + margin.bottom;
 
       var x = d3.scale.ordinal()
             .domain(points.map(function(d) { return d.x; }))
@@ -855,13 +856,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     // let the party being!
     //init();
     //add some watchers
-    scope.$watch(attrs.acChart, function(){ init(); }, true);
-    scope.$watch(attrs.acData, function(){ init(); }, true);
-    scope.$watch(attrs.acConfig, function(){ init(); }, true);
+    console.log(scope.acChart);
+    scope.$watch('acChart', function(){ console.log('watcher chart'); init(); }, true);
+    scope.$watch('acData', function(){ init(); }, true);
+    scope.$watch('acConfig', function(){ init(); }, true);
   }
 
   return {
     restrict:'EA',
-    link : link
+    link : link,
+    transclude: 'true',
+    scope: {
+      acChart : '=',
+      acData : '=',
+      acConfig: '='
+    }
   } 
 });

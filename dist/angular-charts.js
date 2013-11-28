@@ -21,21 +21,6 @@ angular.module('angularCharts').directive('acChart', [
         'rgb(73,66,204)',
         'rgb(0,128,0)'
       ];
-    var config = {
-        title: '',
-        tooltips: true,
-        labels: false,
-        mouseover: function () {
-        },
-        mouseout: function () {
-        },
-        click: function () {
-        },
-        legend: {
-          display: true,
-          position: 'left'
-        }
-      };
     function getRandomColor() {
       var letters = '0123456789ABCDEF'.split('');
       var color = '#';
@@ -45,11 +30,24 @@ angular.module('angularCharts').directive('acChart', [
       return color;
     }
     function link(scope, element, attrs) {
+      var config = {
+          title: '',
+          tooltips: true,
+          labels: false,
+          mouseover: function () {
+          },
+          mouseout: function () {
+          },
+          click: function () {
+          },
+          legend: {
+            display: true,
+            position: 'left'
+          }
+        };
       var totalWidth = element.width(), totalHeight = element.height();
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true;
       function init() {
-        data = scope[attrs.acData];
-        chartType = scope[attrs.acChart];
         prepareData();
         setHeightWidth();
         setContainers();
@@ -84,11 +82,12 @@ angular.module('angularCharts').directive('acChart', [
         height -= element.find('.ac-title').height();
       }
       function prepareData() {
+        data = scope.acData;
+        chartType = scope.acChart;
         series = data.series;
         points = data.data;
         if (!!scope[attrs.acConfig]) {
-          angular.extend(config, scope[attrs.acConfig]);
-          scope.config = config;
+          angular.extend(config, scope.acConfig);
         }
       }
       function getChartFunction(type) {
@@ -108,8 +107,8 @@ angular.module('angularCharts').directive('acChart', [
             bottom: 30,
             left: 40
           };
-        width -= margin.left - margin.right;
-        height -= margin.top - margin.bottom;
+        width -= margin.left + margin.right;
+        height -= margin.top + margin.bottom;
         var x = d3.scale.ordinal().rangeRoundBands([
             0,
             width
@@ -216,8 +215,8 @@ angular.module('angularCharts').directive('acChart', [
             bottom: 20,
             left: 40
           };
-        width -= margin.left - margin.right;
-        height -= margin.top - margin.bottom;
+        width -= margin.left + margin.right;
+        height -= margin.top + margin.bottom;
         var x = d3.scale.ordinal().domain(points.map(function (d) {
             return d.x;
           })).rangeRoundBands([
@@ -333,8 +332,8 @@ angular.module('angularCharts').directive('acChart', [
             bottom: 20,
             left: 40
           };
-        width -= margin.left - margin.right;
-        height -= margin.top - margin.bottom;
+        width -= margin.left + margin.right;
+        height -= margin.top + margin.bottom;
         var x = d3.scale.ordinal().domain(points.map(function (d) {
             return d.x;
           })).rangeRoundBands([
@@ -596,19 +595,27 @@ angular.module('angularCharts').directive('acChart', [
           'w': w.width()
         };
       };
-      scope.$watch(attrs.acChart, function () {
+      console.log(scope.acChart);
+      scope.$watch('acChart', function () {
+        console.log('watcher chart');
         init();
       }, true);
-      scope.$watch(attrs.acData, function () {
+      scope.$watch('acData', function () {
         init();
       }, true);
-      scope.$watch(attrs.acConfig, function () {
+      scope.$watch('acConfig', function () {
         init();
       }, true);
     }
     return {
       restrict: 'EA',
-      link: link
+      link: link,
+      transclude: 'true',
+      scope: {
+        acChart: '=',
+        acData: '=',
+        acConfig: '='
+      }
     };
   }
 ]);
@@ -629,8 +636,8 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
     "	}\n" +
     "</style>\n" +
     "\n" +
-    "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{config.title}}</div>\n" +
-    "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{config.legend.display}}'>\n" +
+    "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
+    "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
     "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
     "	<tr ng-repeat=\"l in legends\">\n" +
     "		<td><div style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
@@ -656,10 +663,10 @@ angular.module("right", []).run(["$templateCache", function($templateCache) {
     "	}\n" +
     "</style>\n" +
     "\n" +
-    "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{config.title}}</div>\n" +
+    "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
     "<div class='ac-chart' style='float:left; width:75%;'>\n" +
     "</div>\n" +
-    "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{config.legend.display}}'>\n" +
+    "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
     "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
     "	<tr ng-repeat=\"l in legends | limitTo:yMaxData\">\n" +
     "		<td><div style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +

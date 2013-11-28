@@ -3,9 +3,7 @@ angular-charts
 
 angular directives for common charts using d3
 
-for more information visit
-
-http://chinmaymk.github.io/angular-charts/
+Note: this is under development, will give out a stable release by first week of december
 
 License - MIT.
 
