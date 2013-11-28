@@ -7,8 +7,7 @@ for more information visit
 
 http://chinmaymk.github.io/angular-charts/
 
-License
-MIT license.
+License - MIT.
 
 ##Got suggestions ?
 Feel free to submit a pull request, file an issue, or get in touch on twitter [@_chinmaymk](https://twitter.com/Chinmay_MK)
