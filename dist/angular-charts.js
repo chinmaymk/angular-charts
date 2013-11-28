@@ -75,6 +75,7 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
       function setContainers() {
+        console.log(scope.acConfig.legend.position, config.legend.position);
         var container = $templateCache.get(config.legend.position);
         element.html($compile(container)(scope));
         chartContainer = element.find('.ac-chart');
@@ -86,7 +87,7 @@ angular.module('angularCharts').directive('acChart', [
         chartType = scope.acChart;
         series = data.series;
         points = data.data;
-        if (!!scope[attrs.acConfig]) {
+        if (scope.acConfig) {
           angular.extend(config, scope.acConfig);
         }
       }
@@ -595,9 +596,24 @@ angular.module('angularCharts').directive('acChart', [
           'w': w.width()
         };
       };
-      console.log(scope.acChart);
+      function merge(obj1, obj2) {
+        var result = {};
+        for (i in obj1) {
+          if (i in obj2 && typeof obj1[i] === 'object' && i !== null) {
+            result[i] = merge(obj1[i], obj2[i]);
+          } else {
+            result[i] = obj1[i];
+          }
+        }
+        for (i in obj2) {
+          if (i in result) {
+            continue;
+          }
+          result[i] = obj2[i];
+        }
+        return result;
+      }
       scope.$watch('acChart', function () {
-        console.log('watcher chart');
         init();
       }, true);
       scope.$watch('acData', function () {
@@ -664,7 +680,7 @@ angular.module("right", []).run(["$templateCache", function($templateCache) {
     "</style>\n" +
     "\n" +
     "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
-    "<div class='ac-chart' style='float:left; width:75%;'>\n" +
+    "<div class='ac-chart' style='float:left;width:75%;'>\n" +
     "</div>\n" +
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
     "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +

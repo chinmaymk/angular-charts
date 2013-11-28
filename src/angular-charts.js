@@ -116,6 +116,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates appropriate DOM structure for legend + chart
      */
     function setContainers() {
+      console.log(scope.acConfig.legend.position, config.legend.position);
       var container = $templateCache.get(config.legend.position);
       element.html($compile(container)(scope));
       chartContainer = element.find('.ac-chart');
@@ -132,7 +133,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       chartType = scope.acChart;
       series = data.series;
       points = data.data;
-      if(!!scope[attrs.acConfig]) {
+      if(scope.acConfig) {
         angular.extend(config, scope.acConfig);
       }
     }
@@ -480,7 +481,10 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     }
 
     
-
+    /**
+     * Creates a nice area chart
+     * @return {[type]} [description]
+     */
     function areaChart() {
       var margin = {top: 0, right: 40, bottom: 20, left: 40};
           width -= margin.left + margin.right;
@@ -853,11 +857,35 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     scope.getWindowDimensions = function () {
         return { 'h': w.height(), 'w': w.width() };
     };
+
+    /**
+     * Merges two objects
+     * @param  {[type]} obj1 [description]
+     * @param  {[type]} obj2 [description]
+     * @return {[type]}      [description]
+     */
+    function merge(obj1, obj2){ // Our merge function
+      var result = {}; // return result
+      for(i in obj1){      // for every property in obj1 
+          if((i in obj2) && (typeof obj1[i] === "object") && (i !== null)){
+              result[i] = merge(obj1[i],obj2[i]); // if it's an object, merge   
+          }else{
+             result[i] = obj1[i]; // add it to result
+          }
+      }
+      for(i in obj2){ // add the remaining properties from object 2
+          if(i in result){ //conflict
+              continue;
+          }
+          result[i] = obj2[i];
+      }
+      return result;
+    }
+
     // let the party being!
     //init();
     //add some watchers
-    console.log(scope.acChart);
-    scope.$watch('acChart', function(){ console.log('watcher chart'); init(); }, true);
+    scope.$watch('acChart', function(){ init(); }, true);
     scope.$watch('acData', function(){ init(); }, true);
     scope.$watch('acConfig', function(){ init(); }, true);
   }

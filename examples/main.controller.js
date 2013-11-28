@@ -51,10 +51,7 @@ function MainController($scope) {
 		title : "Not Products",
 		legend : {
 			display:true,
-			position:'right'
-		},
-		click : function(d) {
-			console.log('clicked!', d);
+			position:'left'
 		}
 	}
 
@@ -64,9 +61,6 @@ function MainController($scope) {
 		legend : {
 			display:true,
 			position:'right'
-		},
-		click : function(d) {
-			console.log('clicked!', d);
 		}
 	}
 }
