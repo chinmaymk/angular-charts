@@ -249,24 +249,15 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           
       bars.attr("width", x0.rangeBand());
         
-      if(config.animate) {
-        bars.attr("x", function(d, i) { return x0(i); })
-          .attr("y", height)
-          .style("fill", function(d) { return getColor(d.s); })
-          .attr("height", 0)
-        .transition()
-          .ease("cubic-in-out")
-          .duration(1000)
-          .attr("y", function(d) { return y(Math.max(0, d.y)); })
-          .attr("height", function(d) { return Math.abs(y(d.y) - y(0)); });  
-      } else {
-        bars.attr("x", function(d, i) { return x0(i); })
-          .style("fill", function(d) { return getColor(d.s); })
-          .attr("y", function(d) { return y(Math.max(0, d.y)); })
-          .attr("height", function(d) { return Math.abs(y(d.y) - y(0)); });  
-      }
-      
-        
+      bars.attr("x", function(d, i) { return x0(i); })
+        .attr("y", height)
+        .style("fill", function(d) { return getColor(d.s); })
+        .attr("height", 0)
+      .transition()
+        .ease("cubic-in-out")
+        .duration(1000)
+        .attr("y", function(d) { return y(Math.max(0, d.y)); })
+        .attr("height", function(d) { return Math.abs(y(d.y) - y(0)); });  
       /**
        * Add events for tooltip
        * @param  {[type]} d [description]
