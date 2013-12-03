@@ -21,8 +21,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                 "border-radius:5px;",
                 "padding:5px;",
                 "color:#fff;"].join('');
-
-  var colors = ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
  
   /**
    * Utility function to call when we run out of colors!
@@ -57,7 +55,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         display: true,
         //could be 'left, right'
         position: 'left'
-      }
+      },
+      colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)']
     }
 
     var totalWidth = element.width(), totalHeight = element.height();
@@ -818,12 +817,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       scope.legends = [];
       if(chartType == 'pie') {
         angular.forEach(points, function(value, key){
-          scope.legends.push({color : colors[key], title: value.x});
+          scope.legends.push({color : config.colors[key], title: value.x});
         });
       }
       if(chartType == 'bar' || chartType == 'area') {
         angular.forEach(series, function(value, key){
-          scope.legends.push({color : colors[key], title: value});
+          scope.legends.push({color : config.colors[key], title: value});
         }); 
       }
     }
@@ -835,11 +834,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]}   [description]
      */
     function getColor(i) {
-      if(i < colors.length) {
-        return colors[i]
+      if(i < config.colors.length) {
+        return config.colors[i]
       } else {
         var color = getRandomColor();
-        colors.push(color);
+        config.colors.push(color);
         return color;
       }
     }
