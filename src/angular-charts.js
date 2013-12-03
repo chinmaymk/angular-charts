@@ -620,7 +620,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .duration(200)
             .style("stroke", "white")
             .style("stroke-width", "2px");
-        config.onmouseover(d, event);
+        config.mouseover(d, event);
         scope.$apply();
       })
       .on("mouseleave", function(d) {  
@@ -631,7 +631,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .style("stroke", "")
             .style("stroke-width", "");
             removeToolTip();
-        config.onmouseout(d, event);
+        config.mouseout(d, event);
         scope.$apply();
       })
       .on("mousemove", function(d) {  
