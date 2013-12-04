@@ -471,6 +471,7 @@ angular.module('angularCharts').directive('acChart', [
         var yMaxPoints = d3.max(points.map(function (d) {
             return d.y.length;
           }));
+        scope.yMaxPoints = yMaxPoints;
         series.slice(0, yMaxPoints).forEach(function (value, index) {
           var d = {};
           d.series = value;
@@ -559,7 +560,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if (chartType == 'bar' || chartType == 'area') {
+        if (chartType == 'bar' || chartType == 'area' || chartType == 'point') {
           angular.forEach(series, function (value, key) {
             scope.legends.push({
               color: config.colors[key],
@@ -584,23 +585,6 @@ angular.module('angularCharts').directive('acChart', [
           'w': w.width()
         };
       };
-      function merge(obj1, obj2) {
-        var result = {};
-        for (i in obj1) {
-          if (i in obj2 && typeof obj1[i] === 'object' && i !== null) {
-            result[i] = merge(obj1[i], obj2[i]);
-          } else {
-            result[i] = obj1[i];
-          }
-        }
-        for (i in obj2) {
-          if (i in result) {
-            continue;
-          }
-          result[i] = obj2[i];
-        }
-        return result;
-      }
       scope.$watch('acChart', function () {
         init();
       }, true);
