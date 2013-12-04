@@ -75,7 +75,6 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
       function setContainers() {
-        console.log(scope.acConfig.legend.position, config.legend.position);
         var container = $templateCache.get(config.legend.position);
         element.html($compile(container)(scope));
         chartContainer = element.find('.ac-chart');
@@ -172,17 +171,17 @@ angular.module('angularCharts').directive('acChart', [
           return Math.abs(y(d.y) - y(0));
         });
         bars.on('mouseover', function (d) {
-          makeToolTip(d.tooltip || d.y, event);
-          config.mouseover(d, event);
+          makeToolTip(d.tooltip || d.y, d3.event);
+          config.mouseover(d, d3.event);
           scope.$apply();
         }).on('mouseleave', function (d) {
           removeToolTip();
-          config.mouseout(d, event);
+          config.mouseout(d, d3.event);
           scope.$apply();
         }).on('mousemove', function (d) {
-          updateToolTip(event);
+          updateToolTip(d3.event);
         }).on('click', function (d) {
-          config.click.call(d, event);
+          config.click.call(d, d3.event);
           scope.$apply();
         });
         if (config.labels) {
@@ -276,17 +275,17 @@ angular.module('angularCharts').directive('acChart', [
           }).attr('cy', function (d) {
             return y(d.y);
           }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-            makeToolTip(d.tooltip || d.y, event);
-            config.mouseover(d, event);
+            makeToolTip(d.tooltip || d.y, d3.event);
+            config.mouseover(d, d3.event);
             scope.$apply();
           }).on('mouseleave', function (d) {
             removeToolTip();
-            config.mouseout(d, event);
+            config.mouseout(d, d3.event);
             scope.$apply();
           }).on('mousemove', function (d) {
-            updateToolTip(event);
+            updateToolTip(d3.event);
           }).on('click', function (d) {
-            config.click(d, event);
+            config.click(d, d3.event);
             scope.$apply();
           });
           if (config.labels) {
@@ -410,17 +409,17 @@ angular.module('angularCharts').directive('acChart', [
         path.on('mouseover', function (d) {
           makeToolTip(d.data.tooltip || d.data.y[0]);
           d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-          config.mouseover(d, event);
+          config.mouseover(d, d3.event);
           scope.$apply();
         }).on('mouseleave', function (d) {
           d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
           removeToolTip();
-          config.mouseout(d, event);
+          config.mouseout(d, d3.event);
           scope.$apply();
         }).on('mousemove', function (d) {
-          updateToolTip(event);
+          updateToolTip(d3.event);
         }).on('click', function (d) {
-          config.click(d, event);
+          config.click(d, d3.event);
           scope.$apply();
         });
         if (!!config.labels) {
@@ -504,17 +503,17 @@ angular.module('angularCharts').directive('acChart', [
           }).attr('cy', function (d) {
             return y(d.y);
           }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-            makeToolTip(d.tooltip || d.y, event);
-            config.mouseover(d, event);
+            makeToolTip(d.tooltip || d.y, d3.event);
+            config.mouseover(d, d3.event);
             scope.$apply();
           }).on('mouseleave', function (d) {
             removeToolTip();
-            config.mouseout(d, event);
+            config.mouseout(d, d3.event);
             scope.$apply();
           }).on('mousemove', function (d) {
-            updateToolTip(event);
+            updateToolTip(d3.event);
           }).on('click', function (d) {
-            config.click(d, event);
+            config.click(d, d3.event);
             scope.$apply();
           });
           if (config.labels) {

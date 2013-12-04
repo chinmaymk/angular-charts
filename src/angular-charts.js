@@ -116,7 +116,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates appropriate DOM structure for legend + chart
      */
     function setContainers() {
-      console.log(scope.acConfig.legend.position, config.legend.position);
       var container = $templateCache.get(config.legend.position);
       element.html($compile(container)(scope));
       chartContainer = element.find('.ac-chart');
@@ -265,20 +264,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]}   [description]
        */
       bars.on("mouseover", function(d) { 
-        makeToolTip(d.tooltip || d.y, event);
-        config.mouseover(d, event);
+        makeToolTip(d.tooltip || d.y, d3.event);
+        config.mouseover(d, d3.event);
         scope.$apply();
       })
       .on("mouseleave", function(d) {  
         removeToolTip();
-        config.mouseout(d, event);
+        config.mouseout(d, d3.event);
         scope.$apply();
       })
       .on("mousemove", function(d) {  
-         updateToolTip(event);
+         updateToolTip(d3.event);
       })
       .on("click", function(d) {
-        config.click.call(d, event);
+        config.click.call(d, d3.event);
         scope.$apply();
       });
 
@@ -425,20 +424,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, event);
-              config.mouseover(d, event);
+              makeToolTip(d.tooltip || d.y, d3.event);
+              config.mouseover(d, d3.event);
               scope.$apply();
           })
           .on("mouseleave", function(d) {
               removeToolTip();
-              config.mouseout(d, event);
+              config.mouseout(d, d3.event);
               scope.$apply();
           })
           .on("mousemove", function(d) {
-              updateToolTip(event);
+              updateToolTip(d3.event);
           })
           .on("click", function(d) {
-            config.click(d, event);
+            config.click(d, d3.event);
             scope.$apply();
           });
 
@@ -621,7 +620,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .duration(200)
             .style("stroke", "white")
             .style("stroke-width", "2px");
-        config.mouseover(d, event);
+        config.mouseover(d, d3.event);
         scope.$apply();
       })
       .on("mouseleave", function(d) {  
@@ -632,14 +631,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .style("stroke", "")
             .style("stroke-width", "");
             removeToolTip();
-        config.mouseout(d, event);
+        config.mouseout(d, d3.event);
         scope.$apply();
       })
       .on("mousemove", function(d) {  
-          updateToolTip(event);
+          updateToolTip(d3.event);
       })
       .on("click", function(d) {
-        config.click(d, event);
+        config.click(d, d3.event);
         scope.$apply();
       });
 
@@ -749,20 +748,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, event);
-              config.mouseover(d, event);
+              makeToolTip(d.tooltip || d.y, d3.event);
+              config.mouseover(d, d3.event);
               scope.$apply();
           })
           .on("mouseleave", function(d) {
               removeToolTip();
-              config.mouseout(d, event);
+              config.mouseout(d, d3.event);
               scope.$apply();
           })
           .on("mousemove", function(d) {
-              updateToolTip(event);
+              updateToolTip(d3.event);
           })
           .on("click", function(d) {
-            config.click(d, event);
+            config.click(d, d3.event);
             scope.$apply();
           });
 
