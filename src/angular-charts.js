@@ -68,7 +68,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     chartContainer, 
     legendContainer, 
     chartType,
-    isAnimate =true;
+    isAnimate =true,
+    defaultColors = config.colors;
 
     /**
      * All the magic happens here
@@ -134,6 +135,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       points = data.data;
       if(scope.acConfig) {
         angular.extend(config, scope.acConfig);
+        config.colors = config.colors.concat(defaultColors);
       }
     }
 
