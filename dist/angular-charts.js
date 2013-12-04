@@ -13,14 +13,6 @@ angular.module('angularCharts').directive('acChart', [
         'padding:5px;',
         'color:#fff;'
       ].join('');
-    var colors = [
-        'steelBlue',
-        'rgb(255,153,0)',
-        'rgb(220,57,18)',
-        'rgb(70,132,238)',
-        'rgb(73,66,204)',
-        'rgb(0,128,0)'
-      ];
     function getRandomColor() {
       var letters = '0123456789ABCDEF'.split('');
       var color = '#';
@@ -43,10 +35,18 @@ angular.module('angularCharts').directive('acChart', [
           legend: {
             display: true,
             position: 'left'
-          }
+          },
+          colors: [
+            'steelBlue',
+            'rgb(255,153,0)',
+            'rgb(220,57,18)',
+            'rgb(70,132,238)',
+            'rgb(73,66,204)',
+            'rgb(0,128,0)'
+          ]
         };
       var totalWidth = element.width(), totalHeight = element.height();
-      var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true;
+      var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
       function init() {
         prepareData();
         setHeightWidth();
@@ -89,6 +89,7 @@ angular.module('angularCharts').directive('acChart', [
         points = data.data;
         if (scope.acConfig) {
           angular.extend(config, scope.acConfig);
+          config.colors = config.colors.concat(defaultColors);
         }
       }
       function getChartFunction(type) {
@@ -409,12 +410,12 @@ angular.module('angularCharts').directive('acChart', [
         path.on('mouseover', function (d) {
           makeToolTip(d.data.tooltip || d.data.y[0]);
           d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-          config.onmouseover(d, event);
+          config.mouseover(d, event);
           scope.$apply();
         }).on('mouseleave', function (d) {
           d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
           removeToolTip();
-          config.onmouseout(d, event);
+          config.mouseout(d, event);
           scope.$apply();
         }).on('mousemove', function (d) {
           updateToolTip(event);
@@ -554,7 +555,7 @@ angular.module('angularCharts').directive('acChart', [
         if (chartType == 'pie') {
           angular.forEach(points, function (value, key) {
             scope.legends.push({
-              color: colors[key],
+              color: config.colors[key],
               title: value.x
             });
           });
@@ -562,18 +563,18 @@ angular.module('angularCharts').directive('acChart', [
         if (chartType == 'bar' || chartType == 'area') {
           angular.forEach(series, function (value, key) {
             scope.legends.push({
-              color: colors[key],
+              color: config.colors[key],
               title: value
             });
           });
         }
       }
       function getColor(i) {
-        if (i < colors.length) {
-          return colors[i];
+        if (i < config.colors.length) {
+          return config.colors[i];
         } else {
           var color = getRandomColor();
-          colors.push(color);
+          config.colors.push(color);
           return color;
         }
       }
