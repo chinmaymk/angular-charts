@@ -628,7 +628,7 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
     "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
     "	<tr ng-repeat=\"l in legends\">\n" +
-    "		<td><div style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
+    "		<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
     "		<td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
     "	</tr>\n" +
     "	</table>\n" +
@@ -657,7 +657,7 @@ angular.module("right", []).run(["$templateCache", function($templateCache) {
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
     "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
     "	<tr ng-repeat=\"l in legends | limitTo:yMaxData\">\n" +
-    "		<td><div style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
+    "		<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
     "		<td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
     "	</tr>\n" +
     "	</table>\n" +
