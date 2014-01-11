@@ -19,6 +19,7 @@
     "test",
     "tests"
   ],
+  "main": ["./dist/angular-charts.js"],
   "dependencies": {
     "d3": "~3.3.10",
     "angular": "latest",
