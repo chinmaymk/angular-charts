@@ -47,6 +47,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     var config = {
       title : '',
       tooltips: true,
+      tooltipGenerator: null,
       labels : false,
       mouseover: function() {},
       mouseout: function() {},
@@ -264,7 +265,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]}   [description]
        */
       bars.on("mouseover", function(d) { 
-        makeToolTip(d.tooltip || d.y, d3.event);
+        makeToolTip({value:d.y, series:series[d.s], index:d.x}, d3.event);
         config.mouseover(d, d3.event);
         scope.$apply();
       })
@@ -423,11 +424,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .attr("r", 3)
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
-          .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, d3.event);
+          .on("mouseover", function(series){ return function(d) {
+              makeToolTip({index:d.x, value:d.y, series:series}, d3.event);
               config.mouseover(d, d3.event);
               scope.$apply();
-          })
+          };}(value.series))
           .on("mouseleave", function(d) {
               removeToolTip();
               config.mouseout(d, d3.event);
@@ -613,7 +614,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                     .attr("class", "arc");
 
       path.on("mouseover", function(d) { 
-        makeToolTip(d.data.tooltip || d.data.y[0]);
+        makeToolTip({value:d.data.y[0]}, d3.event);
         d3.select(this)
             .select('path')
             .transition()
@@ -748,11 +749,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .attr("r", 3)
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
-          .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, d3.event);
+          .on("mouseover", function(series){return function(d) {
+              makeToolTip({index:d.x, value:d.y, series:series}, d3.event);
               config.mouseover(d, d3.event);
               scope.$apply();
-          })
+          };}(value.series))
           .on("mouseleave", function(d) {
               removeToolTip();
               config.mouseout(d, d3.event);
@@ -792,6 +793,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       if(!config.tooltips) {
         return;
       }
+      data = (config.tooltipGenerator) ? config.tooltipGenerator(data) : data.value;
       angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
           .html(data)
           .appendTo('body')
