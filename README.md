@@ -1,5 +1,13 @@
-angular-charts
+angular-charts (REFACTORED FORK)
 ==============
+
+A fork of angular-charts that provides a little more flexibilty towards HTML/CSS, and should be a little easier to maintain.
+
+Could be refactored a whole lot further, still plenty of duplication.
+
+==================
+ Original README
+==================
 
 angular directives for common charts using d3
 
