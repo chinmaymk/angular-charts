@@ -73,7 +73,8 @@ angularCharts.ChartController = function ($scope, $element, $templateCache, $com
       showLabels: config.labels,
       mouseover: function (d) {
         config.mouseover();
-        tooltip.create(d);
+        var data = d[0].data || d[0];
+        tooltip.create(data.tooltip || data.y[0] || data.y);
       },
       mouseout: function () {
       },
@@ -97,8 +98,8 @@ angularCharts.ChartController = function ($scope, $element, $templateCache, $com
   function init() {
     var data = $scope.acData;
     chartType = $scope.acChart;
-    helper.series = $scope.acSeries || data.series;
-    helper.points = $scope.acPoints || data.data;
+    helper.series = $scope.acSeries || data.series || [];
+    helper.points = $scope.acPoints || data.data || [];
     if ($scope.acConfig) {
       angular.extend(config, $scope.acConfig);
     }
@@ -134,7 +135,8 @@ angularCharts.ChartController = function ($scope, $element, $templateCache, $com
     init();
   }, true);
 };var angularCharts = angularCharts || {};
-angularCharts.areaChart = function (chartContainer, width, height, points, config, scope) {
+angularCharts.areaChart = function (chartContainer, helper) {
+  var width = helper.getDimensions().width, height = helper.getDimensions().height || width;
   var margin = {
       top: 0,
       right: 40,
@@ -143,7 +145,7 @@ angularCharts.areaChart = function (chartContainer, width, height, points, confi
     };
   width -= margin.left + margin.right;
   height -= margin.top + margin.bottom;
-  var x = d3.scale.ordinal().domain(points.map(function (d) {
+  var x = d3.scale.ordinal().domain(helper.points.map(function (d) {
       return d.x;
     })).rangeRoundBands([
       0,
@@ -157,26 +159,25 @@ angularCharts.areaChart = function (chartContainer, width, height, points, confi
   var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
   var yData = [0];
   var linedata = [];
-  points.forEach(function (d) {
+  helper.points.forEach(function (d) {
     d.y.map(function (e, i) {
       yData.push(e);
     });
   });
-  var yMaxPoints = d3.max(points.map(function (d) {
+  var yMaxPoints = d3.max(helper.points.map(function (d) {
       return d.y.length;
     }));
-  scope.yMaxData = yMaxPoints;
-  series.slice(0, yMaxPoints).forEach(function (value, index) {
+  helper.series.slice(0, yMaxPoints).forEach(function (value, index) {
     var d = {};
     d.series = value;
-    d.values = points.map(function (point) {
+    d.values = helper.points.map(function (point) {
       return point.y.map(function (e) {
         return {
           x: point.x,
           y: e
         };
       })[index] || {
-        x: points[index].x,
+        x: helper.points[index].x,
         y: 0
       };
     });
@@ -201,7 +202,7 @@ angularCharts.areaChart = function (chartContainer, width, height, points, confi
   point.append('path').attr('class', 'area').attr('d', function (d) {
     return area(d.values);
   }).style('fill', function (d, i) {
-    return getColor(i);
+    return helper.getColor(i);
   }).style('opacity', '0.7');
   function getX(d) {
     return Math.round(x(d)) + x.rangeBand() / 2;
@@ -277,14 +278,14 @@ angularCharts.barChart = function (chartContainer, helper) {
   }).attr('height', function (d) {
     return Math.abs(y(d.y) - y(0));
   });
-  bars.on('mouseover', function (d) {
-    helper.mouseover(arguments);
-  }).on('mouseleave', function (d) {
-    helper.mouseleave(arguments);
-  }).on('mousemove', function (d) {
-    helper.mousemove(arguments);
-  }).on('click', function (d) {
-    helper.click(arguments);
+  bars.on('mouseover', function () {
+    helper.mouseover.call(helper, arguments);
+  }).on('mouseleave', function () {
+    helper.mouseleave.call(helper, arguments);
+  }).on('mousemove', function () {
+    helper.mousemove.call(helper, arguments);
+  }).on('click', function () {
+    helper.click.call(helper, arguments);
   });
   if (helper.showLabels) {
     barGroups.selectAll('not-a-class').data(function (d) {
@@ -299,7 +300,8 @@ angularCharts.barChart = function (chartContainer, helper) {
   }
   svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
 };var angularCharts = angularCharts || {};
-angularCharts.lineChart = function (chartContainer, width, height, points, config, scope) {
+angularCharts.lineChart = function (chartContainer, helper) {
+  var width = helper.getDimensions().width, height = helper.getDimensions().height || width;
   var margin = {
       top: 0,
       right: 40,
@@ -308,7 +310,7 @@ angularCharts.lineChart = function (chartContainer, width, height, points, confi
     };
   width -= margin.left + margin.right;
   height -= margin.top + margin.bottom;
-  var x = d3.scale.ordinal().domain(points.map(function (d) {
+  var x = d3.scale.ordinal().domain(helper.points.map(function (d) {
       return d.x;
     })).rangeRoundBands([
       0,
@@ -327,25 +329,25 @@ angularCharts.lineChart = function (chartContainer, width, height, points, confi
     });
   var yData = [0];
   var linedata = [];
-  points.forEach(function (d) {
+  helper.points.forEach(function (d) {
     d.y.map(function (e, i) {
       yData.push(e);
     });
   });
-  var yMaxPoints = d3.max(points.map(function (d) {
+  var yMaxPoints = d3.max(helper.points.map(function (d) {
       return d.y.length;
     }));
-  series.slice(0, yMaxPoints).forEach(function (value, index) {
+  helper.series.slice(0, yMaxPoints).forEach(function (value, index) {
     var d = {};
     d.series = value;
-    d.values = points.map(function (point) {
+    d.values = helper.points.map(function (point) {
       return point.y.map(function (e) {
         return {
           x: point.x,
           y: e
         };
       })[index] || {
-        x: points[index].x,
+        x: helper.points[index].x,
         y: 0
       };
     });
@@ -359,10 +361,8 @@ angularCharts.lineChart = function (chartContainer, width, height, points, confi
   ]);
   svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
   svg.append('g').attr('class', 'y axis').call(yAxis);
-  var point = svg.selectAll('.points').data(linedata).enter().append('g');
-  path = point.attr('points', 'points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
-    return getColor(i);
-  }).attr('d', function (d) {
+  var point = svg.selectAll('.helper.points').data(linedata).enter().append('g');
+  path = point.attr('helper.points', 'helper.points').append('path').attr('class', 'ac-line').style('stroke', helper.getColor).attr('d', function (d) {
     return line(d.values);
   }).attr('stroke-width', '2').attr('fill', 'none');
   var last = linedata[linedata.length - 1].values;
@@ -376,22 +376,17 @@ angularCharts.lineChart = function (chartContainer, width, height, points, confi
       return getX(d.x);
     }).attr('cy', function (d) {
       return y(d.y);
-    }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-      makeToolTip(d.tooltip || d.y);
-      config.mouseover(d);
-      scope.$apply();
-    }).on('mouseleave', function (d) {
-      removeToolTip();
-      config.mouseout(d);
-      scope.$apply();
-    }).on('mousemove', function (d) {
-      updateToolTip();
-    }).on('click', function (d) {
-      config.click(d);
-      scope.$apply();
+    }).attr('r', 3).style('fill', helper.getColor(linedata.indexOf(value))).style('stroke', helper.getColor(linedata.indexOf(value))).on('mouseover', function () {
+      helper.mouseover.call(helper, arguments);
+    }).on('mouseleave', function () {
+      helper.mouseleave.call(helper, arguments);
+    }).on('mousemove', function () {
+      helper.mousemove.call(helper, arguments);
+    }).on('click', function () {
+      helper.click.call(helper, arguments);
     });
-    if (config.labels) {
-      points.append('text').attr('x', function (d) {
+    if (helper.showLabels) {
+      helper.points.append('text').attr('x', function (d) {
         return getX(d.x);
       }).attr('y', function (d) {
         return y(d.y);
@@ -431,14 +426,14 @@ angularCharts.pieChart = function (chartContainer, helper) {
   }).transition().ease('linear').duration(500).attrTween('d', tweenPie).attr('class', 'arc');
   path.on('mouseover', function (d) {
     d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-    helper.mouseover(d.data.tooltip || d.value);
+    helper.mouseover.call(helper, arguments);
   }).on('mouseleave', function (d) {
     d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
-    helper.mouseleave(arguments);
+    helper.mouseleave.call(helper, arguments);
   }).on('mousemove', function () {
-    helper.mousemove(arguments);
+    helper.mousemove.call(helper, arguments);
   }).on('click', function () {
-    helper.click(arguments);
+    helper.mousemove.call(helper, arguments);
   });
   if (!!helper.showLabels) {
     path.append('text').attr('transform', function (d) {
@@ -458,7 +453,8 @@ angularCharts.pieChart = function (chartContainer, helper) {
     };
   }
 };var angularCharts = angularCharts || {};
-angularCharts.pointChart = function (chartContainer, width, height, points, config, scope) {
+angularCharts.pointChart = function (chartContainer, helper) {
+  var width = helper.getDimensions().width, height = helper.getDimensions().height || width;
   var margin = {
       top: 0,
       right: 40,
@@ -467,7 +463,7 @@ angularCharts.pointChart = function (chartContainer, width, height, points, conf
     };
   width -= margin.left - margin.right;
   height -= margin.top - margin.bottom;
-  var x = d3.scale.ordinal().domain(points.map(function (d) {
+  var x = d3.scale.ordinal().domain(helper.points.map(function (d) {
       return d.x;
     })).rangeRoundBands([
       0,
@@ -481,26 +477,25 @@ angularCharts.pointChart = function (chartContainer, width, height, points, conf
   var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
   var yData = [0];
   var linedata = [];
-  points.forEach(function (d) {
+  helper.points.forEach(function (d) {
     d.y.map(function (e, i) {
       yData.push(e);
     });
   });
-  var yMaxPoints = d3.max(points.map(function (d) {
+  var yMaxPoints = d3.max(helper.points.map(function (d) {
       return d.y.length;
     }));
-  scope.yMaxPoints = yMaxPoints;
-  series.slice(0, yMaxPoints).forEach(function (value, index) {
+  helper.series.slice(0, yMaxPoints).forEach(function (value, index) {
     var d = {};
     d.series = value;
-    d.values = points.map(function (point) {
+    d.values = helper.points.map(function (point) {
       return point.y.map(function (e) {
         return {
           x: point.x,
           y: e
         };
       })[index] || {
-        x: points[index].x,
+        x: helper.points[index].x,
         y: 0
       };
     });
@@ -521,22 +516,17 @@ angularCharts.pointChart = function (chartContainer, width, height, points, conf
       return getX(d.x);
     }).attr('cy', function (d) {
       return y(d.y);
-    }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-      makeToolTip(d.tooltip || d.y);
-      config.mouseover(d);
-      scope.$apply();
-    }).on('mouseleave', function (d) {
-      removeToolTip();
-      config.mouseout(d);
-      scope.$apply();
-    }).on('mousemove', function (d) {
-      updateToolTip();
-    }).on('click', function (d) {
-      config.click(d);
-      scope.$apply();
+    }).attr('r', 3).style('fill', helper.getColor(linedata.indexOf(value))).style('stroke', helper.getColor(linedata.indexOf(value))).on('mouseover', function () {
+      helper.mouseover.call(helper, arguments);
+    }).on('mouseleave', function () {
+      helper.mouseleave.call(helper, arguments);
+    }).on('mousemove', function () {
+      helper.mousemove.call(helper, arguments);
+    }).on('click', function () {
+      helper.click.call(helper, arguments);
     });
-    if (config.labels) {
-      points.append('text').attr('x', function (d) {
+    if (helper.showLabels) {
+      helper.points.append('text').attr('x', function (d) {
         return getX(d.x);
       }).attr('y', function (d) {
         return y(d.y);

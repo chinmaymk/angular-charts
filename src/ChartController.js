@@ -69,7 +69,8 @@ angularCharts.ChartController = function($scope, $element, $templateCache, $comp
         showLabels: config.labels,
         mouseover: function(d) {
             config.mouseover();
-            tooltip.create(d);
+            var data = (d[0].data || d[0]);
+            tooltip.create(data.tooltip || data.y[0] || data.y);
         },
         mouseout: function() {
         },
@@ -86,15 +87,15 @@ angularCharts.ChartController = function($scope, $element, $templateCache, $comp
         getDimensions: function() {
             return chartContainer[0].getBoundingClientRect();
         },
-        getColor: function(i){
+        getColor: function(i) {
             return angularCharts.utils.colorPicker.getColor(i);
         }
     };
     function init() {
         var data = $scope.acData;
         chartType = $scope.acChart;
-        helper.series = $scope.acSeries || data.series;
-        helper.points = $scope.acPoints || data.data;
+        helper.series = $scope.acSeries || data.series || [];
+        helper.points = $scope.acPoints || data.data || [];
         if ($scope.acConfig) {
             angular.extend(config, $scope.acConfig);
         }

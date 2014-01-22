@@ -3,44 +3,46 @@ angular.module('example', ['angularCharts']);
 
 function MainController($scope) {
     $scope.chartType = 'pie';
+
     $scope.data = {
+        series: ['These Will Be', 'Ignored By', 'Pie Charts'],
         data: [{
-                x: "Sales",
-                y: [100, 500, 0],
-                tooltip: "this is a tooltip"
+                x: "Jack",
+                y: [100, 210, 384],
+                tooltip: "This is a custom tooltip text"
             },
             {
-                x: "Not Sales",
-                y: [300, 100, 100]
+                x: "John",
+                y: [300, 289, 456]
             },
             {
-                x: "Tax",
-                y: [351]
+                x: "Stacy",
+                y: [351, 170, 255]
             },
             {
-                x: "Not Tax",
-                y: [54, 0, 879]
+                x: "Luke",
+                y: [54, 341, 879]
             }]
     };
 
     $scope.data1 = {
-        series: ['This', 'Is', 'Something', 'Else', 'Entirely'],
+        series: ['This Is', 'Something', 'Else', 'Entirely'],
         data: [{
                 x: "These",
-                y: [150, 500, 0],
-                tooltip: "this is tooltip"
+                y: [210, 384, 100, 255],
+                tooltip: "This is another custom tooltip text"
             },
             {
                 x: "Are",
-                y: [500, 600, 100]
+                y: [289, 456, 300, 879]
             },
             {
                 x: "Somewhat",
-                y: [351]
+                y: [170, 255, 351, 384]
             },
             {
                 x: "Different",
-                y: [82, 14, 879]
+                y: [341, 879, 54, 456]
             }]
     };
 

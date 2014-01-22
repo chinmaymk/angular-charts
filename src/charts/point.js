@@ -1,6 +1,7 @@
 var angularCharts = angularCharts || {};
 
-angularCharts.pointChart = function(chartContainer, width, height, points, config, scope) {
+angularCharts.pointChart = function(chartContainer, helper) {
+    var width = helper.getDimensions().width, height = helper.getDimensions().height || width;
     var margin = {
         top: 0,
         right: 40,
@@ -11,7 +12,7 @@ angularCharts.pointChart = function(chartContainer, width, height, points, confi
     height -= margin.top - margin.bottom;
 
     var x = d3.scale.ordinal()
-            .domain(points.map(function(d) {
+            .domain(helper.points.map(function(d) {
                 return d.x;
             }))
             .rangeRoundBands([0, width]);
@@ -32,28 +33,27 @@ angularCharts.pointChart = function(chartContainer, width, height, points, confi
     var yData = [0];
     var linedata = [];
 
-    points.forEach(function(d) {
+    helper.points.forEach(function(d) {
         d.y.map(function(e, i) {
             yData.push(e);
         });
     });
 
-    var yMaxPoints = d3.max(points.map(function(d) {
+    var yMaxPoints = d3.max(helper.points.map(function(d) {
         return d.y.length;
     }));
-    scope.yMaxPoints = yMaxPoints;
 
-    series.slice(0, yMaxPoints).forEach(function(value, index) {
+    helper.series.slice(0, yMaxPoints).forEach(function(value, index) {
         var d = {};
         d.series = value;
-        d.values = points.map(function(point) {
+        d.values = helper.points.map(function(point) {
             return point.y.map(function(e) {
                 return {
                     x: point.x,
                     y: e
                 };
             })[index] || {
-                x: points[index].x,
+                x: helper.points[index].x,
                 y: 0
             };
         });
@@ -84,7 +84,7 @@ angularCharts.pointChart = function(chartContainer, width, height, points, confi
             .enter().append("g");
 
     /**
-     * Add points
+     * Add helper.points
      * @param  {[type]} value [description]
      * @param  {[type]} key   [description]
      * @return {[type]}       [description]
@@ -96,34 +96,29 @@ angularCharts.pointChart = function(chartContainer, width, height, points, confi
 
         points.append("circle")
                 .attr("cx", function(d) {
-                    return getX(d.x)
+                    return getX(d.x);
                 })
                 .attr("cy", function(d) {
-                    return y(d.y)
+                    return y(d.y);
                 })
                 .attr("r", 3)
-                .style("fill", getColor(linedata.indexOf(value)))
-                .style("stroke", getColor(linedata.indexOf(value)))
-                .on("mouseover", function(d) {
-                    makeToolTip(d.tooltip || d.y);
-                    config.mouseover(d);
-                    scope.$apply();
+                .style("fill", helper.getColor(linedata.indexOf(value)))
+                .style("stroke", helper.getColor(linedata.indexOf(value)))
+                .on("mouseover", function() {
+                    helper.mouseover.call(helper, arguments);
                 })
-                .on("mouseleave", function(d) {
-                    removeToolTip();
-                    config.mouseout(d);
-                    scope.$apply();
+                .on("mouseleave", function() {
+                    helper.mouseleave.call(helper, arguments);
                 })
-                .on("mousemove", function(d) {
-                    updateToolTip();
+                .on("mousemove", function() {
+                    helper.mousemove.call(helper, arguments);
                 })
-                .on("click", function(d) {
-                    config.click(d);
-                    scope.$apply();
+                .on("click", function() {
+                    helper.click.call(helper, arguments);
                 });
 
-        if (config.labels) {
-            points.append("text")
+        if (helper.showLabels) {
+            helper.points.append("text")
                     .attr("x", function(d) {
                         return getX(d.x);
                     })

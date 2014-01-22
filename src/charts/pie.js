@@ -47,7 +47,7 @@ angularCharts.pieChart = function(chartContainer, helper) {
                 .duration(200)
                 .style("stroke", "white")
                 .style("stroke-width", "2px");
-        helper.mouseover(d.data.tooltip || d.value);
+                helper.mouseover.call(helper, arguments);
     })
             .on("mouseleave", function(d) {
                 d3.select(this)
@@ -56,13 +56,13 @@ angularCharts.pieChart = function(chartContainer, helper) {
                         .duration(200)
                         .style("stroke", "")
                         .style("stroke-width", "");
-                helper.mouseleave(arguments);
+                helper.mouseleave.call(helper, arguments);
             })
             .on("mousemove", function() {
-                helper.mousemove(arguments);
+                helper.mousemove.call(helper, arguments);
             })
             .on("click", function() {
-                helper.click(arguments);
+                helper.mousemove.call(helper, arguments);
             });
 
     if (!!helper.showLabels) {

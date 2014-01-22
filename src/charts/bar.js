@@ -129,17 +129,18 @@ angularCharts.barChart = function(chartContainer, helper) {
      * @param  {[type]} d [description]
      * @return {[type]}   [description]
      */
-    bars.on("mouseover", function(d) {
-        helper.mouseover(arguments);
-    })
-            .on("mouseleave", function(d) {
-                helper.mouseleave(arguments);
+    bars
+            .on("mouseover", function() {
+                helper.mouseover.call(helper, arguments);
             })
-            .on("mousemove", function(d) {
-                helper.mousemove(arguments);
+            .on("mouseleave", function() {
+                helper.mouseleave.call(helper, arguments);
             })
-            .on("click", function(d) {
-                helper.click(arguments);
+            .on("mousemove", function() {
+                helper.mousemove.call(helper, arguments);
+            })
+            .on("click", function() {
+                helper.click.call(helper, arguments);
             });
 
     /**
