@@ -2,7 +2,7 @@
 angular.module('example', ['angularCharts']);
 
 function MainController($scope) {
-    $scope.chartType = 'pie';
+    $scope.chartType = 'line';
 
     $scope.data = {
         series: ['These Will Be', 'Ignored By', 'Pie Charts'],

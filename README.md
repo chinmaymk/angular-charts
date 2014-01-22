@@ -5,6 +5,8 @@ A fork of angular-charts that provides a little more flexibilty towards HTML/CSS
 
 Could be refactored a whole lot further, still plenty of duplication.
 
+There are now 2 directives, one for the chart and one for the legend. See the example HTML.
+
 ==================
  Original README
 ==================

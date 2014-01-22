@@ -11,6 +11,9 @@ var angularCharts = angularCharts || {
                 return color;
             },
             getColor: function(i) {
+                if(isNaN(i)){
+                    throw "Expected a numeric index, got " + typeof(i);
+                }
                 if (i < this.colors.length) {
                     return this.colors[i];
                 } else {

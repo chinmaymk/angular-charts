@@ -50,7 +50,7 @@ angularCharts.lineChart = function(chartContainer, helper) {
             yData.push(e);
         });
     });
-    
+
     var yMaxPoints = d3.max(helper.points.map(function(d) {
         return d.y.length;
     }));
@@ -98,7 +98,9 @@ angularCharts.lineChart = function(chartContainer, helper) {
     path = point.attr("helper.points", "helper.points")
             .append("path")
             .attr("class", "ac-line")
-            .style("stroke", helper.getColor)
+            .style("stroke", function(d, i) {
+                return helper.getColor(i);
+            })
             .attr("d", function(d) {
                 return line(d.values);
             })
@@ -143,18 +145,18 @@ angularCharts.lineChart = function(chartContainer, helper) {
                 .attr("r", 3)
                 .style("fill", helper.getColor(linedata.indexOf(value)))
                 .style("stroke", helper.getColor(linedata.indexOf(value)))
-                   .on("mouseover", function() {
-                helper.mouseover.call(helper, arguments);
-            })
-            .on("mouseleave", function() {
-                helper.mouseleave.call(helper, arguments);
-            })
-            .on("mousemove", function() {
-                helper.mousemove.call(helper, arguments);
-            })
-            .on("click", function() {
-                helper.click.call(helper, arguments);
-            });
+                .on("mouseover", function() {
+                    helper.mouseover.call(helper, arguments);
+                })
+                .on("mouseleave", function() {
+                    helper.mouseleave.call(helper, arguments);
+                })
+                .on("mousemove", function() {
+                    helper.mousemove.call(helper, arguments);
+                })
+                .on("click", function() {
+                    helper.click.call(helper, arguments);
+                });
 
 
         if (helper.showLabels) {

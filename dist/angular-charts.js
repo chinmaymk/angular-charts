@@ -18,6 +18,9 @@ var angularCharts = angularCharts || {
           return color;
         },
         getColor: function (i) {
+          if (isNaN(i)) {
+            throw 'Expected a numeric index, got ' + typeof i;
+          }
           if (i < this.colors.length) {
             return this.colors[i];
           } else {
@@ -362,7 +365,9 @@ angularCharts.lineChart = function (chartContainer, helper) {
   svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
   svg.append('g').attr('class', 'y axis').call(yAxis);
   var point = svg.selectAll('.helper.points').data(linedata).enter().append('g');
-  path = point.attr('helper.points', 'helper.points').append('path').attr('class', 'ac-line').style('stroke', helper.getColor).attr('d', function (d) {
+  path = point.attr('helper.points', 'helper.points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
+    return helper.getColor(i);
+  }).attr('d', function (d) {
     return line(d.values);
   }).attr('stroke-width', '2').attr('fill', 'none');
   var last = linedata[linedata.length - 1].values;
