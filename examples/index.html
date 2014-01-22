@@ -1,41 +1,60 @@
 <!DOCTYPE 5>
 <html ng-app="example">
-<head>
-	<title>angular-charts demo!</title>
-	<style type="text/css">
-		body {
-			font-family: "helvetica";
-			color : #333;
-		}
-		.chart {
-			float:left;
-			width: 50%;
-			height:400px;
-		}
-	</style>
-</head>
-<body ng-controller='MainController'>
-	
-	<select ng-model='chartType'>
-		<option value="pie">pie</option>
-		<option value="bar">bar</option>
-		<option value="line">line</option>
-		<option value="point">point</option>
-		<option value="area">area</option>
-	</select>
+    <head>
+        <title>angular-charts demo!</title>
+        <style type="text/css">
+            body {
+                font-family: "helvetica";
+                color : #333;
+            }
+            .left {
+                float: left;
+            }
+            .right {
+                float: right;
+            }
+            .chart {
+                width: 75%;
+            }
+            .legend {
+                width: 25%;
+            }
+            .col {
+                width: 50%;
+                height: 100%;
+                float: left;
+            }
+            .row {
+                width: 100%;
+                height: 50%;
+            }
+        </style>
+    </head >
+    <body ng-controller='MainController'>
 
-	<div class='charts'>
-		<div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
-	</div>
+        <select ng-model='chartType'>
+            <option value="pie">pie</option>
+            <option value="bar">bar</option>
+            <option value="line">line</option>
+            <option value="point">point</option>
+            <option value="area">area</option>
+        </select>
 
-	<div class='charts'>
-		<div ac-chart="chartType" ac-data="data1" ac-config="config1" id='chart' class='chart'></div>
-	</div>
+        <div class="row">
+            <div class="col">
+                <div class="chart left" ac-chart="chartType" ac-data="data" ac-config="config"></div>
+                <div class="legend right" ac-legend="chartType" ac-series="data.series" ac-points="data.data"></div>
+            </div>
+            <div class="col">
+                <div class="legend left" ac-legend="chartType" ac-series="data1.series" ac-points="data1.data"></div>
+                <div class="chart right" ac-chart="chartType" ac-data="data1" ac-config="config1"></div>
+            </div>
+        </div>
 
-	<script type="text/javascript" src="../bower_components/jquery/jquery.min.js"></script>
-	<script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
-	<script type="text/javascript" src="../bower_components/d3/d3.min.js"></script>
-	<script type="text/javascript" src="../dist/angular-charts.min.js"></script>
-	<script type="text/javascript" src="main.controller.js"></script>
-</body>
+        <script type="text/javascript" src="../bower_components/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
+        <script type="text/javascript" src="../bower_components/d3/d3.min.js"></script>
+        <script type="text/javascript" src="../dist/angular-charts.js"></script>
+        <script type="text/javascript" src="main.controller.js"></script>
+    </body>
 </html>
