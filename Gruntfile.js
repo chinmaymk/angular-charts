@@ -54,6 +54,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-html2js');
 
-    grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify']);//, 'clean'
+    grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
 
 };
