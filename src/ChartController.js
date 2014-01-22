@@ -122,19 +122,9 @@ angularCharts.ChartController = function($scope, $element, $templateCache, $comp
     };
 
     //add some watchers
-    $scope.$watch('acChart', function() {
-        init();
-    }, true);
-    $scope.$watch('acData', function() {
-        init();
-    }, true);
-    $scope.$watch('acConfig', function() {
-        init();
-    }, true);
-    $scope.$watch('acSeries', function() {
-        init();
-    }, true);
-    $scope.$watch('acPoints', function() {
-        init();
-    }, true);
+    $scope.$watch('acChart', init, true);
+    $scope.$watch('acData', init, true);
+    $scope.$watch('acConfig', init, true);
+    $scope.$watch('acSeries', init, true);
+    $scope.$watch('acPoints', init, true);
 };
