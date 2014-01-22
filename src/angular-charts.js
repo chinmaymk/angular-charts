@@ -264,20 +264,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]}   [description]
        */
       bars.on("mouseover", function(d) { 
-        makeToolTip(d.tooltip || d.y, d3.event);
-        config.mouseover(d, d3.event);
+        makeToolTip(d.tooltip || d.y);
+        config.mouseover(d);
         scope.$apply();
       })
       .on("mouseleave", function(d) {  
         removeToolTip();
-        config.mouseout(d, d3.event);
+        config.mouseout(d);
         scope.$apply();
       })
       .on("mousemove", function(d) {  
-         updateToolTip(d3.event);
+         updateToolTip();
       })
       .on("click", function(d) {
-        config.click.call(d, d3.event);
+        config.click.call(d);
         scope.$apply();
       });
 
@@ -424,20 +424,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, d3.event);
-              config.mouseover(d, d3.event);
+              makeToolTip(d.tooltip || d.y);
+              config.mouseover(d);
               scope.$apply();
           })
           .on("mouseleave", function(d) {
               removeToolTip();
-              config.mouseout(d, d3.event);
+              config.mouseout(d);
               scope.$apply();
           })
           .on("mousemove", function(d) {
-              updateToolTip(d3.event);
+              updateToolTip();
           })
           .on("click", function(d) {
-            config.click(d, d3.event);
+            config.click(d);
             scope.$apply();
           });
 
@@ -620,7 +620,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .duration(200)
             .style("stroke", "white")
             .style("stroke-width", "2px");
-        config.mouseover(d, d3.event);
+        config.mouseover(d);
         scope.$apply();
       })
       .on("mouseleave", function(d) {  
@@ -631,14 +631,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .style("stroke", "")
             .style("stroke-width", "");
             removeToolTip();
-        config.mouseout(d, d3.event);
+        config.mouseout(d);
         scope.$apply();
       })
       .on("mousemove", function(d) {  
-          updateToolTip(d3.event);
+          updateToolTip();
       })
       .on("click", function(d) {
-        config.click(d, d3.event);
+        config.click(d);
         scope.$apply();
       });
 
@@ -749,20 +749,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, d3.event);
-              config.mouseover(d, d3.event);
+              makeToolTip(d.tooltip || d.y);
+              config.mouseover(d);
               scope.$apply();
           })
           .on("mouseleave", function(d) {
               removeToolTip();
-              config.mouseout(d, d3.event);
+              config.mouseout(d);
               scope.$apply();
           })
           .on("mousemove", function(d) {
-              updateToolTip(d3.event);
+              updateToolTip();
           })
           .on("click", function(d) {
-            config.click(d, d3.event);
+            config.click(d);
             scope.$apply();
           });
 
@@ -788,15 +788,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates and displays tooltip
      * @return {[type]} [description]
      */
-    function makeToolTip(data, event) {
+    function makeToolTip(data) {
       if(!config.tooltips) {
         return;
       }
       angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
           .html(data)
           .appendTo('body')
-          .fadeIn('slow')
-          .css({left: event.pageX + 20, top: event.pageY - 30});
+          .fadeIn('slow');
     }
 
     /**
@@ -807,8 +806,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       angular.element('.ac-tooltip').remove();
     }
 
-    function updateToolTip(event) {
-      angular.element('.ac-tooltip').css({left: event.pageX + 20, top: event.pageY - 30});
+    function updateToolTip() {
+      angular.element('.ac-tooltip').css({left: d3.event.pageX + 20, top: d3.event.pageY - 30});
     }
 
     /**

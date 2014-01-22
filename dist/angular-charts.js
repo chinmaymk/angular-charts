@@ -171,17 +171,17 @@ angular.module('angularCharts').directive('acChart', [
           return Math.abs(y(d.y) - y(0));
         });
         bars.on('mouseover', function (d) {
-          makeToolTip(d.tooltip || d.y, d3.event);
-          config.mouseover(d, d3.event);
+          makeToolTip(d.tooltip || d.y);
+          config.mouseover(d);
           scope.$apply();
         }).on('mouseleave', function (d) {
           removeToolTip();
-          config.mouseout(d, d3.event);
+          config.mouseout(d);
           scope.$apply();
         }).on('mousemove', function (d) {
-          updateToolTip(d3.event);
+          updateToolTip();
         }).on('click', function (d) {
-          config.click.call(d, d3.event);
+          config.click.call(d);
           scope.$apply();
         });
         if (config.labels) {
@@ -275,17 +275,17 @@ angular.module('angularCharts').directive('acChart', [
           }).attr('cy', function (d) {
             return y(d.y);
           }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-            makeToolTip(d.tooltip || d.y, d3.event);
-            config.mouseover(d, d3.event);
+            makeToolTip(d.tooltip || d.y);
+            config.mouseover(d);
             scope.$apply();
           }).on('mouseleave', function (d) {
             removeToolTip();
-            config.mouseout(d, d3.event);
+            config.mouseout(d);
             scope.$apply();
           }).on('mousemove', function (d) {
-            updateToolTip(d3.event);
+            updateToolTip();
           }).on('click', function (d) {
-            config.click(d, d3.event);
+            config.click(d);
             scope.$apply();
           });
           if (config.labels) {
@@ -409,17 +409,17 @@ angular.module('angularCharts').directive('acChart', [
         path.on('mouseover', function (d) {
           makeToolTip(d.data.tooltip || d.data.y[0]);
           d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-          config.mouseover(d, d3.event);
+          config.mouseover(d);
           scope.$apply();
         }).on('mouseleave', function (d) {
           d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
           removeToolTip();
-          config.mouseout(d, d3.event);
+          config.mouseout(d);
           scope.$apply();
         }).on('mousemove', function (d) {
-          updateToolTip(d3.event);
+          updateToolTip();
         }).on('click', function (d) {
-          config.click(d, d3.event);
+          config.click(d);
           scope.$apply();
         });
         if (!!config.labels) {
@@ -504,17 +504,17 @@ angular.module('angularCharts').directive('acChart', [
           }).attr('cy', function (d) {
             return y(d.y);
           }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-            makeToolTip(d.tooltip || d.y, d3.event);
-            config.mouseover(d, d3.event);
+            makeToolTip(d.tooltip || d.y);
+            config.mouseover(d);
             scope.$apply();
           }).on('mouseleave', function (d) {
             removeToolTip();
-            config.mouseout(d, d3.event);
+            config.mouseout(d);
             scope.$apply();
           }).on('mousemove', function (d) {
-            updateToolTip(d3.event);
+            updateToolTip();
           }).on('click', function (d) {
-            config.click(d, d3.event);
+            config.click(d);
             scope.$apply();
           });
           if (config.labels) {
@@ -532,22 +532,19 @@ angular.module('angularCharts').directive('acChart', [
         }
         ;
       }
-      function makeToolTip(data, event) {
+      function makeToolTip(data) {
         if (!config.tooltips) {
           return;
         }
-        angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).appendTo('body').fadeIn('slow').css({
-          left: event.pageX + 20,
-          top: event.pageY - 30
-        });
+        angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).appendTo('body').fadeIn('slow');
       }
       function removeToolTip() {
         angular.element('.ac-tooltip').remove();
       }
-      function updateToolTip(event) {
+      function updateToolTip() {
         angular.element('.ac-tooltip').css({
-          left: event.pageX + 20,
-          top: event.pageY - 30
+          left: d3.event.pageX + 20,
+          top: d3.event.pageY - 30
         });
       }
       function drawLegend() {
