@@ -71,6 +71,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     isAnimate =true,
     defaultColors = config.colors;
 
+    if(totalHeight === 0 || totalWidth === 0) {
+      throw new Error('Please set height and width for the chart element')
+    }
     /**
      * All the magic happens here
      * handles extracting chart type

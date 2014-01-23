@@ -47,6 +47,9 @@ angular.module('angularCharts').directive('acChart', [
         };
       var totalWidth = element.width(), totalHeight = element.height();
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
+      if (totalHeight === 0 || totalWidth === 0) {
+        throw new Error('Please set height and width for the chart element');
+      }
       function init() {
         prepareData();
         setHeightWidth();
