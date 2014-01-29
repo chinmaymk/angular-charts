@@ -43,7 +43,13 @@ angular.module('angularCharts').directive('acChart', [
             'rgb(70,132,238)',
             'rgb(73,66,204)',
             'rgb(0,128,0)'
-          ]
+          ],
+          margins: {
+            top: 0,
+            right: 40,
+            bottom: 20,
+            left: 40
+          }
         };
       var totalWidth = element.width(), totalHeight = element.height();
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
@@ -104,12 +110,19 @@ angular.module('angularCharts').directive('acChart', [
           };
         return charts[type];
       }
+      function rotateXAxis(xAxisHandle) {
+        if (config.xAxisRotate) {
+          xAxisHandle.selectAll('text').style('text-anchor', 'end').attr('dx', '-.8em').attr('dy', '.15em').attr('transform', function (d) {
+            return 'rotate(' + config.xAxisRotate + ')';
+          });
+        }
+      }
       function barChart() {
         var margin = {
-            top: 0,
-            right: 20,
-            bottom: 30,
-            left: 40
+            top: config.margins.top,
+            right: config.margins.right - 20,
+            bottom: config.margins.bottom + 10,
+            left: config.margins.left
           };
         width -= margin.left + margin.right;
         height -= margin.top + margin.bottom;
@@ -155,7 +168,8 @@ angular.module('angularCharts').directive('acChart', [
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(10).tickFormat(d3.format('s'));
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        var xAxisHandle = svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        rotateXAxis(xAxisHandle);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
             return 'translate(' + x(d.x) + ',0)';
@@ -201,12 +215,7 @@ angular.module('angularCharts').directive('acChart', [
         svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
       }
       function lineChart() {
-        var margin = {
-            top: 0,
-            right: 40,
-            bottom: 20,
-            left: 40
-          };
+        var margin = config.margins;
         width -= margin.left + margin.right;
         height -= margin.top + margin.bottom;
         var x = d3.scale.ordinal().domain(points.map(function (d) {
@@ -258,7 +267,8 @@ angular.module('angularCharts').directive('acChart', [
           d3.min(yData),
           d3.max(yData) + padding
         ]);
-        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        var xAxisHandle = svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        rotateXAxis(xAxisHandle);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
         path = point.attr('points', 'points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
@@ -318,12 +328,7 @@ angular.module('angularCharts').directive('acChart', [
         return linedata;
       }
       function areaChart() {
-        var margin = {
-            top: 0,
-            right: 40,
-            bottom: 20,
-            left: 40
-          };
+        var margin = config.margins;
         width -= margin.left + margin.right;
         height -= margin.top + margin.bottom;
         var x = d3.scale.ordinal().domain(points.map(function (d) {
@@ -376,7 +381,8 @@ angular.module('angularCharts').directive('acChart', [
           d3.min(yData),
           d3.max(yData) + padding
         ]);
-        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        var xAxisHandle = svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        rotateXAxis(xAxisHandle);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
         var area = d3.svg.area().interpolate('basis').x(function (d) {
@@ -444,12 +450,7 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
       function pointChart() {
-        var margin = {
-            top: 0,
-            right: 40,
-            bottom: 20,
-            left: 40
-          };
+        var margin = config.margins;
         width -= margin.left - margin.right;
         height -= margin.top - margin.bottom;
         var x = d3.scale.ordinal().domain(points.map(function (d) {
@@ -497,7 +498,8 @@ angular.module('angularCharts').directive('acChart', [
           d3.min(yData),
           d3.max(yData) + padding
         ]);
-        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        var xAxisHandle = svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        rotateXAxis(xAxisHandle);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
         angular.forEach(linedata, function (value, key) {
