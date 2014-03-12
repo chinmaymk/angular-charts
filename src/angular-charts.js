@@ -187,7 +187,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           return {
             x : d.x,
             y : e,
-            s : i
+            s : i,
+            tooltip: angular.isArray(d.tooltip)?d.tooltip[i]:d.tooltip
           }
         })
       })
