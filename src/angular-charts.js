@@ -830,7 +830,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        */
       function getX(d) {
         return Math.round(x(d)) + x.rangeBand() / 2
-      };
+      }
     }
 
     /**
