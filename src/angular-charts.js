@@ -616,7 +616,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                     .attr("class", "arc");
 
       path.on("mouseover", function(d) { 
-        makeToolTip(d.data.tooltip || d.data.y[0]);
+        makeToolTip(d.data.tooltip || d.data.y[0], d3.event);
         d3.select(this)
             .select('path')
             .transition()
