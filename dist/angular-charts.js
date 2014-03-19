@@ -86,11 +86,15 @@ angular.module('angularCharts').directive('acChart', [
             'rgb(0,128,0)'
           ]
         };
-      var totalWidth = element[0].clientWidth, totalHeight = element[0].clientHeight;
+      var totalWidth, totalHeight;
+      scope.$watch(element, function (newValue, oldValue, scope) {
+        totalWidth = element[0].clientWidth;
+        totalHeight = element[0].clientHeight;
+        if (totalHeight === 0 || totalWidth === 0) {
+          throw new Error('Please set height and width for the chart element');
+        }
+      });
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
-      if (totalHeight === 0 || totalWidth === 0) {
-        throw new Error('Please set height and width for the chart element');
-      }
       /**
      * All the magic happens here
      * handles extracting chart type
@@ -707,7 +711,7 @@ angular.module('angularCharts').directive('acChart', [
         scope.$tooltip.css({
           left: event.pageX + 20,
           top: event.pageY - 30
-        });  // document.getElementById('angular-charts-tooltip').css({left: event.pageX + 20, top: event.pageY - 30});
+        });
       }
       /**
      * Adds data to legend
@@ -778,7 +782,7 @@ angular.module('angularCharts').directive('acChart', [
     };
   }
 ]);
-angular.module('angularChartsTemplates', ['left', 'right', 'tooltip']);
+angular.module('angularChartsTemplates', ['left', 'right']);
 
 angular.module("left", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("left",
@@ -833,9 +837,4 @@ angular.module("right", []).run(["$templateCache", function($templateCache) {
     "	</tr>\n" +
     "	</table>\n" +
     "</div>");
-}]);
-
-angular.module("tooltip", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("tooltip",
-    "");
 }]);
