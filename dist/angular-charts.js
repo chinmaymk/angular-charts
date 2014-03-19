@@ -9,13 +9,14 @@ angular.module('angularCharts').directive('acChart', [
   '$templateCache',
   '$compile',
   '$window',
-  function ($templateCache, $compile, $window) {
+  '$rootElement',
+  function ($templateCache, $compile, $window, $rootElement) {
     /**
    * Initialize some constants
    * @type Array
    */
     var tooltip = [
-        'display:none;',
+        'display:block;',
         'position:absolute;',
         'border:1px solid #333;',
         'background-color:#161616;',
@@ -36,15 +37,6 @@ angular.module('angularCharts').directive('acChart', [
       return color;
     }
     /**
-   * Utility function to check if Object is an element
-   * http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
-   * @param  {Object}  o The object to be tested
-   * @return {Boolean}   
-   */
-    function isElement(o) {
-      return typeof HTMLElement === 'object' ? o instanceof HTMLElement : o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
-    }
-    /**
    * gets the child that matches the classname
    * because Angular.element.children() doesn't take selectors
    * it's still better than a whole jQuery implementation
@@ -55,7 +47,7 @@ angular.module('angularCharts').directive('acChart', [
     function getChildrenByClassname(childrens, className) {
       var child = null;
       for (var i in childrens) {
-        if (isElement(childrens[i])) {
+        if (angular.isElement(childrens[i])) {
           child = angular.element(childrens[i]);
           if (child.hasClass(className))
             return child;
@@ -687,33 +679,35 @@ angular.module('angularCharts').directive('acChart', [
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
-        ;
       }
       /**
      * Creates and displays tooltip
+     * Note: Tooltips should be templated with a directive
      * @return {[type]} [description]
      */
       function makeToolTip(data, event) {
         if (!config.tooltips) {
           return;
         }
-        angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).appendTo('body').fadeIn('slow').css({
-          left: event.pageX + 20,
-          top: event.pageY - 30
-        });
+        var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).css({
+            left: event.pageX + 20,
+            top: event.pageY - 30
+          });
+        $rootElement.find('body').append(el);
+        scope.$tooltip = el;
       }
       /**
      * Clears the tooltip from body
      * @return {[type]} [description]
      */
       function removeToolTip() {
-        angular.element('.ac-tooltip').remove();
+        scope.$tooltip.remove();
       }
       function updateToolTip(event) {
-        angular.element('.ac-tooltip').css({
+        scope.$tooltip.css({
           left: event.pageX + 20,
           top: event.pageY - 30
-        });
+        });  // document.getElementById('angular-charts-tooltip').css({left: event.pageX + 20, top: event.pageY - 30});
       }
       /**
      * Adds data to legend
@@ -784,7 +778,7 @@ angular.module('angularCharts').directive('acChart', [
     };
   }
 ]);
-angular.module('angularChartsTemplates', ['left', 'right']);
+angular.module('angularChartsTemplates', ['left', 'right', 'tooltip']);
 
 angular.module("left", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("left",
@@ -839,4 +833,9 @@ angular.module("right", []).run(["$templateCache", function($templateCache) {
     "	</tr>\n" +
     "	</table>\n" +
     "</div>");
+}]);
+
+angular.module("tooltip", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("tooltip",
+    "");
 }]);
