@@ -36,6 +36,43 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
   }
 
   /**
+   * Utility function to check if Object is an element
+   * http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
+   * @param  {Object}  o The object to be tested
+   * @return {Boolean}   
+   */
+  function isElement(o){
+      return (
+        typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+        o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+    );
+  }
+
+  /**
+   * gets the child that matches the classname
+   * because Angular.element.children() doesn't take selectors
+   * it's still better than a whole jQuery implementation
+   * @param  {Array}  childrens       An array of childrens - element.children() or element.find('div')
+   * @param  {String} className       Class name
+   * @return {Angular.element|null}    The founded child or null
+   */
+  function getChildrenByClassname(childrens, className) {
+      var child = null;
+
+      for(var i in childrens) {
+        if(isElement(childrens[i])) {
+            child = angular.element(childrens[i]);
+            if(child.hasClass(className))
+              return child;
+        }
+      }
+
+      return child;
+    }
+
+
+
+  /**
    * Main link function
    * @param  {[type]} scope   [description]
    * @param  {[type]} element [description]
@@ -59,7 +96,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)']
     }
 
-    var totalWidth = element.width(), totalHeight = element.height();
+    var totalWidth = element[0].clientWidth, totalHeight = element[0].clientHeight;
     var data, 
     series, 
     points, 
@@ -68,7 +105,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     chartContainer, 
     legendContainer, 
     chartType,
-    isAnimate =true,
+    isAnimate = true,
     defaultColors = config.colors;
 
     if(totalHeight === 0 || totalWidth === 0) {
@@ -119,11 +156,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates appropriate DOM structure for legend + chart
      */
     function setContainers() {
-      var container = $templateCache.get(config.legend.position);
-      element.html($compile(container)(scope));
-      chartContainer = element.find('.ac-chart');
-      legendContainer = element.find('.ac-legend');
-      height -= element.find('.ac-title').height();
+        var container = $templateCache.get(config.legend.position);
+        //http://stackoverflow.com/a/17883151
+
+        element.html(container);
+        $compile(element.contents())(scope)
+
+        //getting children divs
+        var childrens = element.find('div');
+
+        //find by className through this childrens
+        chartContainer = getChildrenByClassname(childrens, 'ac-chart');
+        legendContainer = getChildrenByClassname(childrens, 'ac-legend');
+
+        height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
     }
 
     /**
@@ -850,7 +896,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
     var w = angular.element($window);
     scope.getWindowDimensions = function () {
-        return { 'h': w.height(), 'w': w.width() };
+        return { 'h': w[0].clientHeight, 'w': w[0].clientWidth };
     };
 
     //let the party begin!

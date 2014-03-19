@@ -1,9 +1,19 @@
+/**
+* Main module
+*/
 angular.module('angularCharts', ['angularChartsTemplates']);
+/**
+* Main directive handling drawing of all charts
+*/
 angular.module('angularCharts').directive('acChart', [
   '$templateCache',
   '$compile',
   '$window',
   function ($templateCache, $compile, $window) {
+    /**
+   * Initialize some constants
+   * @type Array
+   */
     var tooltip = [
         'display:none;',
         'position:absolute;',
@@ -13,6 +23,10 @@ angular.module('angularCharts').directive('acChart', [
         'padding:5px;',
         'color:#fff;'
       ].join('');
+    /**
+   * Utility function to call when we run out of colors!
+   * @return {[type]} [description]
+   */
     function getRandomColor() {
       var letters = '0123456789ABCDEF'.split('');
       var color = '#';
@@ -21,6 +35,41 @@ angular.module('angularCharts').directive('acChart', [
       }
       return color;
     }
+    /**
+   * Utility function to check if Object is an element
+   * http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
+   * @param  {Object}  o The object to be tested
+   * @return {Boolean}   
+   */
+    function isElement(o) {
+      return typeof HTMLElement === 'object' ? o instanceof HTMLElement : o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
+    }
+    /**
+   * gets the child that matches the classname
+   * because Angular.element.children() doesn't take selectors
+   * it's still better than a whole jQuery implementation
+   * @param  {Array}  childrens       An array of childrens - element.children() or element.find('div')
+   * @param  {String} className       Class name
+   * @return {Angular.element|null}    The founded child or null
+   */
+    function getChildrenByClassname(childrens, className) {
+      var child = null;
+      for (var i in childrens) {
+        if (isElement(childrens[i])) {
+          child = angular.element(childrens[i]);
+          if (child.hasClass(className))
+            return child;
+        }
+      }
+      return child;
+    }
+    /**
+   * Main link function
+   * @param  {[type]} scope   [description]
+   * @param  {[type]} element [description]
+   * @param  {[type]} attrs   [description]
+   * @return {[type]}         [description]
+   */
     function link(scope, element, attrs) {
       var config = {
           title: '',
@@ -45,11 +94,19 @@ angular.module('angularCharts').directive('acChart', [
             'rgb(0,128,0)'
           ]
         };
-      var totalWidth = element.width(), totalHeight = element.height();
+      var totalWidth = element[0].clientWidth, totalHeight = element[0].clientHeight;
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
       if (totalHeight === 0 || totalWidth === 0) {
         throw new Error('Please set height and width for the chart element');
       }
+      /**
+     * All the magic happens here
+     * handles extracting chart type
+     * getting data
+     * validating data
+     * drawing the chart
+     * @return {[type]} [description]
+     */
       function init() {
         prepareData();
         setHeightWidth();
@@ -58,6 +115,10 @@ angular.module('angularCharts').directive('acChart', [
         chartFunc();
         drawLegend();
       }
+      /**
+     * Sets height and width of chart area based on legend
+     * used for setting radius, bar width of chart
+     */
       function setHeightWidth() {
         if (!config.legend.display) {
           height = totalHeight;
@@ -77,13 +138,25 @@ angular.module('angularCharts').directive('acChart', [
           break;
         }
       }
+      /**
+     * Creates appropriate DOM structure for legend + chart
+     */
       function setContainers() {
         var container = $templateCache.get(config.legend.position);
-        element.html($compile(container)(scope));
-        chartContainer = element.find('.ac-chart');
-        legendContainer = element.find('.ac-legend');
-        height -= element.find('.ac-title').height();
+        //http://stackoverflow.com/a/17883151
+        element.html(container);
+        $compile(element.contents())(scope);
+        //getting children divs
+        var childrens = element.find('div');
+        //find by className through this childrens
+        chartContainer = getChildrenByClassname(childrens, 'ac-chart');
+        legendContainer = getChildrenByClassname(childrens, 'ac-legend');
+        height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
       }
+      /**
+     * Parses data from attributes 
+     * @return {[type]} [description]
+     */
       function prepareData() {
         data = scope.acData;
         chartType = scope.acChart;
@@ -94,6 +167,11 @@ angular.module('angularCharts').directive('acChart', [
           config.colors = config.colors.concat(defaultColors);
         }
       }
+      /**
+     * Returns appropriate chart function to call
+     * @param  {[type]} type [description]
+     * @return {[type]}      [description]
+     */
       function getChartFunction(type) {
         var charts = {
             'pie': pieChart,
@@ -104,7 +182,15 @@ angular.module('angularCharts').directive('acChart', [
           };
         return charts[type];
       }
+      /**
+     * Draws a bar chart, grouped with negative value handling
+     * @return {[type]} [description]
+     */
       function barChart() {
+        /**
+       * Setup date attributes
+       * @type {Object}
+       */
         var margin = {
             top: 0,
             right: 20,
@@ -152,11 +238,23 @@ angular.module('angularCharts').directive('acChart', [
           0,
           x.rangeBand()
         ]);
+        /**
+       * Create scales using d3
+       * @type {[type]}
+       */
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(10).tickFormat(d3.format('s'));
+        /**
+       * Start drawing the chart!
+       * @type {[type]}
+       */
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
+        /**
+      * Add bars
+      * @type {[type]}
+      */
         var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
             return 'translate(' + x(d.x) + ',0)';
           });
@@ -173,6 +271,11 @@ angular.module('angularCharts').directive('acChart', [
         }).attr('height', function (d) {
           return Math.abs(y(d.y) - y(0));
         });
+        /**
+       * Add events for tooltip
+       * @param  {[type]} d [description]
+       * @return {[type]}   [description]
+       */
         bars.on('mouseover', function (d) {
           makeToolTip(d.tooltip || d.y, d3.event);
           config.mouseover(d, d3.event);
@@ -187,6 +290,9 @@ angular.module('angularCharts').directive('acChart', [
           config.click.call(d, d3.event);
           scope.$apply();
         });
+        /**
+       * Create labels
+       */
         if (config.labels) {
           barGroups.selectAll('not-a-class').data(function (d) {
             return d.nicedata;
@@ -198,8 +304,15 @@ angular.module('angularCharts').directive('acChart', [
             return d.y;
           });
         }
+        /**
+       * Draw one zero line in case negative values exist
+       */
         svg.append('line').attr('x1', width).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'silver');
       }
+      /**
+     * Draws a line chart
+     * @return {[type]} [description]
+     */
       function lineChart() {
         var margin = {
             top: 0,
@@ -266,11 +379,21 @@ angular.module('angularCharts').directive('acChart', [
         }).attr('d', function (d) {
           return line(d.values);
         }).attr('stroke-width', '2').attr('fill', 'none');
+        /** Animation function
+       * [last description]
+       * @type {[type]}
+       */
         var last = linedata[linedata.length - 1].values;
         var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
         path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(1500).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
           return line(d.values);
         });
+        /**
+       * Add points
+       * @param  {[type]} value [description]
+       * @param  {[type]} key   [description]
+       * @return {[type]}       [description]
+       */
         angular.forEach(linedata, function (value, key) {
           var points = svg.selectAll('.circle').data(value.values).enter();
           points.append('circle').attr('cx', function (d) {
@@ -301,6 +424,9 @@ angular.module('angularCharts').directive('acChart', [
             });
           }
         });
+        /**
+      * Labels at the end of line
+      */
         point.append('text').datum(function (d) {
           return {
             name: d.series,
@@ -311,12 +437,21 @@ angular.module('angularCharts').directive('acChart', [
         }).attr('x', 3).text(function (d) {
           return d.name;
         });
+        /**
+       * Returns x point of line point
+       * @param  {[type]} d [description]
+       * @return {[type]}   [description]
+       */
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
         ;
         return linedata;
       }
+      /**
+     * Creates a nice area chart
+     * @return {[type]} [description]
+     */
       function areaChart() {
         var margin = {
             top: 0,
@@ -353,6 +488,10 @@ angular.module('angularCharts').directive('acChart', [
         var yMaxPoints = d3.max(points.map(function (d) {
             return d.y.length;
           }));
+        /**
+       * Important to set for legend
+       * @type {[type]}
+       */
         scope.yMaxData = yMaxPoints;
         series.slice(0, yMaxPoints).forEach(function (value, index) {
           var d = {};
@@ -396,6 +535,10 @@ angular.module('angularCharts').directive('acChart', [
         }
         ;
       }
+      /**
+     * Draws a beautiful pie chart
+     * @return {[type]} [description]
+     */
       function pieChart() {
         var radius = Math.min(width, height) / 2;
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
@@ -500,6 +643,12 @@ angular.module('angularCharts').directive('acChart', [
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
+        /**
+       * Add points
+       * @param  {[type]} value [description]
+       * @param  {[type]} key   [description]
+       * @return {[type]}       [description]
+       */
         angular.forEach(linedata, function (value, key) {
           var points = svg.selectAll('.circle').data(value.values).enter();
           points.append('circle').attr('cx', function (d) {
@@ -530,11 +679,20 @@ angular.module('angularCharts').directive('acChart', [
             });
           }
         });
+        /**
+       * Returns x point of line point
+       * @param  {[type]} d [description]
+       * @return {[type]}   [description]
+       */
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
         ;
       }
+      /**
+     * Creates and displays tooltip
+     * @return {[type]} [description]
+     */
       function makeToolTip(data, event) {
         if (!config.tooltips) {
           return;
@@ -544,6 +702,10 @@ angular.module('angularCharts').directive('acChart', [
           top: event.pageY - 30
         });
       }
+      /**
+     * Clears the tooltip from body
+     * @return {[type]} [description]
+     */
       function removeToolTip() {
         angular.element('.ac-tooltip').remove();
       }
@@ -553,6 +715,10 @@ angular.module('angularCharts').directive('acChart', [
           top: event.pageY - 30
         });
       }
+      /**
+     * Adds data to legend
+     * @return {[type]} [description]
+     */
       function drawLegend() {
         scope.legends = [];
         if (chartType == 'pie') {
@@ -572,6 +738,12 @@ angular.module('angularCharts').directive('acChart', [
           });
         }
       }
+      /**
+     * Checks if index is available in color 
+     * else returns a random color
+     * @param  {[type]} i [description]
+     * @return {[type]}   [description]
+     */
       function getColor(i) {
         if (i < config.colors.length) {
           return config.colors[i];
@@ -584,10 +756,12 @@ angular.module('angularCharts').directive('acChart', [
       var w = angular.element($window);
       scope.getWindowDimensions = function () {
         return {
-          'h': w.height(),
-          'w': w.width()
+          'h': w[0].clientHeight,
+          'w': w[0].clientWidth
         };
       };
+      //let the party begin!
+      //add some watchers
       scope.$watch('acChart', function () {
         init();
       }, true);
