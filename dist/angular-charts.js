@@ -520,7 +520,7 @@ angular.module('angularCharts').directive('acChart', [
             return getColor(i);
           }).transition().ease('linear').duration(500).attrTween('d', tweenPie).attr('class', 'arc');
         path.on('mouseover', function (d) {
-          makeToolTip(d.data.tooltip || d.data.y[0]);
+          makeToolTip(d.data.tooltip || d.data.y[0], d3.event);
           d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
           config.mouseover(d, d3.event);
           scope.$apply();
