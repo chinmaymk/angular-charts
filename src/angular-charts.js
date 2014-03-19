@@ -83,7 +83,16 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)']
     }
 
-    var totalWidth = element[0].clientWidth, totalHeight = element[0].clientHeight;
+    var totalWidth, totalHeight;
+
+    scope.$watch(element, function (newValue, oldValue, scope) {
+      totalWidth = element[0].clientWidth;
+      totalHeight = element[0].clientHeight;
+       if(totalHeight === 0 || totalWidth === 0) {
+        throw new Error('Please set height and width for the chart element')
+      }
+    });
+
     var data, 
     series, 
     points, 
@@ -95,9 +104,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     isAnimate = true,
     defaultColors = config.colors;
 
-    if(totalHeight === 0 || totalWidth === 0) {
-      throw new Error('Please set height and width for the chart element')
-    }
     /**
      * All the magic happens here
      * handles extracting chart type
