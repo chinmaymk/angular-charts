@@ -133,8 +133,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     function prepareData() {
       data = scope.acData;
       chartType = scope.acChart;
-      series = data.series;
-      points = data.data;
+      series = (data) ? data.series || [] : [];
+      points = (data) ? data.data || [] : [];
       if(scope.acConfig) {
         angular.extend(config, scope.acConfig);
         config.colors = config.colors.concat(defaultColors);
