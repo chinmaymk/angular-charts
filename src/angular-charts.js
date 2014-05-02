@@ -8,13 +8,13 @@ angular.module('angularCharts', ['angularChartsTemplates']);
 /**
 * Main directive handling drawing of all charts
 */
-angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $window) {
+angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $window, $rootElement) {
 
   /**
    * Initialize some constants
    * @type Array
    */
-  var tooltip = ["display:none;",
+  var tooltip = ["display:block;",
                 "position:absolute;",
                 "border:1px solid #333;",
                 "background-color:#161616;",
@@ -34,6 +34,30 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     }
     return color;
   }
+
+  /**
+   * gets the child that matches the classname
+   * because Angular.element.children() doesn't take selectors
+   * it's still better than a whole jQuery implementation
+   * @param  {Array}  childrens       An array of childrens - element.children() or element.find('div')
+   * @param  {String} className       Class name
+   * @return {Angular.element|null}    The founded child or null
+   */
+  function getChildrenByClassname(childrens, className) {
+      var child = null;
+
+      for(var i in childrens) {
+        if(angular.isElement(childrens[i])) {
+            child = angular.element(childrens[i]);
+            if(child.hasClass(className))
+              return child;
+        }
+      }
+
+      return child;
+    }
+
+
 
   /**
    * Main link function
@@ -59,7 +83,16 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)']
     }
 
-    var totalWidth = element.width(), totalHeight = element.height();
+    var totalWidth, totalHeight;
+
+    scope.$watch(element, function (newValue, oldValue, scope) {
+      totalWidth = element[0].clientWidth;
+      totalHeight = element[0].clientHeight;
+       if(totalHeight === 0 || totalWidth === 0) {
+        throw new Error('Please set height and width for the chart element')
+      }
+    });
+
     var data, 
     series, 
     points, 
@@ -68,12 +101,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     chartContainer, 
     legendContainer, 
     chartType,
-    isAnimate =true,
+    isAnimate = true,
     defaultColors = config.colors;
 
-    if(totalHeight === 0 || totalWidth === 0) {
-      throw new Error('Please set height and width for the chart element')
-    }
     /**
      * All the magic happens here
      * handles extracting chart type
@@ -119,11 +149,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates appropriate DOM structure for legend + chart
      */
     function setContainers() {
-      var container = $templateCache.get(config.legend.position);
-      element.html($compile(container)(scope));
-      chartContainer = element.find('.ac-chart');
-      legendContainer = element.find('.ac-legend');
-      height -= element.find('.ac-title').height();
+        var container = $templateCache.get(config.legend.position);
+        //http://stackoverflow.com/a/17883151
+
+        element.html(container);
+        $compile(element.contents())(scope)
+
+        //getting children divs
+        var childrens = element.find('div');
+
+        //find by className through this childrens
+        chartContainer = getChildrenByClassname(childrens, 'ac-chart');
+        legendContainer = getChildrenByClassname(childrens, 'ac-legend');
+
+        height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
     }
 
     /**
@@ -784,22 +823,28 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        */
       function getX(d) {
         return Math.round(x(d)) + x.rangeBand() / 2
-      };
+      }
     }
 
     /**
      * Creates and displays tooltip
+     * Note: Tooltips should be templated with a directive
      * @return {[type]} [description]
      */
     function makeToolTip(data, event) {
       if(!config.tooltips) {
         return;
       }
-      angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
-          .html(data)
-          .appendTo('body')
-          .fadeIn('slow')
-          .css({left: event.pageX + 20, top: event.pageY - 30});
+
+      var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
+               .html(data)
+               .css({left: event.pageX + 20, top: event.pageY - 30});
+
+
+      $rootElement.find('body').append(el);
+
+      scope.$tooltip = el;
+
     }
 
     /**
@@ -807,11 +852,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function removeToolTip() {
-      angular.element('.ac-tooltip').remove();
+      scope.$tooltip.remove();
     }
 
     function updateToolTip(event) {
-      angular.element('.ac-tooltip').css({left: event.pageX + 20, top: event.pageY - 30});
+      scope.$tooltip.css({left: event.pageX + 20, top: event.pageY - 30});
     }
 
     /**
@@ -850,7 +895,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
     var w = angular.element($window);
     scope.getWindowDimensions = function () {
-        return { 'h': w.height(), 'w': w.width() };
+        return { 'h': w[0].clientHeight, 'w': w[0].clientWidth };
     };
 
     //let the party begin!

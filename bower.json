@@ -19,10 +19,15 @@
     "test",
     "tests"
   ],
-  "main": ["./dist/angular-charts.js"],
+  "main": [
+    "./dist/angular-charts.js"
+  ],
   "dependencies": {
     "d3": "~3.3.10",
-    "angular": "latest",
-    "jquery": "~2.0.3"
+    "angular": "latest"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.2.14",
+    "jquery": "~2.1.0"
   }
 }
