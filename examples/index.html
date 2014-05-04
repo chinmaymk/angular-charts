@@ -24,6 +24,10 @@
 		<option value="area">area</option>
 	</select>
 
+	<span ng-show="chartType==='pie'">
+		<label>Radius: <input ng-model="config.innerRadius" type="text" ></label>
+	</span>
+
 	<div class='charts'>
 		<div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
 	</div>
@@ -35,7 +39,7 @@
 	<script type="text/javascript" src="../bower_components/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
 	<script type="text/javascript" src="../bower_components/d3/d3.min.js"></script>
-	<script type="text/javascript" src="../dist/angular-charts.min.js"></script>
+	<script type="text/javascript" src="../dist/angular-charts.js"></script>
 	<script type="text/javascript" src="main.controller.js"></script>
 </body>
 </html>

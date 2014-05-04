@@ -55,8 +55,9 @@ function MainController($scope, $timeout) {
 		legend : {
 			display:true,
 			position:'left'
-		}
-	}
+		},
+		innerRadius: 0
+	};
 
 	$scope.config1 = {
 		labels: false,
@@ -64,6 +65,7 @@ function MainController($scope, $timeout) {
 		legend : {
 			display:true,
 			position:'right'
-		}
+		},
+		lineLegend: 'traditional'
 	}
 }
