@@ -65,7 +65,8 @@ angular.module('angularCharts').directive('acChart', [
             'rgb(73,66,204)',
             'rgb(0,128,0)'
           ],
-          charts: { pie: { innerRadius: 0 } }
+          innerRadius: 0,
+          lineLegend: 'lineEnd'
         };
       var totalWidth = element.width(), totalHeight = element.height();
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
@@ -322,6 +323,7 @@ angular.module('angularCharts').directive('acChart', [
         var yMaxPoints = d3.max(points.map(function (d) {
             return d.y.length;
           }));
+        scope.yMaxData = yMaxPoints;
         series.slice(0, yMaxPoints).forEach(function (value, index) {
           var d = {};
           d.series = value;
@@ -406,16 +408,18 @@ angular.module('angularCharts').directive('acChart', [
         /**
       * Labels at the end of line
       */
-        point.append('text').datum(function (d) {
-          return {
-            name: d.series,
-            value: d.values[d.values.length - 1]
-          };
-        }).attr('transform', function (d) {
-          return 'translate(' + getX(d.value.x) + ',' + y(d.value.y) + ')';
-        }).attr('x', 3).text(function (d) {
-          return d.name;
-        });
+        if (config.lineLegend === 'lineEnd') {
+          point.append('text').datum(function (d) {
+            return {
+              name: d.series,
+              value: d.values[d.values.length - 1]
+            };
+          }).attr('transform', function (d) {
+            return 'translate(' + getX(d.value.x) + ',' + y(d.value.y) + ')';
+          }).attr('x', 3).text(function (d) {
+            return d.name;
+          });
+        }
         /**
        * Returns x point of line point
        * @param  {[type]} d [description]
@@ -522,10 +526,10 @@ angular.module('angularCharts').directive('acChart', [
         var radius = Math.min(width, height) / 2;
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
         var innerRadius = 0;
-        if (config.charts.pie.innerRadius) {
-          var configRadius = config.charts.pie.innerRadius;
+        if (config.innerRadius) {
+          var configRadius = config.innerRadius;
           if (typeof configRadius === 'string' && configRadius.indexOf('%') > 0) {
-            configRadius = radius * parseFloat(configRadius) * 0.01;
+            configRadius = radius * (1 - parseFloat(configRadius) * 0.01);
           }
           if (configRadius) {
             innerRadius = radius - Number(configRadius);
@@ -729,7 +733,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if (chartType == 'bar' || chartType == 'area' || chartType == 'point') {
+        if (chartType == 'bar' || chartType == 'area' || chartType == 'point' || chartType == 'line' && config.lineLegend === 'traditional') {
           angular.forEach(series, function (value, key) {
             scope.legends.push({
               color: config.colors[key],

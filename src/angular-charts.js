@@ -57,11 +57,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         position: 'left'
       },
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'],
-      charts: {
-        pie: {
-          innerRadius: 0
-        }
-      },
+      innerRadius: 0, // Only on pie Charts
+      lineLegend: 'lineEnd', // Only on line Charts
     };
 
     var totalWidth = element.width(), totalHeight = element.height();
@@ -354,7 +351,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       })
 
       var yMaxPoints = d3.max(points.map(function(d){ return d.y.length; }));
-
+      scope.yMaxData = yMaxPoints;
       series.slice(0, yMaxPoints).forEach(function(value, index) {
         var d = {};
         d.series = value;
@@ -462,12 +459,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      /**
       * Labels at the end of line
       */
-      point.append("text")
-        .datum(function(d) { return {name: d.series, value: d.values[d.values.length - 1]}; })
-        .attr("transform", function(d) { return "translate(" + getX(d.value.x) + "," + y(d.value.y) + ")"; })
-        .attr("x", 3)
-        .text(function(d) { return d.name; });
-
+      if (config.lineLegend === 'lineEnd') {
+        point.append("text")
+          .datum(function(d) { return {name: d.series, value: d.values[d.values.length - 1]}; })
+          .attr("transform", function(d) { return "translate(" + getX(d.value.x) + "," + y(d.value.y) + ")"; })
+          .attr("x", 3)
+          .text(function(d) { return d.name; });  
+      }
+      
       /**
        * Returns x point of line point
        * @param  {[type]} d [description]
@@ -596,10 +595,10 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
       var innerRadius = 0;
 
-      if (config.charts.pie.innerRadius) {
-        var configRadius = config.charts.pie.innerRadius;
+      if (config.innerRadius) {
+        var configRadius = config.innerRadius;
         if (typeof(configRadius) === 'string' && configRadius.indexOf('%') > 0) {
-          configRadius = radius * parseFloat(configRadius) * 0.01;
+          configRadius = radius * (1-parseFloat(configRadius) * 0.01);
         }
 
         if (configRadius) {
@@ -848,7 +847,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           scope.legends.push({color : config.colors[key], title: value.x});
         });
       }
-      if(chartType == 'bar' || chartType == 'area' || chartType == 'point') {
+      if(chartType == 'bar' || chartType == 'area' || chartType == 'point' ||
+        (chartType == 'line' && config.lineLegend === 'traditional')) {
         angular.forEach(series, function(value, key){
           scope.legends.push({color : config.colors[key], title: value});
         }); 
