@@ -90,7 +90,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     function init() {
       prepareData();
       setHeightWidth();
-      setContainers()
+      setContainers();
       var chartFunc = getChartFunction(chartType);
       chartFunc();
       drawLegend();
@@ -192,7 +192,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           return {
             x : d.x,
             y : e,
-            s : i
+            s : i,
+            tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip,
           }
         })
       })
@@ -272,7 +273,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]}   [description]
        */
       bars.on("mouseover", function(d) { 
-        makeToolTip(d.tooltip || d.y, d3.event);
+        makeToolTip({ value: d.y, series: series[d.s], index: d.x}, d3.event);
         config.mouseover(d, d3.event);
         scope.$apply();
       })
@@ -431,11 +432,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .attr("r", 3)
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
-          .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, d3.event);
+          .on("mouseover", function(series){ return function(d) {
+              makeToolTip({index:d.x, value:d.y, series:series}, d3.event);
               config.mouseover(d, d3.event);
               scope.$apply();
-          })
+          };}(value.series))
           .on("mouseleave", function(d) {
               removeToolTip();
               config.mouseout(d, d3.event);
@@ -593,8 +594,18 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                   .attr("height", height)
                   .append("g")
                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+      var innerRadius = 0;
 
-      var innerRadius = config.charts.pie.innerRadius ? radius - Number(config.charts.pie.innerRadius) : 0;
+      if (config.charts.pie.innerRadius) {
+        var configRadius = config.charts.pie.innerRadius;
+        if (typeof(configRadius) === 'string' && configRadius.indexOf('%') > 0) {
+          configRadius = radius * parseFloat(configRadius) * 0.01;
+        }
+
+        if (configRadius) {
+          innerRadius = radius - Number(configRadius);
+        }
+      }
 
       scope.yMaxData = points.length;
 
@@ -623,7 +634,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                     .attr("class", "arc");
 
       path.on("mouseover", function(d) { 
-        makeToolTip(d.data.tooltip || d.data.y[0]);
+        makeToolTip({ value: d.data.y[0] }, d3.event);
         d3.select(this)
             .select('path')
             .transition()
@@ -758,11 +769,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .attr("r", 3)
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
-          .on("mouseover", function(d) {
-              makeToolTip(d.tooltip || d.y, d3.event);
+          .on("mouseover", function(series){return function(d) {
+              makeToolTip({index:d.x, value:d.y, series:series}, d3.event);
               config.mouseover(d, d3.event);
               scope.$apply();
-          })
+          };}(value.series))
           .on("mouseleave", function(d) {
               removeToolTip();
               config.mouseout(d, d3.event);
@@ -801,6 +812,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     function makeToolTip(data, event) {
       if(!config.tooltips) {
         return;
+      }
+      if (Object.prototype.toString.call(config.tooltips) == "[object Function]") {
+        data = config.tooltips(data);
+      } else {
+        data = data.value;
       }
       angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
           .html(data)

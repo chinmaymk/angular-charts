@@ -55,8 +55,13 @@ function MainController($scope, $timeout) {
 		legend : {
 			display:true,
 			position:'left'
+		},
+		charts: {
+			pie: {
+				innerRadius: 0
+			}
 		}
-	}
+	};
 
 	$scope.config1 = {
 		labels: false,
