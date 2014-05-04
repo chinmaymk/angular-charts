@@ -1,7 +1,7 @@
 {
   "name": "utopia",
-  "version": "0.0.1",
-  "description": "ERROR: No README.md file found!",
+  "version": "0.1.0",
+  "description": "angular directives for common charts using d3, for more information visit",
   "main": "Gruntfile.js",
   "dependencies": {
     "grunt": "~0.4.1",
