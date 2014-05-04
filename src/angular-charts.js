@@ -56,8 +56,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         //could be 'left, right'
         position: 'left'
       },
-      colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)']
-    }
+      colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'],
+      charts: {
+        pie: {
+          innerRadius: 0
+        }
+      },
+    };
 
     var totalWidth = element.width(), totalHeight = element.height();
     var data, 
@@ -589,11 +594,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                   .append("g")
                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+      var innerRadius = config.charts.pie.innerRadius ? radius - Number(config.charts.pie.innerRadius) : 0;
+
       scope.yMaxData = points.length;
 
       var arc = d3.svg.arc()
                   .outerRadius(radius - 10)
-                  .innerRadius(0);
+                  .innerRadius(innerRadius);
 
       var arcOver = d3.svg.arc()
                       .outerRadius(radius + 5)
