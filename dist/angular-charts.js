@@ -174,7 +174,11 @@ angular.module('angularCharts').directive('acChart', [
           return Math.abs(y(d.y) - y(0));
         });
         bars.on('mouseover', function (d) {
-          makeToolTip(d.tooltip || d.y, d3.event);
+          makeToolTip({
+            value: d.y,
+            series: series[d.s],
+            index: d.x
+          }, d3.event);
           config.mouseover(d, d3.event);
           scope.$apply();
         }).on('mouseleave', function (d) {
@@ -277,11 +281,17 @@ angular.module('angularCharts').directive('acChart', [
             return getX(d.x);
           }).attr('cy', function (d) {
             return y(d.y);
-          }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-            makeToolTip(d.tooltip || d.y, d3.event);
-            config.mouseover(d, d3.event);
-            scope.$apply();
-          }).on('mouseleave', function (d) {
+          }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (series) {
+            return function (d) {
+              makeToolTip({
+                index: d.x,
+                value: d.y,
+                series: series
+              }, d3.event);
+              config.mouseover(d, d3.event);
+              scope.$apply();
+            };
+          }(value.series)).on('mouseleave', function (d) {
             removeToolTip();
             config.mouseout(d, d3.event);
             scope.$apply();
@@ -410,7 +420,7 @@ angular.module('angularCharts').directive('acChart', [
             return getColor(i);
           }).transition().ease('linear').duration(500).attrTween('d', tweenPie).attr('class', 'arc');
         path.on('mouseover', function (d) {
-          makeToolTip(d.data.tooltip || d.data.y[0]);
+          makeToolTip({ value: d.data.y[0] }, d3.event);
           d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
           config.mouseover(d, d3.event);
           scope.$apply();
@@ -506,11 +516,17 @@ angular.module('angularCharts').directive('acChart', [
             return getX(d.x);
           }).attr('cy', function (d) {
             return y(d.y);
-          }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (d) {
-            makeToolTip(d.tooltip || d.y, d3.event);
-            config.mouseover(d, d3.event);
-            scope.$apply();
-          }).on('mouseleave', function (d) {
+          }).attr('r', 3).style('fill', getColor(linedata.indexOf(value))).style('stroke', getColor(linedata.indexOf(value))).on('mouseover', function (series) {
+            return function (d) {
+              makeToolTip({
+                index: d.x,
+                value: d.y,
+                series: series
+              }, d3.event);
+              config.mouseover(d, d3.event);
+              scope.$apply();
+            };
+          }(value.series)).on('mouseleave', function (d) {
             removeToolTip();
             config.mouseout(d, d3.event);
             scope.$apply();
@@ -538,6 +554,11 @@ angular.module('angularCharts').directive('acChart', [
       function makeToolTip(data, event) {
         if (!config.tooltips) {
           return;
+        }
+        if (Object.prototype.toString.call(config.tooltips) == '[object Function]') {
+          data = config.tooltips(data);
+        } else {
+          data = data.value;
         }
         angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).appendTo('body').fadeIn('slow').css({
           left: event.pageX + 20,
