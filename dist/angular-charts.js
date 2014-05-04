@@ -43,7 +43,8 @@ angular.module('angularCharts').directive('acChart', [
             'rgb(70,132,238)',
             'rgb(73,66,204)',
             'rgb(0,128,0)'
-          ]
+          ],
+          graphTypeLine: { legend: 'lineEnd' }
         };
       var totalWidth = element.width(), totalHeight = element.height();
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
@@ -236,6 +237,7 @@ angular.module('angularCharts').directive('acChart', [
         var yMaxPoints = d3.max(points.map(function (d) {
             return d.y.length;
           }));
+        scope.yMaxData = yMaxPoints;
         series.slice(0, yMaxPoints).forEach(function (value, index) {
           var d = {};
           d.series = value;
@@ -301,16 +303,18 @@ angular.module('angularCharts').directive('acChart', [
             });
           }
         });
-        point.append('text').datum(function (d) {
-          return {
-            name: d.series,
-            value: d.values[d.values.length - 1]
-          };
-        }).attr('transform', function (d) {
-          return 'translate(' + getX(d.value.x) + ',' + y(d.value.y) + ')';
-        }).attr('x', 3).text(function (d) {
-          return d.name;
-        });
+        if (config.graphTypeLine.legend == 'lineEnd') {
+          point.append('text').datum(function (d) {
+            return {
+              name: d.series,
+              value: d.values[d.values.length - 1]
+            };
+          }).attr('transform', function (d) {
+            return 'translate(' + getX(d.value.x) + ',' + y(d.value.y) + ')';
+          }).attr('x', 3).text(function (d) {
+            return d.name;
+          });
+        }
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
@@ -563,7 +567,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if (chartType == 'bar' || chartType == 'area' || chartType == 'point') {
+        if (chartType == 'bar' || chartType == 'area' || chartType == 'point' || chartType == 'line' && config.graphTypeLine.legend == 'traditional') {
           angular.forEach(series, function (value, key) {
             scope.legends.push({
               color: config.colors[key],
