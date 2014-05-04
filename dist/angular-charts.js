@@ -153,6 +153,18 @@ angular.module('angularCharts').directive('acChart', [
         return charts[type];
       }
       /**
+     * Filters down the x axis labels if a limit is specified
+     */
+      function filterXAxis(xAxis, x) {
+        var allTicks = x.domain();
+        if (config.xAxisMaxTicks && allTicks.length > config.xAxisMaxTicks) {
+          var mod = Math.ceil(allTicks.length / config.xAxisMaxTicks);
+          xAxis.tickValues(allTicks.filter(function (e, i) {
+            return i % mod == 0;
+          }));
+        }
+      }
+      /**
      * Draws a bar chart, grouped with negative value handling
      * @return {[type]} [description]
      */
@@ -214,6 +226,7 @@ angular.module('angularCharts').directive('acChart', [
        * @type {[type]}
        */
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
+        filterXAxis(xAxis, x);
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(10).tickFormat(d3.format('s'));
         /**
        * Start drawing the chart!
@@ -308,6 +321,7 @@ angular.module('angularCharts').directive('acChart', [
             10
           ]);
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
+        filterXAxis(xAxis, x);
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
         var line = d3.svg.line().interpolate('cardinal').x(function (d) {
             return getX(d.x);
@@ -456,6 +470,7 @@ angular.module('angularCharts').directive('acChart', [
             10
           ]);
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
+        filterXAxis(xAxis, x);
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
         var line = d3.svg.line().interpolate('cardinal').x(function (d) {
             return getX(d.x);
@@ -600,6 +615,7 @@ angular.module('angularCharts').directive('acChart', [
             10
           ]);
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
+        filterXAxis(xAxis, x);
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
         var yData = [0];
         var linedata = [];
