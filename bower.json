@@ -22,7 +22,6 @@
   "main": ["./dist/angular-charts.js"],
   "dependencies": {
     "d3": "~3.3.10",
-    "angular": "latest",
-    "jquery": "~2.0.3"
+    "angular": "latest"
   }
 }
