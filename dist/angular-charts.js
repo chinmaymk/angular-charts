@@ -9,7 +9,8 @@ angular.module('angularCharts').directive('acChart', [
   '$templateCache',
   '$compile',
   '$window',
-  function ($templateCache, $compile, $window) {
+  '$timeout',
+  function ($templateCache, $compile, $window, $timeout) {
     /**
    * Initialize some constants
    * @type Array
@@ -758,6 +759,15 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
       var w = angular.element($window);
+      var resizePromise = null;
+      w.bind('resize', function (ev) {
+        resizePromise && $timeout.cancel(resizePromise);
+        resizePromise = $timeout(function () {
+          totalWidth = element.width();
+          totalHeight = element.height();
+          init();
+        }, 100);
+      });
       scope.getWindowDimensions = function () {
         return {
           'h': w.height(),
