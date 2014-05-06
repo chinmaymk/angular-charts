@@ -6,8 +6,9 @@ angular directives for common charts using d3, for more information visit
 http://chinmaymk.github.io/angular-charts/
 
 ###Contributors
-* [michalochman](https://github.com/michalochman) - [configurable colors](https://github.com/chinmaymk/angular-charts/commits?author=michalochman)
-* [reneolivo](https://github.com/reneolivo) - fix for [bower.json](https://github.com/chinmaymk/angular-charts/commits?author=reneolivo)
+* [felipeleusin](https://github.com/felipeleusin)
+* [michalochman](https://github.com/michalochman)
+* [reneolivo](https://github.com/reneolivo) 
 
 License - MIT.
 
