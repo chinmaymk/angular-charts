@@ -93,6 +93,11 @@
           <option value="point">Point</option>
           <option value="area">Area</option>
         </select>
+        <span ng-show="chartType==='pie'"><b>Radius</b> <input ng-model="config.innerRadius" size="4"></span>
+        <span ng-show="chartType==='line'">
+          <b>Legend Position:</b>
+          <select ng-options="opt for opt in ['lineEnd','traditional']" ng-model="config.lineLegend"></select>
+        </span>
         <p></p>
         <div class='charts'>
           <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
@@ -119,7 +124,7 @@
       <li class='list-group-item'>One click chart change</li>
       <li class='list-group-item'>Tiny - 13kb minified</li>
       <li class='list-group-item'>Auto tooltips</li>
-      <li class='list-group-item'>Auto h,w dimensions</li>
+      <li class='list-group-item'>Auto h,w dimensions <strong>updates automatically when resizing</strong></li>
       <li class='list-group-item'>Beautiful animations</li>
       <li class='list-group-item'>Callback events</li>
       <li class='list-group-item'>Simple data format</li>
@@ -197,9 +202,9 @@
           <pre>
             <code>
 var config = {
-  title : '',
+  title: '',
   tooltips: true,
-  labels : false,
+  labels: false,
   mouseover: function() {},
   mouseout: function() {},
   click: function() {},
@@ -207,7 +212,9 @@ var config = {
     display: true,
     //could be 'left, right'
     position: 'left'
-  }
+  },
+  innerRadius: 0 // applicable on pieCharts, can be a percentage like '50%'
+  lineLegend: 'lineEnd' // can be also 'traditional'
 }
         </code>
       </pre>
@@ -253,6 +260,21 @@ var config = {
     <td>function</td>
     <td>
       Refer <a href="#events">events</a> section for more details
+    </td>
+  </tr>
+  <tr>
+    <td>innerRadius</td>
+    <td>string/number</td>
+    <td>configures radius on Pie charts.
+      <div>can be used as string for percentages. ex: '50%'</div>
+    </td>
+  </tr>
+  <tr>
+    <td>lineLegend</td>
+    <td>string</td>
+    <td>
+      allows to overried line graphs legend position.
+      <div>can be either 'lineEnd' or 'traditional', defaults to 'lineEnd'</div>
     </td>
   </tr>
 </table>

@@ -78,7 +78,9 @@ function MainController($scope) {
 		},
 		mouseout : function(d) {
 			$scope.messages.push('mouseout!');
-		}
+		},
+		innerRadius: 0,
+		lineLegend: 'lineEnd',
 	}
 }
 
