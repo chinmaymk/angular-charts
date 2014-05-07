@@ -9,6 +9,11 @@ http://chinmaymk.github.io/angular-charts/
 * [felipeleusin](https://github.com/felipeleusin)
 * [michalochman](https://github.com/michalochman)
 * [reneolivo](https://github.com/reneolivo) 
+* [sagivf](https://github.com/sagivf)
+* [stephenarmstrong](https://github.com/stephenarmstrong)
+* [jerjoham](https://github.com/jerjoham)
+* [soyuka](https://github.com/soyuka)
+* [jkleijn](https://github.com/jkleijn)
 
 License - MIT.
 
