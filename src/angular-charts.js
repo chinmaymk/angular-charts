@@ -648,11 +648,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       if (config.innerRadius) {
         var configRadius = config.innerRadius;
         if (typeof(configRadius) === 'string' && configRadius.indexOf('%') > 0) {
-          configRadius = radius * (1-parseFloat(configRadius) * 0.01);
+          configRadius = radius * (parseFloat(configRadius) * 0.01);
+        } else {
+          configRadius = Number(configRadius);
         }
 
-        if (configRadius) {
-          innerRadius = radius - Number(configRadius);
+        if (configRadius >= 0) {
+          innerRadius = configRadius;
         }
       }
 
