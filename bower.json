@@ -1,6 +1,6 @@
 {
   "name": "angular-charts",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "authors": [
     "chinmaymk"
   ],
@@ -23,7 +23,6 @@
   "dependencies": {
     "d3": "~3.3.10",
     "angular": "latest",
-    "jquery": "~2.0.3"
   },
   "repository": {
     "type": "git",

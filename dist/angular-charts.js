@@ -8,15 +8,16 @@ angular.module('angularCharts', ['angularChartsTemplates']);
 angular.module('angularCharts').directive('acChart', [
   '$templateCache',
   '$compile',
+  '$rootElement',
   '$window',
   '$timeout',
-  function ($templateCache, $compile, $window, $timeout) {
+  function ($templateCache, $compile, $rootElement, $window, $timeout) {
     /**
    * Initialize some constants
    * @type Array
    */
     var tooltip = [
-        'display:none;',
+        'display:block;',
         'position:absolute;',
         'border:1px solid #333;',
         'background-color:#161616;',
@@ -26,7 +27,7 @@ angular.module('angularCharts').directive('acChart', [
       ].join('');
     /**
    * Utility function to call when we run out of colors!
-   * @return {[type]} [description]
+   * @return {String} Hexadecimal color
    */
     function getRandomColor() {
       var letters = '0123456789ABCDEF'.split('');
@@ -35,6 +36,25 @@ angular.module('angularCharts').directive('acChart', [
         color += letters[Math.round(Math.random() * 15)];
       }
       return color;
+    }
+    /**
+   * Utility function that gets the child that matches the classname
+   * because Angular.element.children() doesn't take selectors
+   * it's still better than a whole jQuery implementation
+   * @param  {Array}  childrens       An array of childrens - element.children() or element.find('div')
+   * @param  {String} className       Class name
+   * @return {Angular.element|null}    The founded child or null
+   */
+    function getChildrenByClassname(childrens, className) {
+      var child = null;
+      for (var i in childrens) {
+        if (angular.isElement(childrens[i])) {
+          child = angular.element(childrens[i]);
+          if (child.hasClass(className))
+            return child;
+        }
+      }
+      return child;
     }
     /**
    * Main link function
@@ -69,7 +89,11 @@ angular.module('angularCharts').directive('acChart', [
           innerRadius: 0,
           lineLegend: 'lineEnd'
         };
-      var totalWidth = element.width(), totalHeight = element.height();
+      var totalWidth = element[0].clientWidth;
+      var totalHeight = element[0].clientHeight;
+      if (totalHeight === 0 || totalWidth === 0) {
+        throw new Error('Please set height and width for the chart element');
+      }
       var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
       if (totalHeight === 0 || totalWidth === 0) {
         throw new Error('Please set height and width for the chart element');
@@ -118,10 +142,14 @@ angular.module('angularCharts').directive('acChart', [
      */
       function setContainers() {
         var container = $templateCache.get(config.legend.position);
-        element.html($compile(container)(scope));
-        chartContainer = element.find('.ac-chart');
-        legendContainer = element.find('.ac-legend');
-        height -= element.find('.ac-title').height();
+        element.html(container);
+        //http://stackoverflow.com/a/17883151
+        $compile(element.contents())(scope);
+        //getting children divs
+        var childrens = element.find('div');
+        chartContainer = getChildrenByClassname(childrens, 'ac-chart');
+        legendContainer = getChildrenByClassname(childrens, 'ac-legend');
+        height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
       }
       /**
      * Parses data from attributes 
@@ -373,11 +401,15 @@ angular.module('angularCharts').directive('acChart', [
        * [last description]
        * @type {[type]}
        */
-        var last = linedata[linedata.length - 1].values;
-        var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
-        path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(1500).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
-          return line(d.values);
-        });
+        if (linedata.length > 0) {
+          var last = linedata[linedata.length - 1].values;
+          if (last.length > 0) {
+            var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
+            path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(1500).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
+              return line(d.values);
+            });
+          }
+        }
         /**
        * Add points
        * @param  {[type]} value [description]
@@ -558,25 +590,32 @@ angular.module('angularCharts').directive('acChart', [
             return d.y[0];
           });
         var path = svg.selectAll('.arc').data(pie(points)).enter().append('g');
+        var complete = false;
         var arcs = path.append('path').style('fill', function (d, i) {
             return getColor(i);
-          }).transition().ease('linear').duration(500).attrTween('d', tweenPie).attr('class', 'arc');
-        path.on('mouseover', function (d) {
-          makeToolTip({ value: d.data.y[0] }, d3.event);
-          d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-          config.mouseover(d, d3.event);
-          scope.$apply();
-        }).on('mouseleave', function (d) {
-          d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
-          removeToolTip();
-          config.mouseout(d, d3.event);
-          scope.$apply();
-        }).on('mousemove', function (d) {
-          updateToolTip(d3.event);
-        }).on('click', function (d) {
-          config.click(d, d3.event);
-          scope.$apply();
-        });
+          }).transition().ease('linear').duration(500).attrTween('d', tweenPie).attr('class', 'arc').each('end', function () {
+            //avoid firing multiple times
+            if (!complete) {
+              complete = true;
+              //Add listeners when transition is done
+              path.on('mouseover', function (d) {
+                makeToolTip({ value: d.data.y[0] }, d3.event);
+                d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
+                config.mouseover(d, d3.event);
+                scope.$apply();
+              }).on('mouseleave', function (d) {
+                d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
+                removeToolTip();
+                config.mouseout(d, d3.event);
+                scope.$apply();
+              }).on('mousemove', function (d) {
+                updateToolTip(d3.event);
+              }).on('click', function (d) {
+                config.click(d, d3.event);
+                scope.$apply();
+              });
+            }
+          });
         if (!!config.labels) {
           path.append('text').attr('transform', function (d) {
             return 'translate(' + arc.centroid(d) + ')';
@@ -713,25 +752,27 @@ angular.module('angularCharts').directive('acChart', [
         if (!config.tooltips) {
           return;
         }
-        if (Object.prototype.toString.call(config.tooltips) == '[object Function]') {
+        if (typeof config.tooltips == 'function') {
           data = config.tooltips(data);
         } else {
           data = data.value;
         }
-        angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).appendTo('body').fadeIn('slow').css({
-          left: event.pageX + 20,
-          top: event.pageY - 30
-        });
+        var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).css({
+            left: event.pageX + 20,
+            top: event.pageY - 30
+          });
+        $rootElement.find('body').append(el);
+        scope.$tooltip = el;
       }
       /**
      * Clears the tooltip from body
      * @return {[type]} [description]
      */
       function removeToolTip() {
-        angular.element('.ac-tooltip').remove();
+        scope.$tooltip.remove();
       }
       function updateToolTip(event) {
-        angular.element('.ac-tooltip').css({
+        scope.$tooltip.css({
           left: event.pageX + 20,
           top: event.pageY - 30
         });
@@ -779,15 +820,15 @@ angular.module('angularCharts').directive('acChart', [
       w.bind('resize', function (ev) {
         resizePromise && $timeout.cancel(resizePromise);
         resizePromise = $timeout(function () {
-          totalWidth = element.width();
-          totalHeight = element.height();
+          totalWidth = element[0].clientWidth;
+          totalHeight = element[0].clientHeight;
           init();
         }, 100);
       });
       scope.getWindowDimensions = function () {
         return {
-          'h': w.height(),
-          'w': w.width()
+          'h': w[0].clientHeight,
+          'w': w[0].clientWidth
         };
       };
       //let the party begin!
@@ -820,25 +861,25 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("left",
     "\n" +
     "<style>\n" +
-    "	.axis path,\n" +
-    "	.axis line {\n" +
-    "	  fill: none;\n" +
-    "	  stroke: #333;\n" +
-    "	}\n" +
-    "	.ac-line {\n" +
-    "		fill:none;\n" +
-    "		stroke-width:2px;\n" +
-    "	}\n" +
+    " .axis path,\n" +
+    " .axis line {\n" +
+    "   fill: none;\n" +
+    "   stroke: #333;\n" +
+    " }\n" +
+    " .ac-line {\n" +
+    "   fill:none;\n" +
+    "   stroke-width:2px;\n" +
+    " }\n" +
     "</style>\n" +
     "\n" +
     "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
-    "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
-    "	<tr ng-repeat=\"l in legends\">\n" +
-    "		<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
-    "		<td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
-    "	</tr>\n" +
-    "	</table>\n" +
+    " <table style='list-style:none;margin:0px;padding:0px;'>\n" +
+    " <tr ng-repeat=\"l in legends\">\n" +
+    "   <td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
+    "   <td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
+    " </tr>\n" +
+    " </table>\n" +
     "</div>\n" +
     "<div class='ac-chart' style='float:left; width:75%;'>\n" +
     "</div>");
@@ -847,26 +888,26 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
 angular.module("right", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("right",
     "<style>\n" +
-    "	.axis path,\n" +
-    "	.axis line {\n" +
-    "	  fill: none;\n" +
-    "	  stroke: #333;\n" +
-    "	}\n" +
-    "	.ac-line {\n" +
-    "		fill:none;\n" +
-    "		stroke-width:2px;\n" +
-    "	}\n" +
+    " .axis path,\n" +
+    " .axis line {\n" +
+    "   fill: none;\n" +
+    "   stroke: #333;\n" +
+    " }\n" +
+    " .ac-line {\n" +
+    "   fill:none;\n" +
+    "   stroke-width:2px;\n" +
+    " }\n" +
     "</style>\n" +
     "\n" +
     "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
     "<div class='ac-chart' style='float:left;width:75%;'>\n" +
     "</div>\n" +
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
-    "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
-    "	<tr ng-repeat=\"l in legends | limitTo:yMaxData\">\n" +
-    "		<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
-    "		<td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
-    "	</tr>\n" +
-    "	</table>\n" +
+    " <table style='list-style:none;margin:0px;padding:0px;'>\n" +
+    " <tr ng-repeat=\"l in legends | limitTo:yMaxData\">\n" +
+    "   <td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
+    "   <td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
+    " </tr>\n" +
+    " </table>\n" +
     "</div>");
 }]);
