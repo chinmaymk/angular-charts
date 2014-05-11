@@ -642,43 +642,52 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                     .data(pie(points))
                     .enter().append("g");
 
+      var complete = false;
       var arcs = path.append("path")
                     .style("fill", function(d, i) { return getColor(i); })
                     .transition()
                     .ease("linear")
                     .duration(500)
                     .attrTween("d", tweenPie)
-                    .attr("class", "arc");
+                    .attr("class", "arc")
+                    .each('end', function() {
+                      //avoid firing multiple times
+                      if(!complete) {
+                        complete = true
 
-      path.on("mouseover", function(d) { 
-        makeToolTip({ value: d.data.y[0] }, d3.event);
-        d3.select(this)
-            .select('path')
-            .transition()
-            .duration(200)
-            .style("stroke", "white")
-            .style("stroke-width", "2px");
-        config.mouseover(d, d3.event);
-        scope.$apply();
-      })
-      .on("mouseleave", function(d) {  
-          d3.select(this)
-            .select('path')
-            .transition()
-            .duration(200)
-            .style("stroke", "")
-            .style("stroke-width", "");
-            removeToolTip();
-        config.mouseout(d, d3.event);
-        scope.$apply();
-      })
-      .on("mousemove", function(d) {  
-          updateToolTip(d3.event);
-      })
-      .on("click", function(d) {
-        config.click(d, d3.event);
-        scope.$apply();
-      });
+                        //Add listeners when transition is done
+                        path.on("mouseover", function(d) { 
+                          makeToolTip({ value: d.data.y[0] }, d3.event);
+                          d3.select(this)
+                              .select('path')
+                              .transition()
+                              .duration(200)
+                              .style("stroke", "white")
+                              .style("stroke-width", "2px");
+                          config.mouseover(d, d3.event);
+                          scope.$apply();
+                        })
+                        .on("mouseleave", function(d) {  
+                            d3.select(this)
+                              .select('path')
+                              .transition()
+                              .duration(200)
+                              .style("stroke", "")
+                              .style("stroke-width", "");
+                              removeToolTip();
+                          config.mouseout(d, d3.event);
+                          scope.$apply();
+                        })
+                        .on("mousemove", function(d) {  
+                            updateToolTip(d3.event);
+                        })
+                        .on("click", function(d) {
+                          config.click(d, d3.event);
+                          scope.$apply();
+                        });
+
+                      }
+                    });
 
       if(!!config.labels) {
         path.append("text")
