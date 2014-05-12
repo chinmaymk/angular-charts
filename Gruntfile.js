@@ -35,7 +35,7 @@ module.exports = function(grunt) {
         base : 'src/templates',
         module : 'angularChartsTemplates',
         rename : function(name) {
-          return name.replace('.html', '')
+          return name.replace('.html', '');
         }
       },
       main: {
@@ -43,17 +43,36 @@ module.exports = function(grunt) {
         dest: 'build/templates.js'
       },
     },
+    update_json: {
+      bower: {
+        src: 'package.json',
+        dest: 'bower.json',
+        fields: ['name', 'version', 'description', 'repository']
+      }
+    },
+    copy: {
+      bower_release_pre: {
+        files: [
+          { src: 'dist/angular-charts.js', dest: 'dist/angular-charts.tmp.js' },
+          { src: 'dist/angular-charts.min.js', dest: 'dist/angular-charts.min.tmp.js' }
+        ]
+      }
+    },
+    shell: {
+      bower_release: {
+        command: [
+          'git checkout bower',
+          'git checkout master -- bower.json',
+          'mv -f dist/angular-charts.tmp.js dist/angular-charts.js',
+          'mv -f dist/angular-charts.min.tmp.js dist/angular-charts.min.js',
+        ]
+      }
+    }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-ngmin');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-html2js');
+  require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
+  grunt.registerTask('release', ['default', 'update_json', 'bower_release_pre', 'bower_release']);
   
 };

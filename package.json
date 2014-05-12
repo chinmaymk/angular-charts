@@ -1,9 +1,10 @@
 {
-  "name": "utopia",
-  "version": "0.1.0",
+  "name": "angular-charts",
+  "version": "0.2.2",
   "description": "angular directives for common charts using d3, for more information visit",
   "main": "Gruntfile.js",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "*",
     "grunt-contrib-uglify": "*",
@@ -12,13 +13,15 @@
     "grunt-contrib-clean": "*",
     "grunt-html2js": "~0.1.9",
     "grunt-ngmin": "0.0.3",
-    "grunt-contrib-watch": "~0.5.3"
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-update-json": "^0.1.3",
+    "load-grunt-tasks": "^0.4.0",
+    "grunt-prompt": "^1.1.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "",
+  "repository": "https://github.com/chinmaymk/angular-charts.git",
   "author": "chinmaymk",
   "license": "MIT"
 }
