@@ -43,13 +43,6 @@ module.exports = function(grunt) {
         dest: 'build/templates.js'
       },
     },
-    update_json: {
-      bower: {
-        src: 'package.json',
-        dest: 'bower.json',
-        fields: ['name', 'version', 'description', 'repository']
-      }
-    },
     copy: {
       bowerPreRelease: {
         files: [
@@ -75,6 +68,6 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
-  grunt.registerTask('release', ['default', 'update_json', 'copy:bowerPreRelease', 'shell:bowerRelease']);
+  grunt.registerTask('release', ['default', 'copy:bowerPreRelease', 'shell:bowerRelease']);
   
 };
