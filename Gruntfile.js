@@ -51,7 +51,7 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      bower_release_pre: {
+      bowerPreRelease: {
         files: [
           { src: 'dist/angular-charts.js', dest: 'dist/angular-charts.tmp.js' },
           { src: 'dist/angular-charts.min.js', dest: 'dist/angular-charts.min.tmp.js' }
@@ -59,7 +59,7 @@ module.exports = function(grunt) {
       }
     },
     shell: {
-      bower_release: {
+      bowerRelease: {
         command: [
           'git checkout bower',
           'git checkout master -- bower.json',
@@ -73,6 +73,6 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
-  grunt.registerTask('release', ['default', 'update_json', 'bower_release_pre', 'bower_release']);
+  grunt.registerTask('release', ['default', 'update_json', 'copy:bowerPreRelease', 'shell:bowerRelease']);
   
 };
