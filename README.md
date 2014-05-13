@@ -10,7 +10,7 @@ We recommend downloading a copy of angular-charts from [releases](https://github
 Releases sit on the bower branch. If you want to build from master download and run grunt.
 
 ###Playground
-You can try out config options on [plunkr](http://plnkr.co/edit/T9J7bz?p=preview)
+You can try out angular-charts on [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 
 ###Contributors
 * [felipeleusin](https://github.com/felipeleusin)
