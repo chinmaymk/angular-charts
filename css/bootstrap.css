@@ -744,7 +744,7 @@ samp {
 }
 
 code {
-  padding: 2px 4px;
+  /*padding: 2px 4px;*/
   font-size: 90%;
   color: #c7254e;
   white-space: nowrap;
