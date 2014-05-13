@@ -5,7 +5,8 @@ angular directives for common charts using d3, for more information visit
 
 http://chinmaymk.github.io/angular-charts/
 
-###Releases
+###Downloading zip from this page won't work!!!
+We recommend downloading a copy of angular-charts from [releases](https://github.com/chinmaymk/angular-charts/releases).
 Releases sit on the bower branch. If you want to build from master download and run grunt.
 
 ###Contributors
