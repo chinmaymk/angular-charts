@@ -882,7 +882,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
                .html(data)
-               .css({left: event.pageX + 20, top: event.pageY - 30});
+               .css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
 
       $rootElement.find('body').append(el);
 
@@ -898,7 +898,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     }
 
     function updateToolTip(event) {
-      scope.$tooltip.css({left: event.pageX + 20, top: event.pageY - 30});
+      scope.$tooltip.css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
     }
 
     /**
