@@ -884,7 +884,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                .html(data)
                .css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
 
-      $rootElement.find('body').append(el);
+     angular.element(document.body).append(el);
 
       scope.$tooltip = el;
     }
