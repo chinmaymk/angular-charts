@@ -43,6 +43,20 @@ module.exports = function(grunt) {
         dest: 'build/templates.js'
       },
     },
+    prompt: {
+      release: {
+        options: {
+          questions: [
+            {
+              config: 'release', // arbitray name or config for any other grunt task
+              type: 'confirm', // list, checkbox, confirm, input, password
+              message: 'Are you sure?', // Question to ask the user, function needs to return a string,
+              default: false // default value if nothing is entered
+            }
+          ]
+        }
+      },
+    },
     copy: {
       bowerPreRelease: {
         files: [
@@ -68,6 +82,12 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
-  grunt.registerTask('release', ['default', 'copy:bowerPreRelease', 'shell:bowerRelease']);
+  grunt.registerTask('release', ['prompt', 'bowerValidateRelease']);
   
+  grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
+    if(grunt.config('release') === true) {
+      grunt.task.run('default', 'copy:bowerPreRelease', 'shell:bowerRelease');
+    }
+  });
+
 };
