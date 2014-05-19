@@ -1,4 +1,4 @@
-angular-charts
+angular-charts [![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
 ==============
 
 angular directives for common charts using d3, for more information visit
