@@ -577,10 +577,12 @@ angular.module('angularCharts').directive('acChart', [
         if (config.innerRadius) {
           var configRadius = config.innerRadius;
           if (typeof configRadius === 'string' && configRadius.indexOf('%') > 0) {
-            configRadius = radius * (1 - parseFloat(configRadius) * 0.01);
+            configRadius = radius * (parseFloat(configRadius) * 0.01);
+          } else {
+            configRadius = Number(configRadius);
           }
-          if (configRadius) {
-            innerRadius = radius - Number(configRadius);
+          if (configRadius >= 0) {
+            innerRadius = configRadius;
           }
         }
         scope.yMaxData = points.length;
@@ -758,10 +760,10 @@ angular.module('angularCharts').directive('acChart', [
           data = data.value;
         }
         var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).css({
-            left: event.pageX + 20,
-            top: event.pageY - 30
+            left: event.pageX + 20 + 'px',
+            top: event.pageY - 30 + 'px'
           });
-        $rootElement.find('body').append(el);
+        angular.element(document.body).append(el);
         scope.$tooltip = el;
       }
       /**
@@ -773,8 +775,8 @@ angular.module('angularCharts').directive('acChart', [
       }
       function updateToolTip(event) {
         scope.$tooltip.css({
-          left: event.pageX + 20,
-          top: event.pageY - 30
+          left: event.pageX + 20 + 'px',
+          top: event.pageY - 30 + 'px'
         });
       }
       /**
@@ -861,25 +863,25 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("left",
     "\n" +
     "<style>\n" +
-    " .axis path,\n" +
-    " .axis line {\n" +
-    "   fill: none;\n" +
-    "   stroke: #333;\n" +
-    " }\n" +
-    " .ac-line {\n" +
-    "   fill:none;\n" +
-    "   stroke-width:2px;\n" +
-    " }\n" +
+    "	.axis path,\n" +
+    "	.axis line {\n" +
+    "	  fill: none;\n" +
+    "	  stroke: #333;\n" +
+    "	}\n" +
+    "	.ac-line {\n" +
+    "		fill:none;\n" +
+    "		stroke-width:2px;\n" +
+    "	}\n" +
     "</style>\n" +
     "\n" +
     "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
-    " <table style='list-style:none;margin:0px;padding:0px;'>\n" +
-    " <tr ng-repeat=\"l in legends\">\n" +
-    "   <td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
-    "   <td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
-    " </tr>\n" +
-    " </table>\n" +
+    "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
+    "	<tr ng-repeat=\"l in legends\">\n" +
+    "		<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
+    "		<td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
+    "	</tr>\n" +
+    "	</table>\n" +
     "</div>\n" +
     "<div class='ac-chart' style='float:left; width:75%;'>\n" +
     "</div>");
@@ -888,26 +890,26 @@ angular.module("left", []).run(["$templateCache", function($templateCache) {
 angular.module("right", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("right",
     "<style>\n" +
-    " .axis path,\n" +
-    " .axis line {\n" +
-    "   fill: none;\n" +
-    "   stroke: #333;\n" +
-    " }\n" +
-    " .ac-line {\n" +
-    "   fill:none;\n" +
-    "   stroke-width:2px;\n" +
-    " }\n" +
+    "	.axis path,\n" +
+    "	.axis line {\n" +
+    "	  fill: none;\n" +
+    "	  stroke: #333;\n" +
+    "	}\n" +
+    "	.ac-line {\n" +
+    "		fill:none;\n" +
+    "		stroke-width:2px;\n" +
+    "	}\n" +
     "</style>\n" +
     "\n" +
     "<div class='ac-title' style='font-weight: bold;font-size: 1.2em;'>{{acConfig.title}}</div>\n" +
     "<div class='ac-chart' style='float:left;width:75%;'>\n" +
     "</div>\n" +
     "<div class='ac-legend' style='float:left; max-width:25%;' ng-show='{{acConfig.legend.display}}'>\n" +
-    " <table style='list-style:none;margin:0px;padding:0px;'>\n" +
-    " <tr ng-repeat=\"l in legends | limitTo:yMaxData\">\n" +
-    "   <td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
-    "   <td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
-    " </tr>\n" +
-    " </table>\n" +
+    "	<table style='list-style:none;margin:0px;padding:0px;'>\n" +
+    "	<tr ng-repeat=\"l in legends | limitTo:yMaxData\">\n" +
+    "		<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>\n" +
+    "		<td style=' display: inline-block;' ng-bind='l.title'></td>\n" +
+    "	</tr>\n" +
+    "	</table>\n" +
     "</div>");
 }]);
