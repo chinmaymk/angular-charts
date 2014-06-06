@@ -80,6 +80,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'],
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
+      lineCurveType: 'cardinal',
     };
 
     var totalWidth = element[0].clientWidth;
@@ -314,7 +315,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]}   [description]
        */
       bars.on("mouseover", function(d) { 
-        makeToolTip({ value: d.y, series: series[d.s], index: d.x}, d3.event);
+        var tooltipContent;
+        if(typeof d.tooltip != 'undefined') {
+          tooltipContent = d.tooltip;
+        } else {
+          tooltipContent = d.y;
+        }
+        makeToolTip({ value: tooltipContent, series: series[d.s], index: d.x}, d3.event);
         config.mouseover(d, d3.event);
         scope.$apply();
       })
@@ -382,7 +389,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .tickFormat(d3.format('s'));
 
       var line = d3.svg.line()
-          .interpolate("cardinal")
+          .interpolate(config.lineCurveType)
           .x(function(d) { return getX(d.x); })
           .y(function(d) { return y(d.y); });
 
@@ -404,7 +411,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           return point.y.map(function(e) {
             return {
               x : point.x,
-              y : e
+              y : e,
+              tooltip : point.tooltip,
             }
           })[index] || {x:points[index].x, y :0};
         });
@@ -479,7 +487,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(series){ return function(d) {
-              makeToolTip({index:d.x, value:d.y, series:series}, d3.event);
+              var tooltipContent;
+              if(typeof d.tooltip != 'undefined') {
+                tooltipContent = d.tooltip;
+              } else {
+                tooltipContent = d.y;
+              }
+              makeToolTip({index:d.x, value:tooltipContent, series:series}, d3.event);
               config.mouseover(d, d3.event);
               scope.$apply();
           };}(value.series))
@@ -557,7 +571,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .tickFormat(d3.format('s'));
 
       var line = d3.svg.line()
-          .interpolate("cardinal")
+          .interpolate(config.lineCurveType)
           .x(function(d) { return getX(d.x); })
           .y(function(d) { return y(d.y); });
 
@@ -831,7 +845,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(series){return function(d) {
-              makeToolTip({index:d.x, value:d.y, series:series}, d3.event);
+              var tooltipContent;
+              if(typeof d.tooltip != 'undefined') {
+                tooltipContent = d.tooltip;
+              } else {
+                tooltipContent = d.y;
+              }
+              makeToolTip({index:d.x, value:tooltipContent, series:series}, d3.event);
               config.mouseover(d, d3.event);
               scope.$apply();
           };}(value.series))
