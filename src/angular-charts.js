@@ -80,6 +80,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'],
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
+      chartType:"line"//default to line
     };
 
     var totalWidth = element[0].clientWidth;
@@ -166,7 +167,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      */
     function prepareData() {
       data = scope.acData;
-      chartType = scope.acChart;
+      chartType = scope.acChart || config.chartType;
       series = (data) ? data.series || [] : [];
       points = (data) ? data.data || [] : [];
       if(scope.acConfig) {
