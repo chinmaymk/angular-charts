@@ -12,6 +12,10 @@ module.exports = function(grunt) {
       dist: {
         src: ['build/*.js'],
         dest: 'dist/angular-charts.js'
+      },
+      amd:{
+        src:['src/angular-charts.prefix','build/*.js','src/angular-charts.suffix'],
+        dest:'dist/amd/angular-charts.js'
       }
     },
     uglify : {
@@ -82,6 +86,7 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
+  grunt.registerTask('amd',['ngmin','html2js','concat:amd','uglify','clean']);
   grunt.registerTask('release', ['prompt', 'bowerValidateRelease']);
   
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
