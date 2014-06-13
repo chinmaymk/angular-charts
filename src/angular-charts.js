@@ -20,7 +20,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                 "border-radius:5px;",
                 "padding:5px;",
                 "color:#fff;"].join('');
- 
+
   /**
    * Utility function to call when we run out of colors!
    * @return {String} Hexadecimal color
@@ -89,13 +89,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       throw new Error('Please set height and width for the chart element')
     }
 
-    var data, 
-    series, 
-    points, 
-    height, 
-    width, 
-    chartContainer, 
-    legendContainer, 
+    var data,
+    series,
+    points,
+    height,
+    width,
+    chartContainer,
+    legendContainer,
     chartType,
     isAnimate =true,
     defaultColors = config.colors;
@@ -142,7 +142,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
               width = totalWidth * 0.75;
               break;
       }
-    } 
+    }
 
     /**
      * Creates appropriate DOM structure for legend + chart
@@ -161,7 +161,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     }
 
     /**
-     * Parses data from attributes 
+     * Parses data from attributes
      * @return {[type]} [description]
      */
     function prepareData() {
@@ -220,7 +220,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       var y = d3.scale.linear()
           .range([height, 10]);
-      
+
       var x0 = d3.scale.ordinal()
         .rangeRoundBands([0, width], .1);
 
@@ -282,7 +282,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       svg.append("g")
           .attr("class", "y axis")
           .call(yAxis);
-     
+
      /**
       * Add bars
       * @type {[type]}
@@ -296,9 +296,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       var bars = barGroups.selectAll("rect")
           .data(function(d) { return d.nicedata; })
         .enter().append("rect");
-          
+
       bars.attr("width", x0.rangeBand());
-        
+
       bars.attr("x", function(d, i) { return x0(i); })
         .attr("y", height)
         .style("fill", function(d) { return getColor(d.s); })
@@ -307,23 +307,23 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .ease("cubic-in-out")
         .duration(1000)
         .attr("y", function(d) { return y(Math.max(0, d.y)); })
-        .attr("height", function(d) { return Math.abs(y(d.y) - y(0)); });  
+        .attr("height", function(d) { return Math.abs(y(d.y) - y(0)); });
       /**
        * Add events for tooltip
        * @param  {[type]} d [description]
        * @return {[type]}   [description]
        */
-      bars.on("mouseover", function(d) { 
+      bars.on("mouseover", function(d) {
         makeToolTip({ value: d.y, series: series[d.s], index: d.x}, d3.event);
         config.mouseover(d, d3.event);
         scope.$apply();
       })
-      .on("mouseleave", function(d) {  
+      .on("mouseleave", function(d) {
         removeToolTip();
         config.mouseout(d, d3.event);
         scope.$apply();
       })
-      .on("mousemove", function(d) {  
+      .on("mousemove", function(d) {
          updateToolTip(d3.event);
       })
       .on("click", function(d) {
@@ -341,7 +341,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .attr("x", function(d, i) { return x0(i); })
         .attr("y", function(d) { return height - Math.abs(y(d.y) - y(0)); })
         // .attr("transform", "rotate(270)")
-        .text(function(d) {return d.y; });    
+        .text(function(d) {return d.y; });
       }
 
       /**
@@ -441,7 +441,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .attr("d", function(d) { return line(d.values) })
         .attr("stroke-width", "2")
         .attr("fill", "none");
-      
+
       /** Animation function
        * [last description]
        * @type {[type]}
@@ -450,7 +450,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         var last = linedata[linedata.length - 1].values;
         if (last.length > 0) {
           var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
-          
+
           path.attr("stroke-dasharray", totalLength + " " + totalLength)
           .attr("stroke-dashoffset", totalLength)
           .transition()
@@ -460,7 +460,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             .attr("d", function(d) { return line(d.values); });
         }
       }
-      
+
       /**
        * Add points
        * @param  {[type]} value [description]
@@ -473,8 +473,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .enter();
 
         points.append("circle")
-          .attr("cx", function(d) {return getX(d.x) } ) 
-          .attr("cy", function(d) {return y(d.y)} ) 
+          .attr("cx", function(d) {return getX(d.x) } )
+          .attr("cy", function(d) {return y(d.y)} )
           .attr("r", 3)
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
@@ -498,13 +498,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
           if(config.labels) {
             points.append("text")
-            .attr("x", function(d) {return getX(d.x)} ) 
+            .attr("x", function(d) {return getX(d.x)} )
             .attr("y", function(d) {return y(d.y)} )
             .text(function(d){return d.y});
           }
       });
-      
-     
+
+
      /**
       * Labels at the end of line
       */
@@ -513,9 +513,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .datum(function(d) { return {name: d.series, value: d.values[d.values.length - 1]}; })
           .attr("transform", function(d) { return "translate(" + getX(d.value.x) + "," + y(d.value.y) + ")"; })
           .attr("x", 3)
-          .text(function(d) { return d.name; });  
+          .text(function(d) { return d.name; });
       }
-      
+
       /**
        * Returns x point of line point
        * @param  {[type]} d [description]
@@ -528,7 +528,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       return linedata;
     }
 
-    
+
     /**
      * Creates a nice area chart
      * @return {[type]} [description]
@@ -690,7 +690,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                         complete = true
 
                         //Add listeners when transition is done
-                        path.on("mouseover", function(d) { 
+                        path.on("mouseover", function(d) {
                           makeToolTip({ value: d.data.y[0] }, d3.event);
                           d3.select(this)
                               .select('path')
@@ -701,7 +701,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                           config.mouseover(d, d3.event);
                           scope.$apply();
                         })
-                        .on("mouseleave", function(d) {  
+                        .on("mouseleave", function(d) {
                             d3.select(this)
                               .select('path')
                               .transition()
@@ -712,7 +712,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                           config.mouseout(d, d3.event);
                           scope.$apply();
                         })
-                        .on("mousemove", function(d) {  
+                        .on("mousemove", function(d) {
                             updateToolTip(d3.event);
                         })
                         .on("click", function(d) {
@@ -728,14 +728,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
           .attr("dy", ".35em")
           .style("text-anchor", "middle")
-          .text(function(d) { return d.data.y[0]; });  
+          .text(function(d) { return d.data.y[0]; });
       }
 
       function tweenPie(b) {
         b.innerRadius = 0;
         var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
         return function(t) {
-            return arc(i(t));  
+            return arc(i(t));
         };
       }
     }
@@ -825,8 +825,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .enter();
 
         points.append("circle")
-          .attr("cx", function(d) {return getX(d.x) } ) 
-          .attr("cy", function(d) {return y(d.y)} ) 
+          .attr("cx", function(d) {return getX(d.x) } )
+          .attr("cy", function(d) {return y(d.y)} )
           .attr("r", 3)
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
@@ -850,12 +850,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
         if(config.labels) {
           points.append("text")
-          .attr("x", function(d) {return getX(d.x)} ) 
+          .attr("x", function(d) {return getX(d.x)} )
           .attr("y", function(d) {return y(d.y)} )
           .text(function(d){return d.y});
         }
       });
-      
+
       /**
        * Returns x point of line point
        * @param  {[type]} d [description]
@@ -894,11 +894,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function removeToolTip() {
-      scope.$tooltip.remove();
+      if(scope.$tooltip)
+        scope.$tooltip.remove();
     }
 
     function updateToolTip(event) {
-      scope.$tooltip.css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
+      if(scope.$tooltip)
+        scope.$tooltip.css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
     }
 
     /**
@@ -916,12 +918,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         (chartType == 'line' && config.lineLegend === 'traditional')) {
         angular.forEach(series, function(value, key){
           scope.legends.push({color : config.colors[key], title: value});
-        }); 
+        });
       }
     }
 
     /**
-     * Checks if index is available in color 
+     * Checks if index is available in color
      * else returns a random color
      * @param  {[type]} i [description]
      * @return {[type]}   [description]
@@ -967,5 +969,5 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       acData : '=',
       acConfig: '='
     }
-  } 
+  }
 });
