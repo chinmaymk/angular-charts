@@ -87,14 +87,15 @@ angular.module('angularCharts').directive('acChart', [
             'rgb(0,128,0)'
           ],
           innerRadius: 0,
-          lineLegend: 'lineEnd'
+          lineLegend: 'lineEnd',
+          isAnimate: true
         };
       var totalWidth = element[0].clientWidth;
       var totalHeight = element[0].clientHeight;
       if (totalHeight === 0 || totalWidth === 0) {
         throw new Error('Please set height and width for the chart element');
       }
-      var data, series, points, height, width, chartContainer, legendContainer, chartType, isAnimate = true, defaultColors = config.colors;
+      var data, series, points, height, width, chartContainer, legendContainer, chartType, defaultColors = config.colors;
       if (totalHeight === 0 || totalWidth === 0) {
         throw new Error('Please set height and width for the chart element');
       }
@@ -152,7 +153,7 @@ angular.module('angularCharts').directive('acChart', [
         height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
       }
       /**
-     * Parses data from attributes 
+     * Parses data from attributes
      * @return {[type]} [description]
      */
       function prepareData() {
@@ -188,7 +189,7 @@ angular.module('angularCharts').directive('acChart', [
         if (config.xAxisMaxTicks && allTicks.length > config.xAxisMaxTicks) {
           var mod = Math.ceil(allTicks.length / config.xAxisMaxTicks);
           xAxis.tickValues(allTicks.filter(function (e, i) {
-            return i % mod == 0;
+            return i % mod === 0;
           }));
         }
       }
@@ -278,7 +279,7 @@ angular.module('angularCharts').directive('acChart', [
           return x0(i);
         }).attr('y', height).style('fill', function (d) {
           return getColor(d.s);
-        }).attr('height', 0).transition().ease('cubic-in-out').duration(1000).attr('y', function (d) {
+        }).attr('height', 0).transition().ease('cubic-in-out').duration(config.isAnimate ? 1000 : 0).attr('y', function (d) {
           return y(Math.max(0, d.y));
         }).attr('height', function (d) {
           return Math.abs(y(d.y) - y(0));
@@ -405,7 +406,7 @@ angular.module('angularCharts').directive('acChart', [
           var last = linedata[linedata.length - 1].values;
           if (last.length > 0) {
             var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
-            path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(1500).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
+            path.attr('stroke-dasharray', totalLength + ' ' + totalLength).attr('stroke-dashoffset', totalLength).transition().duration(config.isAnimate ? 1500 : 0).ease('linear').attr('stroke-dashoffset', 0).attr('d', function (d) {
               return line(d.values);
             });
           }
@@ -475,7 +476,6 @@ angular.module('angularCharts').directive('acChart', [
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
-        ;
         return linedata;
       }
       /**
@@ -504,11 +504,11 @@ angular.module('angularCharts').directive('acChart', [
         var xAxis = d3.svg.axis().scale(x).orient('bottom');
         filterXAxis(xAxis, x);
         var yAxis = d3.svg.axis().scale(y).orient('left').ticks(5).tickFormat(d3.format('s'));
-        var line = d3.svg.line().interpolate('cardinal').x(function (d) {
-            return getX(d.x);
-          }).y(function (d) {
-            return y(d.y);
-          });
+        d3.svg.line().interpolate('cardinal').x(function (d) {
+          return getX(d.x);
+        }).y(function (d) {
+          return y(d.y);
+        });
         var yData = [0];
         var linedata = [];
         points.forEach(function (d) {
@@ -564,7 +564,6 @@ angular.module('angularCharts').directive('acChart', [
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
-        ;
       }
       /**
      * Draws a beautiful pie chart
@@ -587,37 +586,37 @@ angular.module('angularCharts').directive('acChart', [
         }
         scope.yMaxData = points.length;
         var arc = d3.svg.arc().outerRadius(radius - 10).innerRadius(innerRadius);
-        var arcOver = d3.svg.arc().outerRadius(radius + 5).innerRadius(0);
+        d3.svg.arc().outerRadius(radius + 5).innerRadius(0);
         var pie = d3.layout.pie().sort(null).value(function (d) {
             return d.y[0];
           });
         var path = svg.selectAll('.arc').data(pie(points)).enter().append('g');
         var complete = false;
-        var arcs = path.append('path').style('fill', function (d, i) {
-            return getColor(i);
-          }).transition().ease('linear').duration(500).attrTween('d', tweenPie).attr('class', 'arc').each('end', function () {
-            //avoid firing multiple times
-            if (!complete) {
-              complete = true;
-              //Add listeners when transition is done
-              path.on('mouseover', function (d) {
-                makeToolTip({ value: d.data.y[0] }, d3.event);
-                d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
-                config.mouseover(d, d3.event);
-                scope.$apply();
-              }).on('mouseleave', function (d) {
-                d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
-                removeToolTip();
-                config.mouseout(d, d3.event);
-                scope.$apply();
-              }).on('mousemove', function (d) {
-                updateToolTip(d3.event);
-              }).on('click', function (d) {
-                config.click(d, d3.event);
-                scope.$apply();
-              });
-            }
-          });
+        path.append('path').style('fill', function (d, i) {
+          return getColor(i);
+        }).transition().ease('linear').duration(config.isAnimate ? 500 : 0).attrTween('d', tweenPie).attr('class', 'arc').each('end', function () {
+          //avoid firing multiple times
+          if (!complete) {
+            complete = true;
+            //Add listeners when transition is done
+            path.on('mouseover', function (d) {
+              makeToolTip({ value: d.data.y[0] }, d3.event);
+              d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
+              config.mouseover(d, d3.event);
+              scope.$apply();
+            }).on('mouseleave', function (d) {
+              d3.select(this).select('path').transition().duration(200).style('stroke', '').style('stroke-width', '');
+              removeToolTip();
+              config.mouseout(d, d3.event);
+              scope.$apply();
+            }).on('mousemove', function (d) {
+              updateToolTip(d3.event);
+            }).on('click', function (d) {
+              config.click(d, d3.event);
+              scope.$apply();
+            });
+          }
+        });
         if (!!config.labels) {
           path.append('text').attr('transform', function (d) {
             return 'translate(' + arc.centroid(d) + ')';
@@ -693,7 +692,7 @@ angular.module('angularCharts').directive('acChart', [
         ]);
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
-        var point = svg.selectAll('.points').data(linedata).enter().append('g');
+        svg.selectAll('.points').data(linedata).enter().append('g');
         /**
        * Add points
        * @param  {[type]} value [description]
@@ -744,7 +743,6 @@ angular.module('angularCharts').directive('acChart', [
         function getX(d) {
           return Math.round(x(d)) + x.rangeBand() / 2;
         }
-        ;
       }
       /**
      * Creates and displays tooltip
@@ -803,7 +801,7 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
       /**
-     * Checks if index is available in color 
+     * Checks if index is available in color
      * else returns a random color
      * @param  {[type]} i [description]
      * @return {[type]}   [description]
