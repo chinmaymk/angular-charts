@@ -11,6 +11,7 @@
     "grunt-contrib-cssmin": "*",
     "grunt-contrib-copy": "*",
     "grunt-contrib-clean": "*",
+    "grunt-contrib-htmlmin": "~0.3.0",
     "grunt-html2js": "~0.1.9",
     "grunt-ngmin": "0.0.3",
     "grunt-contrib-watch": "~0.5.3",
