@@ -3,7 +3,7 @@ angular.module('example', ['angularCharts']);
 
 function MainController($scope, $timeout) {
 	$timeout(function() {
-		$scope.data = {
+		$scope.data1 = {
 			series: ['Sales', 'Income', 'Expense', 'Laptops', 'Keyboards'],
 			data : [{
 				x : "Sales",
@@ -24,9 +24,9 @@ function MainController($scope, $timeout) {
 			}]
 		};
 	}, 100);
-	
 
-	$scope.data1 = {
+
+	$scope.data2 = {
 		series: ['Sales', 'Income', 'Expense', 'Laptops', 'Keyboards'],
 		data : [{
 			x : "Sales",
@@ -49,7 +49,7 @@ function MainController($scope, $timeout) {
 
 	$scope.chartType = 'bar';
 
-	$scope.config = {
+	$scope.config1 = {
 		labels: false,
 		title : "Not Products",
 		legend : {
@@ -59,7 +59,7 @@ function MainController($scope, $timeout) {
 		innerRadius: 0
 	};
 
-	$scope.config1 = {
+	$scope.config2 = {
 		labels: false,
 		title : "Products",
 		legend : {
