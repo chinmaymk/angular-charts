@@ -1,26 +1,3 @@
-/**
-* Utility function that gets the child that matches the classname
-* because Angular.element.children() doesn't take selectors
-* it's still better than a whole jQuery implementation
-* @param  {Array}  childrens       An array of childrens - element.children() or element.find('div')
-* @param  {String} className       Class name
-* @return {Angular.element|null}    The founded child or null
-*/
-function find(childrens, className) {
-  var child = null;
-
-  for(var i in childrens) {
-    if(angular.isElement(childrens[i])) {
-      child = angular.element(childrens[i]);
-      if(child.hasClass(className))
-        return child;
-    }
-  }
-
-  return child;
-}
-
-
 describe('angularCharts', function() {
   var $scope, $compile, $chart, $chart_childrens, body //we'll be working on a unique chart
     , numberOfPoints
@@ -113,17 +90,17 @@ describe('angularCharts', function() {
   })
 
   it('should have the right DOM title', function() {
-    expect(find($chart_childrens, 'ac-title').text()).toEqual('Not Products')
+    expect($chart.querySelector('.ac-title').innerText).toEqual('Not Products')
   })
 
   it('should have the right elements in the legend', function() {
 
-    var $legendItems = find($chart_childrens, 'ac-legend').find('tbody').children()
+    var $legendItems = $chart.querySelector('.ac-legend tbody').children
 
     expect($legendItems.length).toEqual($scope.data.series.length)
 
     for(var i in $scope.data.series) {
-      expect(find($legendItems[i], 'ng-binding').text()).toEqual($scope.data.series[i])
+      expect($legendItems[i].querySelector('.ng-binding').innerText).toEqual($scope.data.series[i])
     }
 
   })
