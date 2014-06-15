@@ -1,10 +1,9 @@
-
 angular.module('example', ['angularCharts']);
 
 function MainController($scope, $timeout) {
 	$timeout(function() {
 		$scope.data1 = {
-			series: ['Sales', 'Income', 'Expense', 'Laptops', 'Keyboards'],
+			series: ['Sales', 'Income', '<i>Expense</i>', 'Laptops', 'Keyboards'],
 			data : [{
 				x : "Sales",
 				y: [100,500, 0],
@@ -25,25 +24,20 @@ function MainController($scope, $timeout) {
 		};
 	}, 100);
 
-
 	$scope.data2 = {
-		series: ['Sales', 'Income', 'Expense', 'Laptops', 'Keyboards'],
+		series: ['<em>500</em> Keyboards', '<em>105</em> Laptops', '<em>100</em> TVs'],
 		data : [{
 			x : "Sales",
-			y: [100,500, 0],
+			y: [100, 500, 0],
 			tooltip:"this is tooltip"
 		},
 		{
-			x : "Not Sales",
+			x : "Income",
 			y: [300, 100, 100]
 		},
 		{
-			x : "Tax",
-			y: [351]
-		},
-		{
-			x : "Not Tax",
-			y: [54, 0, 879]
+			x : "Expense",
+			y: [351, 50, 25]
 		}]
 	}
 
@@ -51,7 +45,7 @@ function MainController($scope, $timeout) {
 
 	$scope.config1 = {
 		labels: false,
-		title : "Not Products",
+		title : "Products",
 		legend : {
 			display:true,
 			position:'left'
@@ -61,9 +55,10 @@ function MainController($scope, $timeout) {
 
 	$scope.config2 = {
 		labels: false,
-		title : "Products",
+		title : "HTML-enabled legend",
 		legend : {
 			display:true,
+			htmlEnabled: true,
 			position:'right'
 		},
 		lineLegend: 'traditional'

@@ -14,3 +14,6 @@ insert_final_newline = true
 
 [*.html]
 indent_style = tab
+
+[examples/main.controller.js]
+indent_style = tab

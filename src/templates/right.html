@@ -6,7 +6,7 @@
 		<table>
 		<tr ng-repeat="l in legends | limitTo:yMaxData">
 			<td><div ng-attr-style='background:{{l.color}}; height:15px;width:15px;'></div></td>
-			<td ng-bind='l.title'></td>
+			<td ng-bind-html='l.title'></td>
 		</tr>
 		</table>
 	</div>

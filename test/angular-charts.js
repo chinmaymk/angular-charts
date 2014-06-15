@@ -105,6 +105,26 @@ describe('angularCharts', function() {
 
   })
 
+  describe('legends', function() {
+
+    it('should escape HTML in the legend if HTML legends are disabled', function() {
+      $scope.config.legend.htmlEnabled = false;
+      $scope.data.series[0] = '<b>hello</b>';
+      compileChart()
+      $scope.$digest()
+      expect($chart.querySelector('.ac-legend tbody').innerHTML).toContain('&lt;b&gt;hello&lt;/b&gt;');
+    })
+
+    it('should preserve HTML in the legend if HTML legends are enabled', function() {
+      $scope.config.legend.htmlEnabled = true;
+      $scope.data.series[0] = '<b>hello</b>';
+      compileChart()
+      $scope.$digest()
+      expect($chart.querySelector('.ac-legend tbody').innerHTML).toContain('<b>hello</b>');
+    })
+
+  })
+
   describe('bars', function() {
 
     it('should have the same amount of graphic items as there are datas', function() {
