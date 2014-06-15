@@ -21,7 +21,7 @@ function MainController($scope, $timeout) {
 			{
 				x : "Not Tax",
 				y: [54, 0, 879]
-			}]     
+			}]
 		};
 	}, 100);
 	
@@ -44,7 +44,7 @@ function MainController($scope, $timeout) {
 		{
 			x : "Not Tax",
 			y: [54, 0, 879]
-		}]     
+		}]
 	}
 
 	$scope.chartType = 'bar';

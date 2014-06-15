@@ -51,7 +51,7 @@ describe('angularCharts', function() {
       {
         x : "Not Tax",
         y: [54, 0, 879]
-      }]     
+      }]
     }
 
     $scope.chartType = 'bar';
@@ -70,13 +70,13 @@ describe('angularCharts', function() {
 
     //just counting number of points in the data scope
     numberOfPoints = 0
-    
+
     for(var i in $scope.data.data) {
-        
+
       for(var j in $scope.data.data[i]) {
 
         if(typeof $scope.data.data[i][j] == 'object') {
-                
+
           if($scope.data.data[i][j].indexOf(0) === -1)
             numberOfPoints += $scope.data.data[i][j].length + 1
           else
@@ -99,7 +99,7 @@ describe('angularCharts', function() {
     expect(compileChart).toThrow()
   })
 
-  it('should throw width/height error', function() {  
+  it('should throw width/height error', function() {
     angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>')
     expect(compileChart).not.toThrow()
   })
@@ -114,10 +114,10 @@ describe('angularCharts', function() {
 
   it('should have the right DOM title', function() {
     expect(find($chart_childrens, 'ac-title').text()).toEqual('Not Products')
-  })        
-  
+  })
+
   it('should have the right elements in the legend', function() {
-      
+
     var $legendItems = find($chart_childrens, 'ac-legend').find('tbody').children()
 
     expect($legendItems.length).toEqual($scope.data.series.length)
@@ -133,7 +133,7 @@ describe('angularCharts', function() {
     it('should have the same amount of graphic items as there are datas', function() {
       expect(d3.selectAll('.ac-chart svg > g > g.g').size()).toEqual($scope.data.data.length)
     })
-      
+
   })
 
   describe('lines', function() {

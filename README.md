@@ -26,7 +26,7 @@ To run tests:
 ###Contributors
 * [felipeleusin](https://github.com/felipeleusin)
 * [michalochman](https://github.com/michalochman)
-* [reneolivo](https://github.com/reneolivo) 
+* [reneolivo](https://github.com/reneolivo)
 * [sagivf](https://github.com/sagivf)
 * [stephenarmstrong](https://github.com/stephenarmstrong)
 * [jerjoham](https://github.com/jerjoham)
