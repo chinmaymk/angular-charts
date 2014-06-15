@@ -952,11 +952,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       return { 'h': w[0].clientHeight, 'w': w[0].clientWidth };
     };
 
-    //let the party begin!
-    //add some watchers
-    scope.$watch('acChart', function(){ init(); }, true);
-    scope.$watch('acData', function(){ init(); }, true);
-    scope.$watch('acConfig', function(){ init(); }, true);
+    // Watch for any of the config changing.
+    scope.$watch('[acChart, acData, acConfig]', init, true);
   }
 
   return {
