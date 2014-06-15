@@ -23,8 +23,8 @@ module.exports = function(grunt) {
     clean : ["build"],
     watch: {
         scripts: {
-        files: ['src/**/*.js', 'src/**/*.html'],
-        tasks: ['ngmin', 'htmlmin', 'html2js', 'concat', 'uglify', 'clean'],
+        files: ['src/**/*.js', 'src/**/*.html', 'src/**/*.css'],
+        tasks: ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean'],
         options: {
           debounceDelay: 250,
         },
@@ -56,6 +56,22 @@ module.exports = function(grunt) {
         dest: 'build/templates.js'
       },
     },
+
+    // CSS -> minfied CSS -> JS.
+    csso: {
+      main: {
+        files: {
+          'build/styles.min.css': ['src/styles.css']
+        }
+      }
+    },
+    css2js: {
+      main: {
+        src: 'build/styles.min.css',
+        dest: 'build/styles.js'
+      }
+    },
+
     karma: {
       unit: {
         configFile: 'karma.conf.js'
@@ -99,7 +115,7 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'concat', 'uglify', 'clean', 'karma']);
+  grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean', 'karma']);
   grunt.registerTask('release', ['karma', 'prompt', 'bowerValidateRelease']);
 
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {

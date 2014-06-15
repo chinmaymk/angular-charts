@@ -21,7 +21,9 @@
     "grunt-karma": "^0.8.3",
     "karma": "^0.12.16",
     "karma-jasmine": "^0.1.5",
-    "karma-phantomjs-launcher": "^0.1.4"
+    "karma-phantomjs-launcher": "^0.1.4",
+    "grunt-css2js": "~0.2.4",
+    "grunt-csso": "~0.5.3"
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start"

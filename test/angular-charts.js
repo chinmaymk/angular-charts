@@ -171,4 +171,22 @@ describe('angularCharts', function() {
     })
   })
 
+  describe('styles', function() {
+
+    it('should add styles to the document', function() {
+      var styleElements = document.querySelectorAll('style');
+
+      // First style element should be Angular's own styles (.ng-show, etc.).
+      expect(styleElements[0].innerHTML).toContain('.ng-hide{display:none');
+
+      // Second style element should be Angular chart's styles.
+      // They should be namespaced under the template's classes.
+      expect(styleElements[1].innerHTML).toContain('.angular-charts-template .axis path,.angular-charts-template .axis line{');
+
+      // Third style element should be the one added in the test suite.
+      expect(styleElements[2].innerHTML).toContain('#chart { width:150px;');
+    })
+
+  })
+
 })
