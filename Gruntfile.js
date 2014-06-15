@@ -48,7 +48,7 @@ module.exports = function(grunt) {
         base : 'build',
         module : 'angularChartsTemplates',
         rename : function(name) {
-          return name.replace('.min.html', '');
+          return 'angularChartsTemplate_' + name.replace('.min.html', '');
         }
       },
       main: {
