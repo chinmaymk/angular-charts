@@ -8,7 +8,7 @@ angular.module('angularCharts', ['angularChartsTemplates']);
 /**
 * Main directive handling drawing of all charts
 */
-angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout) {
+angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
   /**
    * Initialize some constants
    * @type Array
@@ -73,9 +73,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       mouseout: function() {},
       click: function() {},
       legend: {
-        display: true,
-        //could be 'left, right'
-        position: 'left'
+        display: true, // can be either 'left' or 'right'.
+        position: 'left',
+        htmlEnabled: false
       },
       colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'],
       innerRadius: 0, // Only on pie Charts
@@ -148,7 +148,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates appropriate DOM structure for legend + chart
      */
     function setContainers() {
-      var container = $templateCache.get(config.legend.position);
+      var container = $templateCache.get('angularChartsTemplate_' + config.legend.position);
       element.html(container); //http://stackoverflow.com/a/17883151
       $compile(element.contents())(scope);
 
@@ -910,15 +910,34 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       scope.legends = [];
       if(chartType == 'pie') {
         angular.forEach(points, function(value, key){
-          scope.legends.push({color : config.colors[key], title: value.x});
+          scope.legends.push({color : config.colors[key], title: getBindableTextForLegend(value.x)});
         });
       }
       if(chartType == 'bar' || chartType == 'area' || chartType == 'point' ||
         (chartType == 'line' && config.lineLegend === 'traditional')) {
         angular.forEach(series, function(value, key){
-          scope.legends.push({color : config.colors[key], title: value});
+          scope.legends.push({color : config.colors[key], title: getBindableTextForLegend(value)});
         });
       }
+    }
+
+    var HTML_ENTITY_MAP = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': '&quot;',
+      "'": '&#39;',
+      "/": '&#x2F;'
+    };
+
+    function escapeHtml(string) {
+      return String(string).replace(/[&<>"'\/]/g, function (char) {
+        return HTML_ENTITY_MAP[char];
+      });
+    }
+
+    function getBindableTextForLegend(text) {
+      return $sce.trustAsHtml(config.legend.htmlEnabled ? text : escapeHtml(text));
     }
 
     /**
@@ -952,11 +971,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       return { 'h': w[0].clientHeight, 'w': w[0].clientWidth };
     };
 
-    //let the party begin!
-    //add some watchers
-    scope.$watch('acChart', function(){ init(); }, true);
-    scope.$watch('acData', function(){ init(); }, true);
-    scope.$watch('acConfig', function(){ init(); }, true);
+    // Watch for any of the config changing.
+    scope.$watch('[acChart, acData, acConfig]', init, true);
   }
 
   return {
