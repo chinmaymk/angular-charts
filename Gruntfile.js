@@ -24,10 +24,7 @@ module.exports = function(grunt) {
         dest: 'dist/angular-charts.min.js'
       }
     },
-    clean : {
-    	nonamd:["build"],
-    	amd:['dist/angular-charts.amd.js']
-    },
+    clean : ["build"],
     watch: {
         scripts: {
         files: ['src/**/*.js', 'src/**/*.html'],
@@ -88,8 +85,8 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean:nonamd']);
-  grunt.registerTask('amd',['clean:amd','ngmin','html2js','concat:amd','uglify']);
+  grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
+  grunt.registerTask('amd',['ngmin','html2js','concat:amd','uglify','clean']);
   grunt.registerTask('release', ['prompt', 'bowerValidateRelease']);
   
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
