@@ -895,11 +895,15 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function removeToolTip() {
-      scope.$tooltip.remove();
+      if(scope.$tooltip) {
+        scope.$tooltip.remove();
+      }
     }
 
     function updateToolTip(event) {
-      scope.$tooltip.css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
+      if(scope.$tooltip) {
+        scope.$tooltip.css({left: (event.pageX + 20) + 'px', top: (event.pageY - 30) + 'px'});
+      }
     }
 
     /**
