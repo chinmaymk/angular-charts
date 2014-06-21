@@ -90,6 +90,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       throw new Error('Please set height and width for the chart element')
     }
 
+
     var data,
     series,
     points,
@@ -100,9 +101,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     chartType,
     defaultColors = config.colors;
 
-    if(totalHeight === 0 || totalWidth === 0) {
-      throw new Error('Please set height and width for the chart element')
-    }
     /**
      * All the magic happens here
      * handles extracting chart type
@@ -957,6 +955,15 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     scope.$watch('acChart', function(){ init(); }, true);
     scope.$watch('acData', function(){ init(); }, true);
     scope.$watch('acConfig', function(){ init(); }, true);
+
+    scope.$watch(function() {
+        return {w: element[0].clientWidth, h: element[0].clientHeight};
+    },
+    function (newvalue) {
+        totalWidth = newvalue.w;
+        totalHeight = newvalue.h;
+        init();
+    }, true)
   }
 
   return {
