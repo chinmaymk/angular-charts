@@ -538,7 +538,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       var x = d3.scale.ordinal()
             .domain(points.map(function(d) { return d.x; }))
-            .rangeRoundBands([0, width]);
+            .rangePoints([0, width]);
 
       var y = d3.scale.linear()
           .range([height, 10]);
