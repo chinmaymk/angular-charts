@@ -43,6 +43,11 @@ module.exports = function(grunt) {
         dest: 'build/templates.js'
       },
     },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
+    },
     prompt: {
       release: {
         options: {
@@ -81,8 +86,8 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean']);
-  grunt.registerTask('release', ['prompt', 'bowerValidateRelease']);
+  grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean', 'karma']);
+  grunt.registerTask('release', ['karma', 'prompt', 'bowerValidateRelease']);
   
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
     if(grunt.config('release') === true) {
