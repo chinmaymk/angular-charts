@@ -99,8 +99,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     width,
     chartContainer,
     legendContainer,
-    chartType,
-    defaultColors = config.colors;
+    chartType;
 
     /**
      * All the magic happens here
@@ -170,7 +169,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       points = (data) ? data.data || [] : [];
       if(scope.acConfig) {
         angular.extend(config, scope.acConfig);
-        config.colors = config.colors.concat(defaultColors);
       }
     }
 
