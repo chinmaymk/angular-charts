@@ -313,13 +313,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]}   [description]
        */
       bars.on("mouseover", function(d) {
-        var tooltipContent;
-        if(typeof d.tooltip != 'undefined') {
-          tooltipContent = d.tooltip;
-        } else {
-          tooltipContent = d.y;
-        }
-        makeToolTip({ value: tooltipContent, series: series[d.s], index: d.x}, d3.event);
+
+        makeToolTip({index:d.x, value: d.tooltip ? d.tooltip : d.y, series:series[d.s]}, d3.event);
+
         config.mouseover(d, d3.event);
         scope.$apply();
       })
@@ -485,13 +481,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(series){ return function(d) {
-              var tooltipContent;
-              if(typeof d.tooltip != 'undefined') {
-                tooltipContent = d.tooltip;
-              } else {
-                tooltipContent = d.y;
-              }
-              makeToolTip({index:d.x, value:tooltipContent, series:series}, d3.event);
+
+              makeToolTip({index:d.x, value: d.tooltip ? d.tooltip : d.y, series:series}, d3.event);
+
               config.mouseover(d, d3.event);
               scope.$apply();
           };}(value.series))
@@ -704,7 +696,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
             //Add listeners when transition is done
             path.on("mouseover", function(d) {
-              makeToolTip({ value: d.data.y[0] }, d3.event);
+              makeToolTip({ value: d.tooltip ? d.tooltip : d.data.y[0] }, d3.event);
               d3.select(this)
                   .select('path')
                   .transition()
@@ -844,13 +836,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .style("fill", getColor(linedata.indexOf(value)))
           .style("stroke", getColor(linedata.indexOf(value)))
           .on("mouseover", function(series){return function(d) {
-              var tooltipContent;
-              if(typeof d.tooltip != 'undefined') {
-                tooltipContent = d.tooltip;
-              } else {
-                tooltipContent = d.y;
-              }
-              makeToolTip({index:d.x, value:tooltipContent, series:series}, d3.event);
+
+              makeToolTip({index:d.x, value: d.tooltip ? d.tooltip : d.y, series:series}, d3.event);
+
               config.mouseover(d, d3.event);
               scope.$apply();
           };}(value.series))
