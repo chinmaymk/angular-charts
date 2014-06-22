@@ -640,9 +640,23 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       point.append("path")
         .attr("class", "area")
-        .attr("d", function(d) { return area(d.values); })
         .style("fill", function(d,i) { return getColor(i); })
-        .style("opacity", "0.7");
+        .style("opacity", "0.7")
+        .attr("d", function (d) {
+          var values = angular.copy(d.values);
+          resetValues(values);
+          return area(values);
+        })
+        .transition()
+        .duration(config.isAnimate ? 500 : 0)
+        .attr("d", function (d) { return area(d.values); });
+
+      function resetValues(values) {
+        values.forEach(function(value, index) {
+          values[index].y = 0;
+        });
+        return values;
+      }
 
       function getX(d) {
         return Math.round(x(d)) + x.rangeBand() / 2
