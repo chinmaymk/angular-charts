@@ -23,26 +23,55 @@ module.exports = function(grunt) {
     clean : ["build"],
     watch: {
         scripts: {
-        files: ['src/**/*.js', 'src/**/*.html'],
-        tasks: ['ngmin', 'html2js', 'concat', 'uglify', 'clean'],
+        files: ['src/**/*.js', 'src/**/*.html', 'src/**/*.css'],
+        tasks: ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean'],
         options: {
           debounceDelay: 250,
         },
       }
     },
+    htmlmin: {
+      main: {
+        options: {
+          collapseWhitespace: true,
+          collapseBooleanAttributes: true,
+          removeComments: true
+        },
+        files: {
+          'build/right.min.html': 'src/templates/right.html',
+          'build/left.min.html': 'src/templates/left.html',
+        }
+      }
+    },
     html2js: {
       options: {
-        base : 'src/templates',
+        base : 'build',
         module : 'angularChartsTemplates',
         rename : function(name) {
-          return name.replace('.html', '');
+          return 'angularChartsTemplate_' + name.replace('.min.html', '');
         }
       },
       main: {
-        src: ['src/templates/*.html'],
+        src: ['build/*.min.html'],
         dest: 'build/templates.js'
       },
     },
+
+    // CSS -> minfied CSS -> JS.
+    csso: {
+      main: {
+        files: {
+          'build/styles.min.css': ['src/styles.css']
+        }
+      }
+    },
+    css2js: {
+      main: {
+        src: 'build/styles.min.css',
+        dest: 'build/styles.js'
+      }
+    },
+
     karma: {
       unit: {
         configFile: 'karma.conf.js'
@@ -86,9 +115,9 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['ngmin', 'html2js', 'concat', 'uglify', 'clean', 'karma']);
+  grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean', 'karma']);
   grunt.registerTask('release', ['karma', 'prompt', 'bowerValidateRelease']);
-  
+
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
     if(grunt.config('release') === true) {
       grunt.task.run('default', 'copy:bowerPreRelease', 'shell:bowerRelease');
