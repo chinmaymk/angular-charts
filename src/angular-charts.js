@@ -21,6 +21,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                 "padding:5px;",
                 "color:#fff;"].join('');
 
+  var defaultColors = ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
+
   /**
    * Utility function to call when we run out of colors!
    * @return {String} Hexadecimal color
@@ -77,7 +79,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         position: 'left',
         htmlEnabled: false
       },
-      colors: ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'],
+      colors: [],
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
@@ -167,9 +169,22 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       chartType = scope.acChart;
       series = (data) ? data.series || [] : [];
       points = (data) ? data.data || [] : [];
+
       if(scope.acConfig) {
+
+        var arr = [];
+
+        if(scope.acConfig.colors) {
+            ;[].push.apply(arr, scope.acConfig.colors);
+        }
+
+        ;[].push.apply(arr, defaultColors);
+
         angular.extend(config, scope.acConfig);
+        config.colors = arr;
+
       }
+
     }
 
     /**
