@@ -1,26 +1,3 @@
-/**
-* Utility function that gets the child that matches the classname
-* because Angular.element.children() doesn't take selectors
-* it's still better than a whole jQuery implementation
-* @param  {Array}  childrens       An array of childrens - element.children() or element.find('div')
-* @param  {String} className       Class name
-* @return {Angular.element|null}    The founded child or null
-*/
-function find(childrens, className) {
-  var child = null;
-
-  for(var i in childrens) {
-    if(angular.isElement(childrens[i])) {
-      child = angular.element(childrens[i]);
-      if(child.hasClass(className))
-        return child;
-    }
-  }
-
-  return child;
-}
-
-
 describe('angularCharts', function() {
   var $scope, $compile, $chart, $chart_childrens, body //we'll be working on a unique chart
     , numberOfPoints
@@ -51,7 +28,7 @@ describe('angularCharts', function() {
       {
         x : "Not Tax",
         y: [54, 0, 879]
-      }]     
+      }]
     }
 
     $scope.chartType = 'bar';
@@ -70,13 +47,13 @@ describe('angularCharts', function() {
 
     //just counting number of points in the data scope
     numberOfPoints = 0
-    
+
     for(var i in $scope.data.data) {
-        
+
       for(var j in $scope.data.data[i]) {
 
         if(typeof $scope.data.data[i][j] == 'object') {
-                
+
           if($scope.data.data[i][j].indexOf(0) === -1)
             numberOfPoints += $scope.data.data[i][j].length + 1
           else
@@ -99,7 +76,7 @@ describe('angularCharts', function() {
     expect(compileChart).toThrow()
   })
 
-  it('should throw width/height error', function() {  
+  it('should throw width/height error', function() {
     angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>')
     expect(compileChart).not.toThrow()
   })
@@ -113,18 +90,38 @@ describe('angularCharts', function() {
   })
 
   it('should have the right DOM title', function() {
-    expect(find($chart_childrens, 'ac-title').text()).toEqual('Not Products')
-  })        
-  
+    expect($chart.querySelector('.ac-title').innerText).toEqual('Not Products')
+  })
+
   it('should have the right elements in the legend', function() {
-      
-    var $legendItems = find($chart_childrens, 'ac-legend').find('tbody').children()
+
+    var $legendItems = $chart.querySelector('.ac-legend tbody').children
 
     expect($legendItems.length).toEqual($scope.data.series.length)
 
     for(var i in $scope.data.series) {
-      expect(find($legendItems[i], 'ng-binding').text()).toEqual($scope.data.series[i])
+      expect($legendItems[i].querySelector('.ng-binding').innerText).toEqual($scope.data.series[i])
     }
+
+  })
+
+  describe('legends', function() {
+
+    it('should escape HTML in the legend if HTML legends are disabled', function() {
+      $scope.config.legend.htmlEnabled = false;
+      $scope.data.series[0] = '<b>hello</b>';
+      compileChart()
+      $scope.$digest()
+      expect($chart.querySelector('.ac-legend tbody').innerHTML).toContain('&lt;b&gt;hello&lt;/b&gt;');
+    })
+
+    it('should preserve HTML in the legend if HTML legends are enabled', function() {
+      $scope.config.legend.htmlEnabled = true;
+      $scope.data.series[0] = '<b>hello</b>';
+      compileChart()
+      $scope.$digest()
+      expect($chart.querySelector('.ac-legend tbody').innerHTML).toContain('<b>hello</b>');
+    })
 
   })
 
@@ -133,7 +130,7 @@ describe('angularCharts', function() {
     it('should have the same amount of graphic items as there are datas', function() {
       expect(d3.selectAll('.ac-chart svg > g > g.g').size()).toEqual($scope.data.data.length)
     })
-      
+
   })
 
   describe('lines', function() {
@@ -192,6 +189,24 @@ describe('angularCharts', function() {
     it('should have the same amount of graphic items as there are datas', function() {
       expect(d3.selectAll('.ac-chart svg > g > g').size()).toEqual($scope.data.data.length)
     })
+  })
+
+  describe('styles', function() {
+
+    it('should add styles to the document', function() {
+      var styleElements = document.querySelectorAll('style');
+
+      // First style element should be Angular's own styles (.ng-show, etc.).
+      expect(styleElements[0].innerHTML).toContain('.ng-hide{display:none');
+
+      // Second style element should be Angular chart's styles.
+      // They should be namespaced under the template's classes.
+      expect(styleElements[1].innerHTML).toContain('.angular-charts-template .axis path,.angular-charts-template .axis line{');
+
+      // Third style element should be the one added in the test suite.
+      expect(styleElements[2].innerHTML).toContain('#chart { width:150px;');
+    })
+
   })
 
 })

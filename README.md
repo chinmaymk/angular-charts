@@ -12,10 +12,21 @@ Releases sit on the bower branch. If you want to build from master download and 
 ###Playground
 You can try out angular-charts on [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 
+### How to contribite
+
+    git clone git@github.com:chinmaymk/angular-charts.git
+    npm install
+    bower install
+    grunt
+
+To run tests:
+
+    grunt karma
+
 ###Contributors
 * [felipeleusin](https://github.com/felipeleusin)
 * [michalochman](https://github.com/michalochman)
-* [reneolivo](https://github.com/reneolivo) 
+* [reneolivo](https://github.com/reneolivo)
 * [sagivf](https://github.com/sagivf)
 * [stephenarmstrong](https://github.com/stephenarmstrong)
 * [jerjoham](https://github.com/jerjoham)

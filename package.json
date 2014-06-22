@@ -11,6 +11,7 @@
     "grunt-contrib-cssmin": "*",
     "grunt-contrib-copy": "*",
     "grunt-contrib-clean": "*",
+    "grunt-contrib-htmlmin": "~0.3.0",
     "grunt-html2js": "~0.1.9",
     "grunt-ngmin": "0.0.3",
     "grunt-contrib-watch": "~0.5.3",
@@ -20,7 +21,9 @@
     "grunt-karma": "^0.8.3",
     "karma": "^0.12.16",
     "karma-jasmine": "^0.1.5",
-    "karma-phantomjs-launcher": "^0.1.4"
+    "karma-phantomjs-launcher": "^0.1.4",
+    "grunt-css2js": "~0.2.4",
+    "grunt-csso": "~0.5.3"
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start"
