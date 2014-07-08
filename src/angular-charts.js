@@ -162,8 +162,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
       }
       if(config.responsive){
-        element.height(height);
-        element.width(width);
+        element.css('height',height);
+        element.css('width',width);
       }
     }
 
