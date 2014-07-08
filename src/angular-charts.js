@@ -200,7 +200,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         'bar' : barChart,
         'line': lineChart,
         'area': areaChart,
-        'point': pointChart,
+        'point': pointChart
       }
       return charts[type];
     }
@@ -247,7 +247,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             x : d.x,
             y : e,
             s : i,
-            tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip,
+            tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip
           }
         })
       })
@@ -421,7 +421,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             return {
               x : point.x,
               y : e,
-              tooltip : point.tooltip,
+              tooltip : point.tooltip
             }
           })[index] || {x:points[index].x, y :0};
         });
