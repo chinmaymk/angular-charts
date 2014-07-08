@@ -157,7 +157,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       chartContainer = getChildrenByClassname(childrens, 'ac-chart');
       legendContainer = getChildrenByClassname(childrens, 'ac-legend');
 
-      height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
+      if (config.legend.display) {
+        height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
+      }
     }
 
     /**
