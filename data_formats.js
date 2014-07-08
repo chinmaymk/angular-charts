@@ -21,13 +21,13 @@ data = {
 	},
 	{
 		title: 'Mobiles'
-	}
+	},
 	{
 		title: 'Chairs'
-	}
+	},
 	{
 		title: 'Laptops'
-	}
+	},
 	{
 		title: 'Keyboards'
 	}],
