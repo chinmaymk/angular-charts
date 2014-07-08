@@ -83,7 +83,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
-      isAnimate: true
+      isAnimate: true,
+      responsive: false
     };
 
     var totalWidth = element[0].clientWidth;
@@ -159,6 +160,10 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       if (config.legend.display) {
         height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
+      }
+      if(config.responsive){
+        element.height(height);
+        element.width(width);
       }
     }
 
@@ -981,13 +986,29 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       }
     }
 
+    if(config.responsive) {
+      var containerWidth = element[0].parentNode.clientWidth;
+      var containerHeight = element[0].parentNode.clientHeight;
+      totalWidth = containerWidth < originalWidth ? containerWidth : originalWidth;
+      totalHeight = containerHeight < originalHeight ? containerHeight : originalHeight;
+    }
+
     var w = angular.element($window);
     var resizePromise = null;
     w.bind('resize', function(ev) {
       resizePromise && $timeout.cancel(resizePromise);
       resizePromise = $timeout(function() {
-        totalWidth = element[0].clientWidth;
-        totalHeight = element[0].clientHeight;
+
+        if(config.responsive) {
+          containerWidth = element[0].parentNode.clientWidth;
+          containerHeight = element[0].parentNode.clientHeight;
+
+          totalWidth = containerWidth < originalWidth ? containerWidth : originalWidth;
+          totalHeight = containerHeight < originalHeight ? containerHeight : originalHeight;
+        }else {
+          totalWidth = element[0].clientWidth;
+          totalHeight = element[0].clientHeight;
+        }
         init();
       }, 100);
     });
@@ -1000,7 +1021,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     scope.$watch('[acChart, acData, acConfig]', init, true);
 
     scope.$watch(function() {
+      if(config.responsive) {
+        return {w: totalWidth, h: totalHeight};
+      }else{
         return {w: element[0].clientWidth, h: element[0].clientHeight};
+      }
     },
     function (newvalue) {
         totalWidth = newvalue.w;
