@@ -1,39 +1,35 @@
+
+
 /**
  * Main module
  */
 angular.module('angularCharts', ['angularChartsTemplates']);
+
 /**
  * Main directive handling drawing of all charts
  */
 angular.module('angularCharts').directive('acChart', [
-  '$templateCache',
-  '$compile',
-  '$rootElement',
-  '$window',
-  '$timeout',
-  '$sce',
-  function ($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
+    '$templateCache',
+    '$compile',
+    '$rootElement',
+    '$window',
+    '$timeout',
+    '$sce',
+    function($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
     /**
      * Initialize some constants
      * @type Array
      */
-    var tooltip = [
-      'display:block;',
-      'position:absolute;',
-      'border:1px solid #333;',
-      'background-color:#161616;',
-      'border-radius:5px;',
-      'padding:5px;',
-      'color:#fff;'
-    ].join('');
-    var defaultColors = [
-      'steelBlue',
-      'rgb(255,153,0)',
-      'rgb(220,57,18)',
-      'rgb(70,132,238)',
-      'rgb(73,66,204)',
-      'rgb(0,128,0)'
-    ];
+  var tooltip = ["display:block;",
+                "position:absolute;",
+                "border:1px solid #333;",
+                "background-color:#161616;",
+                "border-radius:5px;",
+                "padding:5px;",
+                "color:#fff;"].join('');
+
+  var defaultColors = ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
+
     /**
      * Utility function to call when we run out of colors!
      * @return {String} Hexadecimal color
@@ -46,6 +42,7 @@ angular.module('angularCharts').directive('acChart', [
       }
       return color;
     }
+
     /**
      * Utility function that gets the child that matches the classname
      * because Angular.element.children() doesn't take selectors
@@ -56,6 +53,7 @@ angular.module('angularCharts').directive('acChart', [
      */
     function getChildrenByClassname(childrens, className) {
       var child = null;
+
       for (var i in childrens) {
         if (angular.isElement(childrens[i])) {
           child = angular.element(childrens[i]);
@@ -63,8 +61,10 @@ angular.module('angularCharts').directive('acChart', [
             return child;
         }
       }
+
       return child;
     }
+
     /**
      * Main link function
      * @param  {[type]} scope   [description]
@@ -73,6 +73,7 @@ angular.module('angularCharts').directive('acChart', [
      * @return {[type]}         [description]
      */
     function link(scope, element, attrs) {
+
       var config = {
         title : '',
         tooltips: true,
@@ -152,6 +153,7 @@ angular.module('angularCharts').directive('acChart', [
             break;
         }
       }
+
       /**
        * Creates appropriate DOM structure for legend + chart
        */
@@ -159,6 +161,7 @@ angular.module('angularCharts').directive('acChart', [
         var container = $templateCache.get('angularChartsTemplate_' + config.legend.position);
         element.html(container); //http://stackoverflow.com/a/17883151
         $compile(element.contents())(scope);
+
         //getting children divs
         var childrens = element.find('div');
         chartContainer = getChildrenByClassname(childrens, 'ac-chart');
@@ -182,8 +185,11 @@ angular.module('angularCharts').directive('acChart', [
         chartType = scope.acChart;
         series = (data) ? data.series || [] : [];
         points = (data) ? data.data || [] : [];
+
         if(scope.acConfig) {
+
           var arr = [];
+
           if(scope.acConfig.colors) {
             ;[].push.apply(arr, scope.acConfig.colors);
           }
@@ -191,8 +197,11 @@ angular.module('angularCharts').directive('acChart', [
           [].push.apply(arr, defaultColors);
           angular.extend(config, scope.acConfig);
           config.colors = arr;
+
         }
+
       }
+
       /**
        * Returns appropriate chart function to call
        * @param  {[type]} type [description]
@@ -208,6 +217,7 @@ angular.module('angularCharts').directive('acChart', [
         }
         return charts[type];
       }
+
       /**
        * Filters down the x axis labels if a limit is specified
        */
@@ -218,6 +228,7 @@ angular.module('angularCharts').directive('acChart', [
           xAxis.tickValues(allTicks.filter(function(e,i){ return (i % mod) === 0; }));
         }
       }
+
       /**
        * Draws a bar chart, grouped with negative value handling
        * @return {[type]} [description]
@@ -260,6 +271,7 @@ angular.module('angularCharts').directive('acChart', [
         })
 
         var yMaxPoints = d3.max(points.map(function(d){ return d.y.length; }));
+
         scope.yMaxData = yMaxPoints;
 
         x.domain(points.map(function(d) { return d.x; }));
@@ -268,6 +280,7 @@ angular.module('angularCharts').directive('acChart', [
         y.domain([d3.min(yData), d3.max(yData) + padding]);
 
         x0.domain(d3.range(yMaxPoints)).rangeRoundBands([0, x.rangeBand()]);
+
         /**
          * Create scales using d3
          * @type {[type]}
@@ -986,11 +999,16 @@ angular.module('angularCharts').directive('acChart', [
         }
       }
 
-      if(config.responsive) {
-        var containerWidth = element[0].parentNode.clientWidth;
-        var containerHeight = element[0].parentNode.clientHeight;
-        totalWidth = containerWidth < originalWidth ? containerWidth : originalWidth;
-        totalHeight = containerHeight < originalHeight ? containerHeight : originalHeight;
+      function setTotalSizes(){
+        if(config.responsive) {
+          var containerWidth = element[0].parentNode.clientWidth;
+          var containerHeight = element[0].parentNode.clientHeight;
+          totalWidth = containerWidth < originalWidth ? containerWidth : originalWidth;
+          totalHeight = containerHeight < originalHeight ? containerHeight : originalHeight;
+        }else{
+          totalWidth = element[0].clientWidth;
+          totalHeight = element[0].clientHeight;
+        }
       }
 
       var w = angular.element($window);
@@ -998,17 +1016,7 @@ angular.module('angularCharts').directive('acChart', [
       w.bind('resize', function(ev) {
         resizePromise && $timeout.cancel(resizePromise);
         resizePromise = $timeout(function() {
-
-          if(config.responsive) {
-            containerWidth = element[0].parentNode.clientWidth;
-            containerHeight = element[0].parentNode.clientHeight;
-
-            totalWidth = containerWidth < originalWidth ? containerWidth : originalWidth;
-            totalHeight = containerHeight < originalHeight ? containerHeight : originalHeight;
-          }else {
-            totalWidth = element[0].clientWidth;
-            totalHeight = element[0].clientHeight;
-          }
+          setTotalSizes();
           init();
         }, 100);
       });
@@ -1020,7 +1028,12 @@ angular.module('angularCharts').directive('acChart', [
       // Watch for any of the config changing.
       scope.$watch('[acChart, acData, acConfig]', init, true);
 
+      var isFirstTime = true;
       scope.$watch(function() {
+          if(isFirstTime){
+            setTotalSizes();
+            isFirstTime = false;
+          }
           if(config.responsive) {
             return {w: totalWidth, h: totalHeight};
           }else{
@@ -1043,7 +1056,7 @@ angular.module('angularCharts').directive('acChart', [
         acData : '=',
         acConfig: '='
       }
-    };
+    }
   }
 ]);
 (function () {
