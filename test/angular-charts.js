@@ -185,6 +185,21 @@ describe('angularCharts', function() {
       $scope.$digest()
     })
 
+    it('should change chartType to pie', function() {
+      $scope.chartType = 'pie'
+      $scope.config.responsive = true;
+      compileChart()
+      $scope.$digest()
+    })
+
+    it('should change chartType to pie', function() {
+      $scope.chartType = 'pie'
+      $scope.config.responsive = false;
+      $scope.config.legend.display = false;
+      compileChart()
+      $scope.$digest()
+    })
+
 
     it('should have the same amount of graphic items as there are datas', function() {
       expect(d3.selectAll('.ac-chart svg > g > g').size()).toEqual($scope.data.data.length)
