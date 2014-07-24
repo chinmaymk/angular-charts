@@ -220,8 +220,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * @return {[type]} [description]
        */
       function bubbleChart(){
-          var diameter = (height > width)?width:height,
-              format = d3.format(",d");
+          var diameter = (height > width)?width:height;
 
           var bubble = d3.layout.pack()
               .sort(null)
