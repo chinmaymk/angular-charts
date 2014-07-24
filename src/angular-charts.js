@@ -199,6 +199,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         'line': lineChart,
         'area': areaChart,
         'point': pointChart,
+        'bubble': bubbleChart
       }
       return charts[type];
     }
@@ -213,6 +214,101 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         xAxis.tickValues(allTicks.filter(function(e,i){ return (i % mod) === 0; }));
       }
     }
+
+      /**
+       * Draws a bubble chart
+       * @return {[type]} [description]
+       */
+      function bubbleChart(){
+          var diameter = (height > width)?width:height,
+              format = d3.format(",d");
+
+          var bubble = d3.layout.pack()
+              .sort(null)
+              .size([diameter, diameter])
+              .padding(1.5);
+
+          var svg = d3.select(chartContainer[0]).append("svg")
+              .attr("width", diameter)
+              .attr("height", diameter)
+              .attr("class", "bubble");
+
+          scope.yMaxData = points.length;
+
+          if(data) {
+              /**
+               * Format data in node form
+               */
+              var nodes = { children: [] };
+
+              angular.forEach(points, function (parent, key) {
+                  angular.forEach(parent.y, function(value, i){
+                      var tooltip = series[i] + ": " + value;
+                      nodes.children.push({
+                          packageName: parent.x,
+                          className: series[i],
+                          value: value,
+                          color: getColor(key),
+                          tooltip: (parent.tooltip)? parent.tooltip:tooltip
+                      });
+                  });
+              });
+
+              /**
+               * Start drawing the chart!
+               * @type {[type]}
+               */
+              var node = svg.selectAll(".node")
+                  .data(bubble.nodes(nodes)
+                      .filter(function(d) { return !d.children; }))
+                  .enter().append("g")
+                  .attr("class", "node")
+                  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+              node.append("circle")
+                  .attr("r", function(d) { return d.r; })
+                  .style("fill", function(d) { return d.color; });
+
+              node.append("text")
+                  .attr({
+                      "dy":".3em",
+                      "fill":"white"
+                  })
+                  .style({
+                      "text-anchor":"middle",
+                      "cursor":"default",
+                      "font-size":"12px"
+                  })
+                  .text(function(d) {
+                      var label = d.className.replace(/<\/?[^>]+(>|$)/g, "");
+                      return label.substring(0, d.r/3);
+                  });
+
+              /**
+               * Add events for tooltip
+               * @param  {[type]} d [description]
+               * @return {[type]}   [description]
+               */
+              node.on('mouseover', function (d) {
+                  makeToolTip({index:d.x, value: d.tooltip }, d3.event);
+                  d3.select(this).select('circle').transition().duration(200).style('stroke', 'black').style('stroke-width', '2px');
+                  config.mouseover(d, d3.event);
+                  scope.$apply();
+              }).on('mouseleave', function (d) {
+                  d3.select(this).select('circle').transition().duration(200).style('stroke', '').style('stroke-width', '');
+                  removeToolTip();
+                  config.mouseout(d, d3.event);
+                  scope.$apply();
+              }).on('mousemove', function (d) {
+                  updateToolTip(d3.event);
+              }).on('click', function (d) {
+                  config.click(d, d3.event);
+                  scope.$apply();
+              });
+          }
+
+          d3.select(self.frameElement).style("height", diameter + "px");
+      }
 
     /**
      * Draws a bar chart, grouped with negative value handling
@@ -891,6 +987,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function makeToolTip(data, event) {
+      removeToolTip();
       if(!config.tooltips) {
         return;
       }
@@ -931,17 +1028,25 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      */
     function drawLegend() {
       scope.legends = [];
-      if(chartType == 'pie') {
-        angular.forEach(points, function(value, key){
-          scope.legends.push({color : config.colors[key], title: getBindableTextForLegend(value.x)});
-        });
-      }
-      if(chartType == 'bar' || chartType == 'area' || chartType == 'point' ||
-        (chartType == 'line' && config.lineLegend === 'traditional')) {
-        angular.forEach(series, function(value, key){
-          scope.legends.push({color : config.colors[key], title: getBindableTextForLegend(value)});
-        });
-      }
+        switch(chartType){
+            case 'pie':
+            case 'bubble':
+                angular.forEach(points, function(value, key){
+                    scope.legends.push({color : getColor(key), title: getBindableTextForLegend(value.x)});
+                });
+                break;
+            case 'line':
+                if(config.lineLegend == 'traditional') {
+                    angular.forEach(series, function(value, key){
+                        scope.legends.push({color : getColor(key), title: getBindableTextForLegend(value)});
+                    });
+                }
+                break;
+            default:
+                angular.forEach(series, function(value, key){
+                    scope.legends.push({color : getColor(key), title: getBindableTextForLegend(value)});
+                });
+        }
     }
 
     var HTML_ENTITY_MAP = {
