@@ -83,7 +83,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
-      isAnimate: true
+      isAnimate: true,
+      yAxisTickFormat: 's'
     };
 
     var totalWidth = element[0].clientWidth;
@@ -270,11 +271,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .orient("bottom");
       filterXAxis(xAxis, x);
 
+      var tickFormat = config.yAxisTickFormat || 's';
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left")
           .ticks(10)
-          .tickFormat(d3.format('s'));
+          .tickFormat(d3.format(tickFormat));
 
       /**
        * Start drawing the chart!
@@ -389,11 +391,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .orient("bottom");
       filterXAxis(xAxis, x);
 
+      var tickFormat = config.yAxisTickFormat || 's';
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left")
           .ticks(5)
-          .tickFormat(d3.format('s'));
+          .tickFormat(d3.format(tickFormat));
 
       var line = d3.svg.line()
           .interpolate(config.lineCurveType)
@@ -567,11 +570,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .orient("bottom");
       filterXAxis(xAxis, x);
 
+      var tickFormat = config.yAxisTickFormat || 's';
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left")
           .ticks(5)
-          .tickFormat(d3.format('s'));
+          .tickFormat(d3.format(tickFormat));
 
       d3.svg.line()
           .interpolate(config.lineCurveType)
@@ -776,11 +780,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .orient("bottom");
       filterXAxis(xAxis, x);
 
+      var tickFormat = config.yAxisTickFormat || 's';
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left")
           .ticks(5)
-          .tickFormat(d3.format('s'));
+          .tickFormat(d3.format(tickFormat));
 
       var yData = [0];
       var linedata = [];

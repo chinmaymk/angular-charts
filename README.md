@@ -32,6 +32,7 @@ To run tests:
 * [jerjoham](https://github.com/jerjoham)
 * [soyuka](https://github.com/soyuka)
 * [jkleijn](https://github.com/jkleijn)
+* [chasd00](https://github.com/chasd00)
 
 License - MIT.
 
