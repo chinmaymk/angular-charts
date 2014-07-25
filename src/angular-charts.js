@@ -324,14 +324,20 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
           /* Define an array of objects */
           var numbers = [];
-          angular.forEach(points, function(val){
-              var total = series.length - val.y.length;
+          angular.forEach(points, function(arr){
+              var total = series.length - arr.y.length;
               if(total != 0){
-                  for(var i=0; i<total; i++){
-                      val.y.push(0);
+                  for(var i=0; i<total; i++ ){
+                      arr.y.push(0);
                   }
               }
-              numbers = numbers.concat(val.y);
+              angular.forEach(arr.y, function(val){
+                  var tooltip = arr.x + ": " + val;
+                  numbers.push({
+                      value: val,
+                      tooltip: (arr.tooltip) ? arr.tooltip : tooltip
+                  });
+              });
           });
 
           /* Chart preset configurations */
@@ -339,7 +345,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
               innerRadius = 30,
               numSegments = series.length,
               segmentHeight = 20,
-              accessor = function(d) {return d;};
+              accessor = function(d) { return d.value; };
 
           /* Arc functions */
           ir = function(d, i) {
@@ -389,7 +395,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
            * @return {[type]}   [description]
            */
           d3.selectAll('path').on('mouseover', function (d) {
-              makeToolTip({ value: d }, d3.event);
+              makeToolTip({ value: d.tooltip }, d3.event);
               color = d3.scale.linear().domain(d3.extent(numbers, accessor)).range(["#e8e8e8", getColor(1)]);
               d3.select(this).transition().duration(200).style('fill', color(accessor(d)));
               config.mouseover(d, d3.event);

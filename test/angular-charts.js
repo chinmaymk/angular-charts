@@ -46,18 +46,17 @@ describe('angularCharts', function() {
 
 
     //just counting number of points in the data scope
-    numberOfPoints = 0
+    numberOfPoints = $scope.data.data.length * $scope.data.series.length;
+    // counting number of non zero points in the data scope
     nonZeroPoints = 0
 
     angular.forEach($scope.data.data, function(data){
         angular.forEach(data, function(val){
             if(typeof val == 'object') {
                 if(val.indexOf(0) === -1) {
-                    numberOfPoints += val.length + 1
                     nonZeroPoints += val.length
                 }
                 else {
-                    numberOfPoints += val.length
                     angular.forEach(val, function(i){
                         if(i != 0)
                             nonZeroPoints++
@@ -138,6 +137,19 @@ describe('angularCharts', function() {
 
   })
 
+  describe('circularHeat', function() {
+
+      it('should change chartType to circularHeat', function () {
+          $scope.chartType = 'circularHeat'
+          compileChart()
+          $scope.$digest()
+      })
+
+      it('should have the same amount of paths and data points', function() {
+          expect(d3.selectAll('.ac-chart svg > g > path').size()).toEqual(numberOfPoints)
+      })
+  })
+
   describe('bubbles', function() {
 
       it('should change chartType to bubble', function () {
@@ -146,7 +158,7 @@ describe('angularCharts', function() {
           $scope.$digest()
       })
 
-      it('should have the same amount of bubbles as there are non zero datas points', function() {
+      it('should have the same amount of bubbles and non zero data points', function() {
           expect(d3.selectAll('.ac-chart svg > g > circle').size()).toEqual(nonZeroPoints)
       })
   })

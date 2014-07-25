@@ -41,7 +41,7 @@ function MainController($scope, $timeout) {
 		}]
 	}
 
-	$scope.chartType = 'circularHeat';
+	$scope.chartType = 'bubble';
 
 	$scope.config1 = {
 		labels: false,
