@@ -1,6 +1,6 @@
 describe('angularCharts', function() {
   var $scope, $compile, $chart, $chart_childrens, body //we'll be working on a unique chart
-    , numberOfPoints
+    , numberOfPoints, nonZeroPoints
 
   // load the charts code
   beforeEach(module('angularCharts'));
@@ -46,21 +46,25 @@ describe('angularCharts', function() {
 
 
     //just counting number of points in the data scope
-    numberOfPoints = 0
+    numberOfPoints = $scope.data.data.length * $scope.data.series.length;
+    // counting number of non zero points in the data scope
+    nonZeroPoints = 0
 
-    for(var i in $scope.data.data) {
-
-      for(var j in $scope.data.data[i]) {
-
-        if(typeof $scope.data.data[i][j] == 'object') {
-
-          if($scope.data.data[i][j].indexOf(0) === -1)
-            numberOfPoints += $scope.data.data[i][j].length + 1
-          else
-            numberOfPoints += $scope.data.data[i][j].length
-        }
-      }
-    }
+    angular.forEach($scope.data.data, function(data){
+        angular.forEach(data, function(val){
+            if(typeof val == 'object') {
+                if(val.indexOf(0) === -1) {
+                    nonZeroPoints += val.length
+                }
+                else {
+                    angular.forEach(val, function(i){
+                        if(i != 0)
+                            nonZeroPoints++
+                    })
+                }
+            }
+        })
+    })
 
   }))
 
@@ -131,6 +135,32 @@ describe('angularCharts', function() {
       expect(d3.selectAll('.ac-chart svg > g > g.g').size()).toEqual($scope.data.data.length)
     })
 
+  })
+
+  describe('circularHeat', function() {
+
+      it('should change chartType to circularHeat', function () {
+          $scope.chartType = 'circularHeat'
+          compileChart()
+          $scope.$digest()
+      })
+
+      it('should have the same amount of paths and data points', function() {
+          expect(d3.selectAll('.ac-chart svg > g > path').size()).toEqual(numberOfPoints)
+      })
+  })
+
+  describe('bubbles', function() {
+
+      it('should change chartType to bubble', function () {
+          $scope.chartType = 'bubble'
+          compileChart()
+          $scope.$digest()
+      })
+
+      it('should have the same amount of bubbles and non zero data points', function() {
+          expect(d3.selectAll('.ac-chart svg > g > circle').size()).toEqual(nonZeroPoints)
+      })
   })
 
   describe('lines', function() {

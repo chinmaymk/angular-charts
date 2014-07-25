@@ -41,7 +41,7 @@ function MainController($scope, $timeout) {
 		}]
 	}
 
-	$scope.chartType = 'bar';
+	$scope.chartType = 'bubble';
 
 	$scope.config1 = {
 		labels: false,
