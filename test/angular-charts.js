@@ -1,6 +1,6 @@
 describe('angularCharts', function() {
   var $scope, $compile, $chart, $chart_childrens, body //we'll be working on a unique chart
-    , numberOfPoints, declaredPoints
+    , numberOfPoints, nonZeroPoints
 
   // load the charts code
   beforeEach(module('angularCharts'));
@@ -47,16 +47,22 @@ describe('angularCharts', function() {
 
     //just counting number of points in the data scope
     numberOfPoints = 0
-    declaredPoints = 0
+    nonZeroPoints = 0
 
     angular.forEach($scope.data.data, function(data){
         angular.forEach(data, function(val){
             if(typeof val == 'object') {
-                if(val.indexOf(0) === -1)
+                if(val.indexOf(0) === -1) {
                     numberOfPoints += val.length + 1
-                else
+                    nonZeroPoints += val.length
+                }
+                else {
                     numberOfPoints += val.length
-                declaredPoints += val.length
+                    angular.forEach(val, function(i){
+                        if(i != 0)
+                            nonZeroPoints++
+                    })
+                }
             }
         })
     })
@@ -140,8 +146,8 @@ describe('angularCharts', function() {
           $scope.$digest()
       })
 
-      it('should have the same amount of bubbles as there are declared datas points', function() {
-          expect(d3.selectAll('.ac-chart svg > g > circle').size()).toEqual(declaredPoints)
+      it('should have the same amount of bubbles as there are non zero datas points', function() {
+          expect(d3.selectAll('.ac-chart svg > g > circle').size()).toEqual(nonZeroPoints)
       })
   })
 

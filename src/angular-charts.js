@@ -21,7 +21,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                 "padding:5px;",
                 "color:#fff;"].join('');
 
-  var defaultColors = ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
+  var defaultColors = ['rgb(70, 130, 180)', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
 
   /**
    * Utility function to call when we run out of colors!
@@ -199,7 +199,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         'line': lineChart,
         'area': areaChart,
         'point': pointChart,
-        'bubble': bubbleChart
+        'bubble': bubbleChart,
+        'circularHeat':circularHeatChart
       }
       return charts[type];
     }
@@ -242,14 +243,16 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
               angular.forEach(points, function (parent, key) {
                   angular.forEach(parent.y, function(value, i){
-                      var tooltip = series[i] + ": " + value;
-                      nodes.children.push({
-                          packageName: parent.x,
-                          className: series[i],
-                          value: value,
-                          color: getColor(key),
-                          tooltip: (parent.tooltip)? parent.tooltip:tooltip
-                      });
+                      if(value != 0) {
+                          var tooltip = series[i] + ": " + value;
+                          nodes.children.push({
+                              packageName: parent.x,
+                              className: series[i],
+                              value: value,
+                              color: getColor(key),
+                              tooltip: (parent.tooltip) ? parent.tooltip : tooltip
+                          });
+                      }
                   });
               });
 
@@ -265,8 +268,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
                   .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
               node.append("circle")
-                  .attr("r", function(d) { return d.r; })
-                  .style("fill", function(d) { return d.color; });
+                  .style("fill", function(d) { return d.color; })
+                  .attr("r", 0)
+                  .transition()
+                  .ease("ease-out")
+                  .duration(config.isAnimate ? 1000 : 0)
+                  .attr("r", function(d) { return d.r; });
 
               node.append("text")
                   .attr({
@@ -307,6 +314,125 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           }
 
           d3.select(self.frameElement).style("height", diameter + "px");
+      }
+
+      /**
+       * Draws a sunburst chart
+       * @return {[type]} [description]
+       */
+      function circularHeatChart(){
+
+          /* Define an array of objects */
+          var numbers = [];
+          angular.forEach(points, function(val){
+              var total = series.length - val.y.length;
+              if(total != 0){
+                  for(var i=0; i<total; i++){
+                      val.y.push(0);
+                  }
+              }
+              numbers = numbers.concat(val.y);
+          });
+
+          /* Chart preset configurations */
+          var margin = {top: 20, right: 20, bottom: 20, left: 20},
+              innerRadius = 30,
+              numSegments = series.length,
+              segmentHeight = 20,
+              accessor = function(d) {return d;};
+
+          /* Arc functions */
+          ir = function(d, i) {
+              return innerRadius + Math.floor(i/numSegments) * segmentHeight;
+          }
+          or = function(d, i) {
+              return innerRadius + segmentHeight + Math.floor(i/numSegments) * segmentHeight;
+          }
+          sa = function(d, i) {
+              return (i * 2 * Math.PI) / numSegments;
+          }
+          ea = function(d, i) {
+              return ((i + 1) * 2 * Math.PI) / numSegments;
+          }
+
+          var svg = d3.select(chartContainer[0])
+              .append('svg')
+              .attr("width", width)
+              .attr("height", height)
+              .attr("class", "circularHeat");
+
+
+          var offset = innerRadius + Math.ceil(numbers.length / numSegments) * segmentHeight;
+          var g = svg.append("g")
+              .data(numbers)
+              .classed("circular-heat", true)
+              .attr("transform", "translate(" + parseInt(margin.left + offset) + "," + parseInt(margin.top + offset) + ")");
+
+          var color = d3.scale.linear().domain(d3.extent(numbers, accessor)).range(["#f0f0f0", getColor(0)]);
+
+          g.selectAll("path").data(numbers)
+              .enter().append("path")
+              .attr("d", d3.svg.arc().innerRadius(ir).outerRadius(or).startAngle(sa).endAngle(ea))
+              .attr("stroke", "#fff")
+              .attr("fill", getColor(0))
+              .transition()
+              .ease("ease-out")
+              .duration(config.isAnimate ? 1000 : 0)
+              .attr("stroke", "#000")
+              .attr("fill", function(d) {
+                  return color(accessor(d));
+              });
+
+          /**
+           * Add events for tooltip
+           * @param  {[type]} d [description]
+           * @return {[type]}   [description]
+           */
+          d3.selectAll('path').on('mouseover', function (d) {
+              makeToolTip({ value: d }, d3.event);
+              color = d3.scale.linear().domain(d3.extent(numbers, accessor)).range(["#e8e8e8", getColor(1)]);
+              d3.select(this).transition().duration(200).style('fill', color(accessor(d)));
+              config.mouseover(d, d3.event);
+              scope.$apply();
+          }).on('mouseleave', function (d) {
+              color = d3.scale.linear().domain(d3.extent(numbers, accessor)).range(["#f0f0f0", getColor(0)]);
+              d3.select(this).transition().duration(200).style('fill', color(accessor(d)));
+              removeToolTip();
+              config.mouseout(d, d3.event);
+              scope.$apply();
+          }).on('mousemove', function (d) {
+              updateToolTip(d3.event);
+          }).on('click', function (d) {
+              config.click(d, d3.event);
+              scope.$apply();
+          });
+
+          // Unique id so that the text path defs are unique - is there a better way to do this?
+          var id = d3.selectAll(".circular-heat")[0].length;
+
+          //Segment labels
+          var segmentLabelOffset = 2;
+          var r = innerRadius + Math.ceil(numbers.length / numSegments) * segmentHeight + segmentLabelOffset;
+          labels = svg.append("g")
+              .classed("labels", true)
+              .classed("segment", true)
+              .attr("transform", "translate(" + parseInt(margin.left + offset) + "," + parseInt(margin.top + offset) + ")");
+
+          labels.append("def")
+              .append("path")
+              .attr("id", "segment-label-path-"+id)
+              .attr("d", "m0 -" + r + " a" + r + " " + r + " 0 1 1 -1 0");
+
+          labels.selectAll("text")
+              .data(series).enter()
+              .append("text")
+              .append("textPath")
+              .attr("xlink:href", "#segment-label-path-"+id)
+              .attr("startOffset", function(d, i) {return i * 100 / numSegments + "%";})
+              .text(function(d) {
+                  return d.replace(/<\/?[^>]+(>|$)/g, "");
+              });
+
       }
 
     /**
