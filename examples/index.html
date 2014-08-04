@@ -1,4 +1,4 @@
-<!DOCTYPE 5>
+<!DOCTYPE html>
 <html ng-app="example">
 <head>
 	<title>angular-charts demo!</title>
@@ -7,16 +7,17 @@
 			font-family: "helvetica";
 			color : #333;
 		}
-		.chart {
+		[ac-chart] {
 			float:left;
-			width: 50%;
-			height:400px;
+			width: 48%;
+			height: 400px;
+			margin: 0 1%;
 		}
 	</style>
 </head>
-<body ng-controller='MainController'>
-	
-	<select ng-model='chartType'>
+<body ng-controller="MainController">
+
+	<select ng-model="chartType">
 		<option value="pie">pie</option>
 		<option value="bar">bar</option>
 		<option value="line">line</option>
@@ -25,21 +26,19 @@
 	</select>
 
 	<span ng-show="chartType==='pie'">
-		<label>Radius: <input ng-model="config.innerRadius" type="text" ></label>
+		<label for="innerRadius">Radius:</label>
+		<input ng-model="config1.innerRadius" type="number" id="innerRadius" />
 	</span>
 
-	<div class='charts'>
-		<div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
-	</div>
+	<br />
 
-	<div class='charts'>
-		<div ac-chart="chartType" ac-data="data1" ac-config="config1" id='chart' class='chart'></div>
-	</div>
+	<div ac-chart="chartType" ac-data="data1" ac-config="config1"></div>
 
-	<script type="text/javascript" src="../bower_components/jquery/jquery.min.js"></script>
-	<script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
-	<script type="text/javascript" src="../bower_components/d3/d3.min.js"></script>
-	<script type="text/javascript" src="../dist/angular-charts.js"></script>
-	<script type="text/javascript" src="main.controller.js"></script>
+	<div ac-chart="chartType" ac-data="data2" ac-config="config2"></div>
+
+	<script src="../bower_components/angular/angular.min.js"></script>
+	<script src="../bower_components/d3/d3.min.js"></script>
+	<script src="../dist/angular-charts.js"></script>
+	<script src="main.controller.js"></script>
 </body>
 </html>
