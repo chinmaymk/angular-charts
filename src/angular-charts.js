@@ -436,10 +436,16 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       y.domain([d3.min(yData), d3.max(yData) + padding]);
 
-      svg.append("g")
+      var xAxisSelection = svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
           .call(xAxis);
+      if( config.xAxisLabelRotation )
+          xAxisSelection.selectAll("text")
+            .style("text-anchor","end")
+            .attr("dx","-.8em")
+            .attr("dy",".15em")
+            .attr("transform", function(d){return "rotate(" + config.xAxisLabelRotation + ")"});
 
       svg.append("g")
           .attr("class", "y axis")
