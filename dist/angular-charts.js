@@ -1,10 +1,10 @@
 /**
-* Main module
-*/
+ * Main module
+ */
 angular.module('angularCharts', ['angularChartsTemplates']);
 /**
-* Main directive handling drawing of all charts
-*/
+ * Main directive handling drawing of all charts
+ */
 angular.module('angularCharts').directive('acChart', [
   '$templateCache',
   '$compile',
@@ -273,9 +273,9 @@ angular.module('angularCharts').directive('acChart', [
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         /**
-      * Add bars
-      * @type {[type]}
-      */
+       * Add bars
+       * @type {[type]}
+       */
         var barGroups = svg.selectAll('.state').data(points).enter().append('g').attr('class', 'g').attr('transform', function (d) {
             return 'translate(' + x(d.x) + ',0)';
           });
@@ -463,8 +463,8 @@ angular.module('angularCharts').directive('acChart', [
           }
         });
         /**
-      * Labels at the end of line
-      */
+       * Labels at the end of line
+       */
         if (config.lineLegend === 'lineEnd') {
           point.append('text').datum(function (d) {
             return {
@@ -609,7 +609,7 @@ angular.module('angularCharts').directive('acChart', [
             complete = true;
             //Add listeners when transition is done
             path.on('mouseover', function (d) {
-              makeToolTip({ value: d.tooltip ? d.tooltip : d.data.y[0] }, d3.event);
+              makeToolTip({ value: d.data.tooltip ? d.data.tooltip : d.data.y[0] }, d3.event);
               d3.select(this).select('path').transition().duration(200).style('stroke', 'white').style('stroke-width', '2px');
               config.mouseover(d, d3.event);
               scope.$apply();
@@ -770,6 +770,7 @@ angular.module('angularCharts').directive('acChart', [
             left: event.pageX + 20 + 'px',
             top: event.pageY - 30 + 'px'
           });
+        angular.element('.ac-tooltip').remove();
         angular.element(document.body).append(el);
         scope.$tooltip = el;
       }
