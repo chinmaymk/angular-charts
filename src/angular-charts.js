@@ -822,7 +822,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             //Add listeners when transition is done
             path.on("mouseover", function(d) {
               makeToolTip({
-                value: d.tooltip ? d.tooltip : d.data.y[0]
+                value: d.data.tooltip ? d.data.tooltip : d.data.y[0]
               }, d3.event);
               d3.select(this)
                 .select('path')
