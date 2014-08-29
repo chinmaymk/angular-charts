@@ -863,7 +863,10 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
           .attr("dy", ".35em")
           .style("text-anchor", "middle")
           .text(function(d) {
-            return d.data.y[0];
+            if(d.data.label)
+              return d.data.label;
+            else
+              return d.data.y[0];
           });
       }
 
