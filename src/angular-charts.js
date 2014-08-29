@@ -95,8 +95,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     var totalWidth = element[0].clientWidth;
     var totalHeight = element[0].clientHeight;
 
-   
-
 
     var data,
       series,
