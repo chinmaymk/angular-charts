@@ -7,18 +7,6 @@ angular.module('angularCharts', ['angularChartsTemplates']);
  * Main directive handling drawing of all charts
  */
 angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
-  /**
-   * Initialize some constants
-   * @type Array
-   */
-  var tooltip = ["display:block;",
-    "position:absolute;",
-    "border:1px solid #333;",
-    "background-color:#161616;",
-    "border-radius:5px;",
-    "padding:5px;",
-    "color:#fff;"
-  ].join('');
 
   var defaultColors = ['steelBlue', 'rgb(255,153,0)', 'rgb(220,57,18)', 'rgb(70,132,238)', 'rgb(73,66,204)', 'rgb(0,128,0)'];
 
@@ -252,7 +240,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             x: d.x,
             y: e,
             s: i,
-            tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip,
+            tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip
           }
         })
       })
@@ -467,7 +455,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
             return {
               x: point.x,
               y: e,
-              tooltip: point.tooltip,
+              tooltip: point.tooltip
             }
           })[index] || {
             x: points[index].x,
@@ -1049,14 +1037,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         data = data.value;
       }
 
-      var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>')
+      var el = angular.element('<p class="ac-tooltip"></p>')
         .html(data)
         .css({
           left: (event.pageX + 20) + 'px',
           top: (event.pageY - 30) + 'px'
         });
 
-      angular.element('.ac-tooltip').remove();
+      angular.element(document.querySelector('.ac-tooltip')).remove();
       angular.element(document.body).append(el);
 
       scope.$tooltip = el;
