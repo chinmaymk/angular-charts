@@ -1,36 +1,43 @@
 .angular-charts-template .axis path,
 .angular-charts-template .axis line {
-  fill: none;
-  stroke: #333;
+    fill: none;
+    stroke: #333;
 }
 .angular-charts-template .ac-title {
-  font-weight: bold;
-  font-size: 1.2em;
+    font-weight: bold;
+    font-size: 1.2em;
 }
 .angular-charts-template .ac-chart {
-  float: left;
-  width: 75%;
+    float: left;
+    width: 75%;
 }
 .angular-charts-template .ac-line {
-  fill: none;
-  stroke-width: 2px;
+    fill: none;
+    stroke-width: 2px;
 }
 .angular-charts-template table {
-  float: left;
-  max-width: 25%;
-  list-style: none;
-  margin: 0px;
-  padding: 0px;
+    float: left;
+    max-width: 25%;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
 }
 .angular-charts-template td[ng-bind] {
-  display: inline-block;
+    display: inline-block;
 }
-.angular-charts-template .ac-tooltip {
-  display: block;
-  position: absolute;
-  border: 1px solid rgb(51, 51, 51);
-  background-color: rgb(22, 22, 22);
-  border-radius: 5px;
-  padding: 5px;
-  color: rgb(255, 255, 255);
+
+.angular-charts-template .ac-legend-box {
+    border-radius: 5px;
+    height: 15px;
+    width: 15px;
+}
+
+.ac-tooltip {
+    display: block;
+    position: absolute;
+    border: 2px solid rgba(51, 51, 51, 0.9);
+    background-color: rgba(22, 22, 22, 0.7);
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
 }
