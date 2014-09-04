@@ -26,6 +26,12 @@
     display: inline-block;
 }
 
+.angular-charts-template .ac-legend-box {
+    border-radius: 5px;
+    height: 15px;
+    width: 15px;
+}
+
 .ac-tooltip {
     display: block;
     position: absolute;
