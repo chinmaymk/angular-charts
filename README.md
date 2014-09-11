@@ -19,7 +19,7 @@ Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 Installation is very straight forward. Grab the latest zip from github. Copy angular-chart.min.js in your root, and refer it in your page.
 
 ```html
-<script  src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
+<script src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
 ```
 Add as dependency in your module
 
@@ -38,9 +38,9 @@ bower install angular-charts
 Refer all dependencies in your page in right order
 
 ```html
-<script  src='./bower_components/angular/angular.min.js' type='text/javascript'></script> 
-<script  src='./bower_components/d3/d3.min.js' type='text/javascript'></script> 
-<script  src='./bower_components/angular-charts/dist/angular-charts.min.js' type='text/javascript'></script>
+<script src='./bower_components/angular/angular.min.js' type='text/javascript'></script> 
+<script src='./bower_components/d3/d3.min.js' type='text/javascript'></script> 
+<script src='./bower_components/angular-charts/dist/angular-charts.min.js' type='text/javascript'></script>
 ```
 
 ##Configuration
@@ -53,7 +53,7 @@ Directive syntax
 
 
 ###ac-chart  - string
-**Values:** 'pie', 'bar', 'line', 'point', 'area'
+Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 
 ###ac-config - object
 ```js            
@@ -105,7 +105,7 @@ var acData = {
 }
 ```
 
-###series - string array
+**series - string array**
 ```js
 var series = [
   "Sales",
@@ -113,7 +113,7 @@ var series = [
   "Expense"
 ]
 ```
-###data
+**data**
 x defines what goes on x axis, must be a string, y defines what goes on y axis, must be an array of numbers. 
 
 Values are mapped to series by index. y[0] belongs to series[0], y[1] belongs to series[1] and so on. Tooltip is optional.
