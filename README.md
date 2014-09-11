@@ -7,11 +7,7 @@
 6. Callback events
 7. Simple data format
 
-##Try out
-
-Download zip - [releases](https://github.com/chinmaymk/angular-charts/releases).
-
-Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
+[Download](https://github.com/chinmaymk/angular-charts/releases) | [Playground](http://plnkr.co/edit/T9J7bz?p=preview) | [Contribute](#contribute).
 
 ##Installation
 Grab the latest zip from github, copy ```angular-charts.min.js``` to web root, and refer it from page.
@@ -133,7 +129,7 @@ mouseout : function(d) {
 }
 ```
 
-## How to contribite
+## Contribite
 
 1. Make sure all tests are passing.
 2. Update this README if you are doing any change to config object.
