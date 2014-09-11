@@ -14,7 +14,7 @@ Download zip - [releases](https://github.com/chinmaymk/angular-charts/releases).
 Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 
 ##Installation
-Grab the latest zip from github. Copy angular-chart.min.js in your root, and refer it in your page.
+Grab the latest zip from github, copy ```angular-charts.min.js``` to web root, and refer it from page.
 
 ```html
 <script src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
@@ -54,6 +54,7 @@ Directive syntax
 Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 
 ###ac-config - object
+
 ```js            
  var config = {
   title: '', // chart title
@@ -84,22 +85,12 @@ Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 Entire data structure looks like this
 ```js
 var acData = {
-  series: [
-    "Sales",
-    "Income",
-    "Expense"
-  ],
-  data: [
-    {
-      "x": "Computers",
-      "y": [
-        54,
-        0,
-        879
-      ],
-      "tooltip": "This is a tooltip"
-    }
-  ]
+  series: ["Sales", "Income", "Expense"],
+  data: [{
+    x: "Computers",
+    y: [54, 0, 879],
+    tooltip: "This is a tooltip"
+  }]
 }
 ```
 
@@ -120,13 +111,9 @@ Each data point looks like this
 
 ```js
 var dataPoint = {
-  "x": "Computers",
-  "y": [
-    54,
-    0,
-    879
-  ],
-  "tooltip": "This is a tooltip"
+  x: "Computers",
+  y: [54, 0, 879],
+  tooltip: "This is a tooltip"
 }
 ```
 **Note:** series and data are arrays
