@@ -27,5 +27,10 @@ Thanks to all awesome [contributors](https://github.com/chinmaymk/angular-charts
 
 License - MIT.
 
+###Collaborator instructions
+Please make sure all tests are passing. Thats about it.
+
+**Note**: Please don't send any PRs until you see this. I'm refactoring angular-charts.
+
 ###Got suggestions ?
 Feel free to submit a pull request, file an issue, or get in touch on twitter [@_chinmaymk](https://twitter.com/_chinmaymk)
