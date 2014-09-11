@@ -13,19 +13,6 @@ angular.module('angularCharts').directive('acChart', [
   '$timeout',
   '$sce',
   function ($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
-    /**
-   * Initialize some constants
-   * @type Array
-   */
-    var tooltip = [
-        'display:block;',
-        'position:absolute;',
-        'border:1px solid #333;',
-        'background-color:#161616;',
-        'border-radius:5px;',
-        'padding:5px;',
-        'color:#fff;'
-      ].join('');
     var defaultColors = [
         'steelBlue',
         'rgb(255,153,0)',
@@ -163,15 +150,7 @@ angular.module('angularCharts').directive('acChart', [
         series = data ? data.series || [] : [];
         points = data ? data.data || [] : [];
         if (scope.acConfig) {
-          var arr = [];
-          if (scope.acConfig.colors) {
-            ;
-            [].push.apply(arr, scope.acConfig.colors);
-          }
-          ;
-          [].push.apply(arr, defaultColors);
           angular.extend(config, scope.acConfig);
-          config.colors = arr;
         }
       }
       /**
@@ -310,7 +289,7 @@ angular.module('angularCharts').directive('acChart', [
           config.mouseout(d, d3.event);
           scope.$apply();
         }).on('mousemove', function (d) {
-          updateToolTip(d3.event);
+          updateToolTip(d, d3.event);
         }).on('click', function (d) {
           config.click.call(d, d3.event);
           scope.$apply();
@@ -368,7 +347,7 @@ angular.module('angularCharts').directive('acChart', [
         var yData = [0];
         var linedata = [];
         points.forEach(function (d) {
-          d.y.map(function (e, i) {
+          d.y.map(function (e) {
             yData.push(e);
           });
         });
@@ -402,11 +381,11 @@ angular.module('angularCharts').directive('acChart', [
         svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
-        path = point.attr('points', 'points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
-          return getColor(i);
-        }).attr('d', function (d) {
-          return line(d.values);
-        }).attr('stroke-width', '2').attr('fill', 'none');
+        var path = point.attr('points', 'points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
+            return getColor(i);
+          }).attr('d', function (d) {
+            return line(d.values);
+          }).attr('stroke-width', '2').attr('fill', 'none');
         /** Animation function
        * [last description]
        * @type {[type]}
@@ -521,7 +500,7 @@ angular.module('angularCharts').directive('acChart', [
         var yData = [0];
         var linedata = [];
         points.forEach(function (d) {
-          d.y.map(function (e, i) {
+          d.y.map(function (e) {
             yData.push(e);
           });
         });
@@ -560,7 +539,7 @@ angular.module('angularCharts').directive('acChart', [
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
         var area = d3.svg.area().interpolate('basis').x(function (d) {
             return getX(d.x);
-          }).y0(function (d) {
+          }).y0(function () {
             return y(0);
           }).y1(function (d) {
             return y(0 + d.y);
@@ -619,7 +598,7 @@ angular.module('angularCharts').directive('acChart', [
               config.mouseout(d, d3.event);
               scope.$apply();
             }).on('mousemove', function (d) {
-              updateToolTip(d3.event);
+              updateToolTip(d, d3.event);
             }).on('click', function (d) {
               config.click(d, d3.event);
               scope.$apply();
@@ -761,16 +740,16 @@ angular.module('angularCharts').directive('acChart', [
         if (!config.tooltips) {
           return;
         }
-        if (typeof config.tooltips == 'function') {
+        if (typeof config.tooltips === 'function') {
           data = config.tooltips(data);
         } else {
           data = data.value;
         }
-        var el = angular.element('<p class="ac-tooltip" style="' + tooltip + '"></p>').html(data).css({
+        var el = angular.element('<p class="ac-tooltip"></p>').html(data).css({
             left: event.pageX + 20 + 'px',
             top: event.pageY - 30 + 'px'
           });
-        angular.element('.ac-tooltip').remove();
+        angular.element(document.querySelector('.ac-tooltip')).remove();
         angular.element(document.body).append(el);
         scope.$tooltip = el;
       }
@@ -797,7 +776,7 @@ angular.module('angularCharts').directive('acChart', [
      */
       function drawLegend() {
         scope.legends = [];
-        if (chartType == 'pie') {
+        if (chartType === 'pie') {
           angular.forEach(points, function (value, key) {
             scope.legends.push({
               color: config.colors[key],
@@ -805,7 +784,7 @@ angular.module('angularCharts').directive('acChart', [
             });
           });
         }
-        if (chartType == 'bar' || chartType == 'area' || chartType == 'point' || chartType == 'line' && config.lineLegend === 'traditional') {
+        if (chartType === 'bar' || chartType === 'area' || chartType === 'point' || chartType === 'line' && config.lineLegend === 'traditional') {
           angular.forEach(series, function (value, key) {
             scope.legends.push({
               color: config.colors[key],
@@ -889,7 +868,7 @@ angular.module('angularCharts').directive('acChart', [
 (function () {
     // styles.min.css
     var cssText = "" +
-".angular-charts-template .axis path,.angular-charts-template .axis line{fill:none;stroke:#333}.angular-charts-template .ac-title{font-weight:700;font-size:1.2em}.angular-charts-template .ac-chart{float:left;width:75%}.angular-charts-template .ac-line{fill:none;stroke-width:2px}.angular-charts-template table{float:left;max-width:25%;list-style:none;margin:0;padding:0}.angular-charts-template td[ng-bind]{display:inline-block}.angular-charts-template .ac-tooltip{display:block;position:absolute;border:1px solid #333;background-color:#161616;border-radius:5px;padding:5px;color:#fff}";
+".angular-charts-template .axis path,.angular-charts-template .axis line{fill:none;stroke:#333}.angular-charts-template .ac-title{font-weight:700;font-size:1.2em}.angular-charts-template .ac-chart{float:left;width:75%}.angular-charts-template .ac-line{fill:none;stroke-width:2px}.angular-charts-template table{float:left;max-width:25%;list-style:none;margin:0;padding:0}.angular-charts-template td[ng-bind]{display:inline-block}.angular-charts-template .ac-legend-box{border-radius:5px;height:15px;width:15px}.ac-tooltip{display:block;position:absolute;border:2px solid rgba(51,51,51,.9);background-color:rgba(22,22,22,.7);border-radius:5px;padding:5px;color:#fff}";
     // cssText end
 
     var styleEl = document.createElement("style");
@@ -911,10 +890,10 @@ angular.module('angularChartsTemplates', ['angularChartsTemplate_left', 'angular
 
 angular.module("angularChartsTemplate_left", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("angularChartsTemplate_left",
-    "<div class=\"angular-charts-template\"><div class=\"ac-title\">{{acConfig.title}}</div><div class=\"ac-legend\" ng-show=\"{{acConfig.legend.display}}\"><table><tr ng-repeat=\"l in legends\"><td><div ng-attr-style=\"background:{{l.color}}; height:15px;width:15px;\"></div></td><td ng-bind-html=\"l.title\"></td></tr></table></div><div class=\"ac-chart\"></div></div>");
+    "<div class=\"angular-charts-template\"><div class=\"ac-title\">{{acConfig.title}}</div><div class=\"ac-legend\" ng-show=\"{{acConfig.legend.display}}\"><table><tr ng-repeat=\"l in legends\"><td><div class=\"ac-legend-box\" ng-attr-style=\"background:{{l.color}};\"></div></td><td ng-bind-html=\"l.title\"></td></tr></table></div><div class=\"ac-chart\"></div></div>");
 }]);
 
 angular.module("angularChartsTemplate_right", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("angularChartsTemplate_right",
-    "<div class=\"angular-charts-template\"><div class=\"ac-title\">{{acConfig.title}}</div><div class=\"ac-chart\"></div><div class=\"ac-legend\" ng-show=\"{{acConfig.legend.display}}\"><table><tr ng-repeat=\"l in legends | limitTo:yMaxData\"><td><div ng-attr-style=\"background:{{l.color}}; height:15px;width:15px;\"></div></td><td ng-bind-html=\"l.title\"></td></tr></table></div></div>");
+    "<div class=\"angular-charts-template\"><div class=\"ac-title\">{{acConfig.title}}</div><div class=\"ac-chart\"></div><div class=\"ac-legend\" ng-show=\"{{acConfig.legend.display}}\"><table><tr ng-repeat=\"l in legends | limitTo:yMaxData\"><td><div class=\"ac-legend-box\" ng-attr-style=\"background:{{l.color}};\"></div></td><td ng-bind-html=\"l.title\"></td></tr></table></div></div>");
 }]);
