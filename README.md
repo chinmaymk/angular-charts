@@ -1,11 +1,3 @@
-angular-charts [![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
-==============
-
-angular directives for common charts using d3.
-
-Download zip - [releases](https://github.com/chinmaymk/angular-charts/releases).
-Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
-
 ##Features
 1. One click chart change
 2. Tiny - 4.4kb minified and gzipped
@@ -15,8 +7,10 @@ Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 6. Callback events
 7. Simple data format
 
+[Download](https://github.com/chinmaymk/angular-charts/releases) | [Playground](http://plnkr.co/edit/T9J7bz?p=preview) | [Contribute](#contribute)
+
 ##Installation
-Installation is very straight forward. Grab the latest zip from github. Copy angular-chart.min.js in your root, and refer it in your page.
+Grab the latest zip from [releases](https://github.com/chinmaymk/angular-charts/releases), copy ```angular-charts.min.js``` to web root, and refer it from page.
 
 ```html
 <script src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
@@ -26,11 +20,11 @@ Add as dependency in your module
 ```js
 angular.module('yourApp', ['angularCharts']);
 ```
-###Dependencies
+**Dependencies**
 1. angular
 2. d3
 
-###Install using bower
+**Install using bower**
 
 ```js
 bower install angular-charts
@@ -56,6 +50,7 @@ Directive syntax
 Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 
 ###ac-config - object
+
 ```js            
  var config = {
   title: '', // chart title
@@ -86,22 +81,12 @@ Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 Entire data structure looks like this
 ```js
 var acData = {
-  series: [
-    "Sales",
-    "Income",
-    "Expense"
-  ],
-  data: [
-    {
-      "x": "Computers",
-      "y": [
-        54,
-        0,
-        879
-      ],
-      "tooltip": "This is a tooltip"
-    }
-  ]
+  series: ["Sales", "Income", "Expense"],
+  data: [{
+    x: "Computers",
+    y: [54, 0, 879],
+    tooltip: "This is a tooltip"
+  }]
 }
 ```
 
@@ -122,19 +107,15 @@ Each data point looks like this
 
 ```js
 var dataPoint = {
-  "x": "Computers",
-  "y": [
-    54,
-    0,
-    879
-  ],
-  "tooltip": "This is a tooltip"
+  x: "Computers",
+  y: [54, 0, 879],
+  tooltip: "This is a tooltip"
 }
 ```
 **Note:** series and data are arrays
 
 ##Events
-Three events are exposed via config objects.
+Three events are exposed via config object.
 
 ```js     
 click : function(d) {
@@ -148,8 +129,15 @@ mouseout : function(d) {
 }
 ```
 
-## How to contribite
-Make sure all tests are passing. Thats about it.
+## Contribute
+Thanks to all awesome [contributors](https://github.com/chinmaymk/angular-charts/network/members)
+
+Some things to follow
+
+1. Make sure all tests are passing.
+2. Update this README if you are doing any change to config object.
+3. Avoid any changes in data format
+4. Keep backwards compatibility
 
 **Note**: Please don't send any PRs until you see this. I'm refactoring angular-charts.
 
@@ -162,9 +150,8 @@ To run tests:
 
     grunt karma
 
-Thanks to all awesome [contributors](https://github.com/chinmaymk/angular-charts/network/members)
-
-License - MIT.
-
 ##Got suggestions ?
 Feel free to submit a pull request, file an issue, or get in touch on twitter [@_chinmaymk](https://twitter.com/_chinmaymk)
+
+License - MIT.
+[![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
