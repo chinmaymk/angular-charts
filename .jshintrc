@@ -70,6 +70,7 @@
     "beforeEach": false,
     "after": false,
     "afterEach": false,
+    "angular": true,
     "$": true,
     "rr": true
   }

@@ -1,11 +1,3 @@
-angular-charts [![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
-==============
-
-angular directives for common charts using d3.
-
-Download zip - [releases](https://github.com/chinmaymk/angular-charts/releases).
-Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
-
 ##Features
 1. One click chart change
 2. Tiny - 4.4kb minified and gzipped
@@ -15,8 +7,14 @@ Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 6. Callback events
 7. Simple data format
 
+##Try out
+
+Download zip - [releases](https://github.com/chinmaymk/angular-charts/releases).
+
+Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
+
 ##Installation
-Installation is very straight forward. Grab the latest zip from github. Copy angular-chart.min.js in your root, and refer it in your page.
+Grab the latest zip from github. Copy angular-chart.min.js in your root, and refer it in your page.
 
 ```html
 <script src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
@@ -134,7 +132,7 @@ var dataPoint = {
 **Note:** series and data are arrays
 
 ##Events
-Three events are exposed via config objects.
+Three events are exposed via config object.
 
 ```js     
 click : function(d) {
@@ -149,7 +147,9 @@ mouseout : function(d) {
 ```
 
 ## How to contribite
-Make sure all tests are passing. Thats about it.
+
+1. Make sure all tests are passing.
+2. Update this README if you are doing any change to config object.
 
 **Note**: Please don't send any PRs until you see this. I'm refactoring angular-charts.
 
@@ -168,3 +168,5 @@ License - MIT.
 
 ##Got suggestions ?
 Feel free to submit a pull request, file an issue, or get in touch on twitter [@_chinmaymk](https://twitter.com/_chinmaymk)
+
+[![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
