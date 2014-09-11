@@ -113,10 +113,12 @@ var series = [
   "Expense"
 ]
 ```
-**data**
-x defines what goes on x axis, must be a string, y defines what goes on y axis, must be an array of numbers. 
+**data - object array**
 
+x defines what goes on x axis, must be a string, y defines what goes on y axis, must be an array of numbers. 
 Values are mapped to series by index. y[0] belongs to series[0], y[1] belongs to series[1] and so on. Tooltip is optional.
+
+Each data point looks like this
 
 ```js
 var dataPoint = {
@@ -133,11 +135,6 @@ var dataPoint = {
 
 ##Events
 Three events are exposed via config objects.
-```
-onmouseover
-onmouseout
-click
-```
 
 ```js     
 click : function(d) {
@@ -152,7 +149,8 @@ mouseout : function(d) {
 ```
 
 ## How to contribite
-Please make sure all tests are passing.
+Make sure all tests are passing. Thats about it.
+
 **Note**: Please don't send any PRs until you see this. I'm refactoring angular-charts.
 
     git clone git@github.com:chinmaymk/angular-charts.git
