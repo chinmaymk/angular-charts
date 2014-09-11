@@ -70,7 +70,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
-      isAnimate: true
+      isAnimate: true,
+      yAxisTickFormat: 's'
     };
 
     var totalWidth = element[0].clientWidth;
@@ -260,7 +261,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .scale(y)
         .orient("left")
         .ticks(10)
-        .tickFormat(d3.format('s'));
+        .tickFormat(d3.format(config.yAxisTickFormat));
 
       /**
        * Start drawing the chart!
@@ -410,7 +411,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .scale(y)
         .orient("left")
         .ticks(5)
-        .tickFormat(d3.format('s'));
+        .tickFormat(d3.format(config.yAxisTickFormat));
 
       var line = d3.svg.line()
         .interpolate(config.lineCurveType)
@@ -635,7 +636,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .scale(y)
         .orient("left")
         .ticks(5)
-        .tickFormat(d3.format('s'));
+        .tickFormat(d3.format(config.yAxisTickFormat));
 
       d3.svg.line()
         .interpolate(config.lineCurveType)
@@ -883,7 +884,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .scale(y)
         .orient("left")
         .ticks(5)
-        .tickFormat(d3.format('s'));
+        .tickFormat(d3.format(config.yAxisTickFormat));
 
       var yData = [0];
       var linedata = [];
@@ -1047,7 +1048,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       }
     }
 
-    function updateToolTip(event) {
+    function updateToolTip(d, event) {
       if (scope.$tooltip) {
         scope.$tooltip.css({
           left: (event.pageX + 20) + 'px',
