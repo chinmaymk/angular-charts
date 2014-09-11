@@ -21,6 +21,7 @@ Add as dependency in your module
 angular.module('yourApp', ['angularCharts']);
 ```
 **Dependencies**
+
 1. angular
 2. d3
 
