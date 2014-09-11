@@ -1,17 +1,10 @@
 angular-charts [![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
 ==============
 
-angular directives for common charts using d3, for more information visit
+angular directives for common charts using d3.
 
-http://chinmaymk.github.io/angular-charts/
-
-##Downloading zip from this page won't work!!!
-We recommend downloading a copy of angular-charts from [releases](https://github.com/chinmaymk/angular-charts/releases).
-Releases sit on the bower branch. If you want to build from master download and run grunt
-
-##Playground
-You can try out angular-charts on [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
-
+Download zip - [releases](https://github.com/chinmaymk/angular-charts/releases).
+Playground - [plunkr](http://plnkr.co/edit/T9J7bz?p=preview).
 
 ##Features
 1. One click chart change
@@ -25,31 +18,34 @@ You can try out angular-charts on [plunkr](http://plnkr.co/edit/T9J7bz?p=preview
 ##Installation
 Installation is very straight forward. Grab the latest zip from github. Copy angular-chart.min.js in your root, and refer it in your page.
 
-```js
-<script type='text/javascript' src='path/to/js/angular-charts.min.js'></script>
+```html
+<script  src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
 ```
 Add as dependency in your module
+
 ```js
 angular.module('yourApp', ['angularCharts']);
 ```
 ###Dependencies
-angular
-d3
+1. angular
+2. d3
 
 ###Install using bower
-```
+
+```js
 bower install angular-charts
 ```
-
 Refer all dependencies in your page in right order
-```js
-<script type='text/javascript' src='./bower_components/angular/angular.min.js'></script> 
-<script type='text/javascript' src='./bower_components/d3/d3.min.js'></script> 
-<script type='text/javascript' src='./bower_components/angular-charts/dist/angular-charts.min.js'></script>
+
+```html
+<script  src='./bower_components/angular/angular.min.js' type='text/javascript'></script> 
+<script  src='./bower_components/d3/d3.min.js' type='text/javascript'></script> 
+<script  src='./bower_components/angular-charts/dist/angular-charts.min.js' type='text/javascript'></script>
 ```
 
 ##Configuration
 Directive syntax
+
 ```html
 <div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
 ```
@@ -90,12 +86,12 @@ Directive syntax
 Entire data structure looks like this
 ```js
 var acData = {
-  "series": [
+  series: [
     "Sales",
     "Income",
     "Expense"
   ],
-  "data": [
+  data: [
     {
       "x": "Computers",
       "y": [
@@ -123,7 +119,7 @@ x defines what goes on x axis, must be a string, y defines what goes on y axis, 
 Values are mapped to series by index. y[0] belongs to series[0], y[1] belongs to series[1] and so on. Tooltip is optional.
 
 ```js
-var data = {
+var dataPoint = {
   "x": "Computers",
   "y": [
     54,
