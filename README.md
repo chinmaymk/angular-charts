@@ -7,10 +7,10 @@
 6. Callback events
 7. Simple data format
 
-[Download](https://github.com/chinmaymk/angular-charts/releases) | [Playground](http://plnkr.co/edit/T9J7bz?p=preview) | [Contribute](#contribute).
+[Download](https://github.com/chinmaymk/angular-charts/releases) | [Playground](http://plnkr.co/edit/T9J7bz?p=preview) | [Contribute](#contribute)
 
 ##Installation
-Grab the latest zip from github, copy ```angular-charts.min.js``` to web root, and refer it from page.
+Grab the latest zip from [releases](https://github.com/chinmaymk/angular-charts/releases), copy ```angular-charts.min.js``` to web root, and refer it from page.
 
 ```html
 <script src='path/to/js/angular-charts.min.js' type='text/javascript'></script>
@@ -20,11 +20,11 @@ Add as dependency in your module
 ```js
 angular.module('yourApp', ['angularCharts']);
 ```
-###Dependencies
+**Dependencies**
 1. angular
 2. d3
 
-###Install using bower
+**Install using bower**
 
 ```js
 bower install angular-charts
@@ -129,10 +129,15 @@ mouseout : function(d) {
 }
 ```
 
-## Contribite
+## Contribute
+Thanks to all awesome [contributors](https://github.com/chinmaymk/angular-charts/network/members)
+
+Some things to follow
 
 1. Make sure all tests are passing.
 2. Update this README if you are doing any change to config object.
+3. Avoid any changes in data format
+4. Keep backwards compatibility
 
 **Note**: Please don't send any PRs until you see this. I'm refactoring angular-charts.
 
@@ -145,11 +150,8 @@ To run tests:
 
     grunt karma
 
-Thanks to all awesome [contributors](https://github.com/chinmaymk/angular-charts/network/members)
-
-License - MIT.
-
 ##Got suggestions ?
 Feel free to submit a pull request, file an issue, or get in touch on twitter [@_chinmaymk](https://twitter.com/_chinmaymk)
 
+License - MIT.
 [![Build Status](https://travis-ci.org/chinmaymk/angular-charts.svg?branch=master)](https://travis-ci.org/chinmaymk/angular-charts)
