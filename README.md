@@ -74,7 +74,8 @@ Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
   lineLegend: 'lineEnd', // Only on line Charts
   lineCurveType: 'cardinal', // change this as per d3 guidelines to avoid smoothline
   isAnimate: true, // run animations while rendering chart
-  yAxisTickFormat: 's' //refer tickFormats in d3 to edit this value
+  yAxisTickFormat: 's', //refer tickFormats in d3 to edit this value
+  xAxisLabelRotation: false //Degrees of rotation (Margins automatically adjusted)
 };
 ```  
 

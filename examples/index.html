@@ -33,6 +33,11 @@
 		<input ng-model="config1.innerRadius" type="number" id="innerRadius" />
 	</span>
 
+	<span ng-show="chartType!=='pie'">
+		<label for="rotateLabels">Rotate xAxis Labels:</label>
+		<input ng-model="config1.xAxisLabelRotation" type="number" id="rotateLabels" />
+	</span>
+
 	<br />
 
 	<div id="chart1" ac-chart="chartType" ac-data="data1" ac-config="config1"></div>

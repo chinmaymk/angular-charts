@@ -95,7 +95,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
       isAnimate: true,
-      yAxisTickFormat: 's'
+      yAxisTickFormat: 's',
+      xAxisLabelRotation: false //Degrees of rotation
     };
 
     var totalWidth = element[0].clientWidth;
@@ -215,6 +216,17 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         }));
       }
     }
+    /**
+     * Rotates xAxis labels by config option
+     * @param {[selection]}
+     */
+    function rotateAxisLabels (selection){
+      selection
+        .style("text-anchor", "end")
+        .attr('dx', '-.8em')
+        .attr('dy', '.15em')
+        .attr('transform', function (d){return "rotate(" + config.xAxisLabelRotation + ")"});
+    }
 
     /**
      * Draws a bar chart, grouped with negative value handling
@@ -297,10 +309,18 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      svg.append("g")
+      var xAxisSelection = svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
+
+      if(config.xAxisLabelRotation){
+        rotateAxisLabels(xAxisSelection.selectAll("text")); //Call before getting measurements
+        height = (height + margin.bottom) - xAxisSelection.node().getBBox().height;
+        margin.bottom = xAxisSelection.node().getBBox().height;
+        xAxisSelection.attr("transform", "translate(0," + height + ")");
+        y.range([height, 10]);
+      }
 
       svg.append("g")
         .attr("class", "y axis")
@@ -487,10 +507,18 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       y.domain([d3.min(yData), d3.max(yData) + padding]);
 
-      svg.append("g")
+      var xAxisSelection = svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
+
+      if(config.xAxisLabelRotation){
+        rotateAxisLabels(xAxisSelection.selectAll("text")); //Call before getting measurements
+        height = (height + margin.bottom) - xAxisSelection.node().getBBox().height;
+        margin.bottom = xAxisSelection.node().getBBox().height;
+        xAxisSelection.attr("transform", "translate(0," + height + ")");
+        y.range([height, 10]);
+      }
 
       svg.append("g")
         .attr("class", "y axis")
@@ -717,10 +745,18 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       y.domain([d3.min(yData), d3.max(yData) + padding]);
 
-      svg.append("g")
+      var xAxisSelection = svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
+
+      if(config.xAxisLabelRotation){
+        rotateAxisLabels(xAxisSelection.selectAll("text")); //Call before getting measurements
+        height = (height + margin.bottom) - xAxisSelection.node().getBBox().height;
+        margin.bottom = xAxisSelection.node().getBBox().height;
+        xAxisSelection.attr("transform", "translate(0," + height + ")");
+        y.range([height, 10]);
+      }
 
       svg.append("g")
         .attr("class", "y axis")
@@ -951,10 +987,18 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       y.domain([d3.min(yData), d3.max(yData) + padding]);
 
-      svg.append("g")
+      var xAxisSelection = svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
+
+      if(config.xAxisLabelRotation){
+        rotateAxisLabels(xAxisSelection.selectAll("text")); //Call before getting measurements
+        height = (height + margin.bottom) - xAxisSelection.node().getBBox().height;
+        margin.bottom = xAxisSelection.node().getBBox().height;
+        xAxisSelection.attr("transform", "translate(0," + height + ")");
+        y.range([height, 10]);
+      }
 
       svg.append("g")
         .attr("class", "y axis")
