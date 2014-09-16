@@ -43,7 +43,8 @@ function MainController($scope) {
 			display: true,
 			position: 'left'
 		},
-		innerRadius: 0
+		innerRadius: 0,
+		xAxisLabelRotation: null
 	};
 
 	$scope.config2 = {
