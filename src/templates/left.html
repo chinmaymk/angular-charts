@@ -2,7 +2,7 @@
 	<div class='ac-title'>{{acConfig.title}}</div>
 	<div class='ac-legend' ng-show='{{acConfig.legend.display}}'>
 		<table>
-		<tr ng-repeat="l in legends">
+		<tr ng-repeat="l in legends | limitTo:yMaxData">
 			<td><div class="ac-legend-box" ng-attr-style='background:{{l.color}};'></div></td>
 			<td ng-bind-html='l.title'></td>
 		</tr>
