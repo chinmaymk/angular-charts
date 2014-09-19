@@ -5,6 +5,7 @@
 
   var service = {};
   var chartFunctions = [];
+  var injector;
 
   var HTML_ENTITY_MAP = {
     "&": "&amp;",
@@ -92,13 +93,13 @@
   /**
    * Default Legend 
    */
-  service.defaultLegend = function (config, box, series, points, $sce){
+  service.defaultLegend = function (config, box, series, points){
     var service = this;
 
     angular.forEach(series, function(value, key) {
       box.legends.push({
         color: config.colors[key],
-        title: service.getBindableTextForLegend(config, value, $sce)
+        title: service.getBindableTextForLegend(config, value)
       });
     });
   };
@@ -111,14 +112,22 @@
     });
   }
 
-  service.getBindableTextForLegend = function (config, text, $sce) {
-    return $sce.trustAsHtml(config.legend.htmlEnabled ? text : service.escapeHtml(text));
+  service.getBindableTextForLegend = function (config, text) {
+    var returnText;
+    injector.invoke(['$sce', function($sce){
+      returnText = $sce.trustAsHtml(config.legend.htmlEnabled ? text : service.escapeHtml(text));
+    }], service);
+    return returnText;
   }
 
   /**
    * Public API when injected into anything but the module config
    */
-  service.$get = function($sce){
+  service.$get = function($injector){
+
+      //Proive later version of injector to service after all providers have been handled
+      injector = $injector;
+
       return {
       /**
        * Invokes chart function injecting service as this
@@ -132,11 +141,19 @@
         if(!chartFunctions.hasOwnProperty(type))
           throw new Error('Chart type "'+type+'" does not exist');
 
-        chartFunctions[type].chart.call(service, config, box, domFunctions, series, points);
+        var localInjections = {
+          config: config,
+          box: box,
+          domFunctions: domFunctions,
+          series: series,
+          points: points
+        };
+
+        $injector.invoke(chartFunctions[type].chart, service, localInjections);
 
         //Blank legends before calling function
         box.legends = [];
-        chartFunctions[type].legend.call(service, config, box, series, points, $sce);
+        $injector.invoke(chartFunctions[type].legend, service, localInjections);
       }
     };
   };
@@ -950,13 +967,13 @@
         return arc(i(t));
       };
     }
-  }, function (config, box, series, points, $sce){
+  }, function (config, box, series, points){
       var service = this;
 
       angular.forEach(points, function(value, key) {
         box.legends.push({
           color: config.colors[key],
-          title: service.getBindableTextForLegend(config, value.x, $sce)
+          title: service.getBindableTextForLegend(config, value.x)
         });
       });
   });
