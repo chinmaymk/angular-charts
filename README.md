@@ -42,7 +42,7 @@ Refer all dependencies in your page in right order
 Directive syntax
 
 ```html
-<div ac-chart="chartType" ac-data="data" ac-config="config" id='chart' class='chart'></div>
+<div data-ac-chart="chartType" data-ac-data="data" data-ac-config="config" id='chart' class='chart'></div>
 ```
 **Note:** chartType, data and config are properties of scope. Not the actual values.
 
