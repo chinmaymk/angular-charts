@@ -565,6 +565,10 @@
     }
 
     return linedata;
+  }, function (config, box, series, points){
+    if(config.lineLegend == "traditional"){
+      this.defaultLegend(config, box, series, points);
+    }
   });
 
   service.addChart('area', function (config, box, domFunctions, series, points){
