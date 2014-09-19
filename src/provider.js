@@ -17,6 +17,23 @@
   };
 
   /**
+   * Utility function to check if parameter is $injector.invoke() able
+   * @param {Function || array} subject
+   * @return {Boolean}
+   */
+   function isInvokable(subject){
+      var response = false;
+      
+      if(typeof subject == 'function' 
+        || ( ( typeof subject == 'array' || typeof subject == 'object' ) 
+              && typeof subject[subject.length - 1] == 'function') )
+        response = true;
+
+
+      return response;
+   }
+
+  /**
    * Utility function to call when we run out of colors!
    * @access config
    * @return {String} Hexadecimal color
@@ -34,11 +51,14 @@
    * @return {Object} this
    */
   service.addChart = function (type, chartFunction, legendFunction){
-    if(typeof chartFunction != 'function')
-      throw new Error('addChart expects parameter 2 to be function');
+    if(!isInvokable(chartFunction)){
+        throw new Error('addChart expects parameter 2 to be function');
+    }
 
-    if(legendFunction != null && typeof legendFunction != 'function')
-      throw new Error('addChart expects parameter 3 if set to be function');
+    if(legendFunction != null && !isInvokable(legendFunction)){
+        console.log(legendFunction)
+        throw new Error('addChart expects parameter 3 if set to be function');
+      }
     
     chartFunctions[type] = {
       chart: chartFunction,
@@ -104,6 +124,8 @@
     });
   };
 
+  service.defaultLegend['$inject'] = ['config', 'box', 'series', 'points'];
+
 
 
   service.escapeHtml = function (string) {
@@ -123,9 +145,9 @@
   /**
    * Public API when injected into anything but the module config
    */
-  service.$get = function($injector){
+  service.$get = ['$injector', function($injector){
 
-      //Proive later version of injector to service after all providers have been handled
+      //Provide later version of injector to service after all providers have been handled
       injector = $injector;
 
       return {
@@ -156,9 +178,9 @@
         $injector.invoke(chartFunctions[type].legend, service, localInjections);
       }
     };
-  };
+  }];
 
-  service.addChart('bar', function (config, box, domFunctions, series, points){
+  service.addChart('bar', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
     var service = this;
     /**
      * Setup date attributes
@@ -341,9 +363,9 @@
       .attr("y1", y(0))
       .attr("y2", y(0))
       .style("stroke", "silver");
-  });
+  }]);
 
-  service.addChart('line', function (config, box, domFunctions, series, points) {
+  service.addChart('line', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points) {
     var service = this;
     box.margin = {
       top: 0,
@@ -565,13 +587,13 @@
     }
 
     return linedata;
-  }, function (config, box, series, points){
+  }], ['config', 'box', 'series', 'points', function (config, box, series, points){
     if(config.lineLegend == "traditional"){
       this.defaultLegend(config, box, series, points);
     }
-  });
+  }]);
 
-  service.addChart('area', function (config, box, domFunctions, series, points){
+  service.addChart('area', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
     var service = this;
     box.margin = {
       top: 0,
@@ -697,9 +719,9 @@
     function getX(d) {
       return Math.round(x(d)) + x.rangeBand() / 2;
     }
-  });
+  }]);
 
-  service.addChart('point', function (config, box, domFunctions, series, points){
+  service.addChart('point', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
     var service = this;
     box.margin = {
       top: 0,
@@ -855,9 +877,9 @@
     function getX(d) {
       return Math.round(x(d)) + x.rangeBand() / 2;
     }
-  });
+  }]);
 
-  service.addChart('pie', function (config, box, domFunctions, series, points){
+  service.addChart('pie', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
     var service = this;
 
     var radius = Math.min(box.width, box.height) / 2;
@@ -971,7 +993,7 @@
         return arc(i(t));
       };
     }
-  }, function (config, box, series, points){
+  }], ['config', 'box', 'series', 'points', function (config, box, series, points){
       var service = this;
 
       angular.forEach(points, function(value, key) {
@@ -980,7 +1002,7 @@
           title: service.getBindableTextForLegend(config, value.x)
         });
       });
-  });
+  }]);
 
   return service;
 

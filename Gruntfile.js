@@ -15,6 +15,9 @@ module.exports = function(grunt) {
       }
     },
     uglify : {
+      options: {
+        sourceMap: true
+      },
       dist: {
         src: 'dist/angular-charts.js',
         dest: 'dist/angular-charts.min.js'
@@ -71,10 +74,27 @@ module.exports = function(grunt) {
         dest: 'build/styles.js'
       }
     },
-
+    meta: {
+      // list of files / patterns to load in the browser
+      karmaFiles: [
+        'bower_components/angular/angular.js',
+        'bower_components/angular-mocks/angular-mocks.js',
+        'bower_components/d3/d3.js'
+      ]
+    },
     karma: {
-      unit: {
+      options: {
         configFile: 'karma.conf.js'
+      },
+      unit: {
+        options: {
+          files: ['<%= meta.karmaFiles %>', '<%= uglify.dist.src %>', 'test/*.js']
+        }
+      },
+      minified: {
+        options: {
+          files: ['<%= meta.karmaFiles %>', '<%= uglify.dist.dest %>', 'test/*.js']
+        },
       }
     },
     prompt: {
