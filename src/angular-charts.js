@@ -183,7 +183,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       if(box.chartContainer == null && box.legendContainer == null){
         var container = $templateCache.get('angularChartsTemplate_' + config.legend.position);
         element.html(container); //http://stackoverflow.com/a/17883151
-        
+        $compile(element.contents())(scope);
 
         //getting children divs
         var childrens = element.find('div');
@@ -192,10 +192,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         box.height -= getChildrenByClassname(childrens, 'ac-title')[0].clientHeight;
       }else{
         d3.select(box.chartContainer[0]).selectAll('svg').remove();
-        d3.select(box.legendContainer[0]).selectAll('tr').remove();
       }
 
-      $compile(element.contents())(scope);
+      
     }
 
     /**
