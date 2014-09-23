@@ -108,7 +108,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       width: 0,
       chartContainer: null,
       legendContainer: null,
-      yMaxData: 0,
+      yMaxData: null,
       legends: []
     };
 
@@ -216,9 +216,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Set yMaxData
      */
      function setYMaxData(){
-      scope.yMaxData = d3.max(points.map(function(d){
+      scope.yMaxData = (box.yMaxData == null) ? d3.max(points.map(function(d){
         return d.y.length;
-      }));
+      })) : box.yMaxData;
      }
 
     /**
