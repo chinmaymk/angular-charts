@@ -486,10 +486,9 @@
     if (linedata.length > 0) {
       var last = linedata[linedata.length - 1].values;
       if (last.length > 0) {
-        var totalLength = path.node().getTotalLength() + getX(last[last.length - 1].x);
-
-        path.attr("stroke-dasharray", totalLength + " " + totalLength)
-          .attr("stroke-dashoffset", totalLength)
+        path.each(function (d){ d.totalLength = this.getTotalLength(); }) // http://stackoverflow.com/a/21140763/2661741
+          .attr("stroke-dasharray", function (d){ return d.totalLength + " " + d.totalLength; })
+          .attr("stroke-dashoffset", function (d){ return d.totalLength; })
           .transition()
           .duration(config.isAnimate ? 1500 : 0)
           .ease("linear")
