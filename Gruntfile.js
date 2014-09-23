@@ -38,7 +38,7 @@ module.exports = function (grunt) {
                 files: ['src/**/*.js', 'src/**/*.html', 'src/**/*.css'],
                 tasks: ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean'],
                 options: {
-                    debounceDelay: 250
+                    spawn: false
                 }
             }
         },
@@ -101,7 +101,7 @@ module.exports = function (grunt) {
                         }
                     ]
                 }
-            },
+            }
         },
         copy: {
             bowerPreRelease: {
