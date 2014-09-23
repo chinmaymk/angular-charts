@@ -535,7 +535,7 @@
           domFunctions.removeToolTip(d, d3.event);
         })
         .on("mousemove", function(d) {
-          domFunctions.updateToolTip(d3.event);
+          domFunctions.updateToolTip(d, d3.event);
         })
         .on("click", function(d) {
           domFunctions.click(d, d3.event);
@@ -917,7 +917,9 @@
       });
 
     var path = svg.selectAll(".arc")
-      .data(pie(points))
+      .data(pie(points).filter(function (d){
+        return d.value > 0;
+      }))
       .enter().append("g");
 
     var complete = false;
@@ -995,12 +997,16 @@
   }], ['config', 'box', 'series', 'points', function (config, box, series, points){
       var service = this;
 
-      angular.forEach(points, function(value, key) {
+      var filteredPoints = points.filter(function (d){return d.y[0] > 0;});
+
+      angular.forEach(filteredPoints, function(value, key) {
         box.legends.push({
           color: config.colors[key],
           title: service.getBindableTextForLegend(config, value.x)
         });
       });
+
+      box.yMaxData = filteredPoints.length;
   }]);
 
   return service;
