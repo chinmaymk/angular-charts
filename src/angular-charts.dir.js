@@ -1,9 +1,4 @@
 /**
- * Main module
- */
-angular.module('angularCharts', ['angularChartsTemplates']);
-
-/**
  * Main directive handling drawing of all charts
  */
 angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
