@@ -14,15 +14,19 @@ module.exports = function (grunt) {
                 src: ['src/**/*.srv.js'],
                 dest: 'build/services.js'
             },
+            controllers: {
+                src: ['src/**/*.ctrl.js'],
+                dest: 'build/controllers.js'
+            },
             utils: {
-                src: ['src/**/*.js', '!src/**/*.srv.js', '!src/**/*.mdl.js', '!src/**/*.dir.js'],
+                src: ['src/**/*.js', '!src/**/*.srv.js', '!src/**/*.mdl.js', '!src/**/*.dir.js', '!src/**/*.ctrl.js'],
                 dest: 'build/utils.js'
             }
         },
         pkg: grunt.file.readJSON('package.json'),
         concat: {
             dist: {
-                src: ['build/templates.js', 'build/modules.js', 'src/**/*.srv.js', 'src/**/*.dir.js', 'build/utils.js', 'build/styles.js'],
+                src: ['build/templates.js', 'build/modules.js', 'build/services.js', 'build/controllers.js', 'build/directives.js', 'build/utils.js', 'build/styles.js'],
                 dest: 'dist/angular-charts.js'
             }
         },
