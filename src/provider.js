@@ -29,6 +29,44 @@
    */
   var injector;
 
+  /**
+   * Beautiful default colors
+   *
+   * @type {Array}
+   */
+  var defaultColors = [
+    'rgb(255,153,0)',
+    'rgb(220,57,18)',
+    'rgb(70,132,238)',
+    'rgb(73,66,204)',
+    'rgb(0,128,0)',
+    'rgb(0, 169, 221)',
+    'steelBlue',
+    'rgb(0, 169, 221)',
+    'rgb(50, 205, 252)',
+    'rgb(70,132,238)',
+    'rgb(0, 169, 221)',
+    'rgb(5, 150, 194)',
+    'rgb(50, 183, 224)',
+    'steelBlue',
+    'rgb(2, 185, 241)',
+    'rgb(0, 169, 221)',
+    'steelBlue',
+    'rgb(0, 169, 221)',
+    'rgb(50, 205, 252)',
+    'rgb(70,132,238)',
+    'rgb(0, 169, 221)',
+    'rgb(5, 150, 194)',
+    'rgb(50, 183, 224)',
+    'steelBlue',
+    'rgb(2, 185, 241)'
+  ];
+
+  /**
+   * HTML Character replacement map
+   *
+   * @type {Object}
+   */
   var HTML_ENTITY_MAP = {
     "&": "&amp;",
     "<": "&lt;",
@@ -57,6 +95,21 @@
       return response;
    }
 
+   /**
+    * Set default colors
+    *
+    * @param {Array} list
+    * @return acChartLogicProvider
+    */
+    acChartLogicProvider.setDefaultColors = function(list) {
+      if(typeof list !== 'object')
+        throw new Error('setDefaultColors expects an array');
+
+      defaultColors = list;
+
+      return acChartLogicProvider;
+    };
+
   /**
    * Utility function to call when we run out of colors!
    * @access config
@@ -72,7 +125,7 @@
   /**
    * Used to add chart functions by type
    * @access config
-   * @return {Object} this
+   * @return {Object} acChartLogicProvider
    */
   acChartLogicProvider.addChart = function (type, chartFunction, legendFunction){
     if(!isInvokable(chartFunction)){
