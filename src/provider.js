@@ -1,10 +1,32 @@
 /**
- * Chart Provider
+ * Singleton Chart Logic
+ *
+ * Provides an API for customizing and adding charts at the application level
  */
  angular.module('angularCharts').provider('acChartLogic', function(){
+  
+  /**
+   * Provider object
+   *
+   * @access private
+   * @type {Object}
+   */
+  var acChartLogicProvider = {};
 
-  var service = {};
-  var chartFunctions = [];
+  /**
+   * Stores chart functions
+   *
+   * @access private
+   * @type {Object}
+   */
+  var chartFunctions = {};
+  
+  /**
+   * angular $injector service
+   * Set when acChartLogic is injected into directive
+   *
+   * @access private
+   */
   var injector;
 
   var HTML_ENTITY_MAP = {
@@ -18,6 +40,8 @@
 
   /**
    * Utility function to check if parameter is $injector.invoke() able
+   * 
+   * @access private
    * @param {Function || array} subject
    * @return {Boolean}
    */
@@ -38,7 +62,7 @@
    * @access config
    * @return {String} Hexadecimal color
    */
-  service.getRandomColor = function () {
+  acChartLogicProvider.getRandomColor = function () {
     var r = (Math.round(Math.random() * 127) + 127).toString(16);
     var g = (Math.round(Math.random() * 127) + 127).toString(16);
     var b = (Math.round(Math.random() * 127) + 127).toString(16);
@@ -50,7 +74,7 @@
    * @access config
    * @return {Object} this
    */
-  service.addChart = function (type, chartFunction, legendFunction){
+  acChartLogicProvider.addChart = function (type, chartFunction, legendFunction){
     if(!isInvokable(chartFunction)){
         throw new Error('addChart expects parameter 2 to be function');
     }
@@ -62,17 +86,18 @@
     
     chartFunctions[type] = {
       chart: chartFunction,
-      legend: (legendFunction != null)? legendFunction : service.defaultLegend
+      legend: (legendFunction != null)? legendFunction : acChartLogicProvider.defaultLegend
     };
 
-    return service;
+    return acChartLogicProvider;
   };
 
   /**
    * Filters down the x axis labels if a limit is specified
-   * @access public
+   *
+   * @access config
    */
-  service.filterXAxis = function (config, xAxis, x){
+  acChartLogicProvider.filterXAxis = function (config, xAxis, x){
     var allTicks = x.domain();
     if (config.xAxisMaxTicks && allTicks.length > config.xAxisMaxTicks) {
       var mod = Math.ceil(allTicks.length / config.xAxisMaxTicks);
@@ -84,9 +109,11 @@
 
   /**
    * Rotates xAxis labels by config option
+   *
+   * @access config
    * @param {[selection]}
    */
-  service.rotateAxisLabels = function (config, selection){
+  acChartLogicProvider.rotateAxisLabels = function (config, selection){
     selection
       .style("text-anchor", "end")
       .attr('dx', '-.8em')
@@ -97,62 +124,80 @@
   /**
    * Checks if index is available in color
    * else returns a random color
+   *
+   * @access config
    * @param  {[type]} i [description]
    * @return {[type]}   [description]
    */
-  service.getColor = function (config, i) {
+  acChartLogicProvider.getColor = function (config, i) {
     if (i < config.colors.length) {
       return config.colors[i];
     } else {
-      var color = service.getRandomColor();
+      var color = acChartLogicProvider.getRandomColor();
       config.colors.push(color);
       return color;
     }
   }
 
   /**
-   * Default Legend 
+   * Default Legend
+   * 
+   * Note: Must be injectable
+   *
+   * @access config
    */
-  service.defaultLegend = function (config, box, series, points){
-    var service = this;
+  acChartLogicProvider.defaultLegend = ['config', 'box', 'series', 'points', function (config, box, series, points){
+    var acChartLogicProvider = this;
 
     angular.forEach(series, function(value, key) {
       box.legends.push({
         color: config.colors[key],
-        title: service.getBindableTextForLegend(config, value)
+        title: acChartLogicProvider.getBindableTextForLegend(config, value)
       });
     });
-  };
-
-  service.defaultLegend['$inject'] = ['config', 'box', 'series', 'points'];
+  }];
 
 
-
-  service.escapeHtml = function (string) {
+  /**
+   * Escapes html to safe characters
+   *
+   * @access config
+   * @param {String} string
+   * @return {String}
+   */
+  acChartLogicProvider.escapeHtml = function (string) {
     return String(string).replace(/[&<>"'\/]/g, function(char) {
       return HTML_ENTITY_MAP[char];
     });
   }
 
-  service.getBindableTextForLegend = function (config, text) {
-    var returnText;
-    injector.invoke(['$sce', function($sce){
-      returnText = $sce.trustAsHtml(config.legend.htmlEnabled ? text : service.escapeHtml(text));
-    }], service);
-    return returnText;
+  /**
+   * Gets text for legend label
+   *
+   * @access config
+   * @param {Object} config
+   * @param {String} text
+   * @return {String}
+   */
+  acChartLogicProvider.getBindableTextForLegend = function (config, text) {
+    var $sce = injector.get('$sce');
+
+    return $sce.trustAsHtml(config.legend.htmlEnabled ? text : acChartLogicProvider.escapeHtml(text));
   }
 
   /**
    * Public API when injected into anything but the module config
+   *
+   * @return {Object}
    */
-  service.$get = ['$injector', function($injector){
+  acChartLogicProvider.$get = ['$injector', function($injector){
 
-      //Provide later version of injector to service after all providers have been handled
+      //Provides usable version of injector to acChartLogicProvider
       injector = $injector;
 
       return {
       /**
-       * Invokes chart function injecting service as this
+       * Invokes chart function injecting acChartLogicProvider as this
        * @access public
        */
       callChartFunction: function (type, config, box, domFunctions, series, points){
@@ -171,17 +216,29 @@
           points: points
         };
 
-        $injector.invoke(chartFunctions[type].chart, service, localInjections);
+        $injector.invoke(chartFunctions[type].chart, acChartLogicProvider, localInjections);
 
         //Blank legends before calling function
         box.legends = [];
-        $injector.invoke(chartFunctions[type].legend, service, localInjections);
+        $injector.invoke(chartFunctions[type].legend, acChartLogicProvider, localInjections);
+      },
+
+      /**
+       * Retrieves default color list
+       *
+       * @return {Array}
+       */
+      getDefaultColors: function(){
+        return defaultColors;
       }
     };
   }];
 
-  service.addChart('bar', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
+  /**
+   * Bar Chart Definition
+   */
+  acChartLogicProvider.addChart('bar', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
     /**
      * Setup date attributes
      * @type {Object}
@@ -238,7 +295,7 @@
     var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
+    acChartLogicProvider.filterXAxis(config, xAxis, x);
 
     var yAxis = d3.svg.axis()
       .scale(y)
@@ -262,7 +319,7 @@
       .call(xAxis);
 
     if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
+      acChartLogicProvider.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
       box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
       box.margin.bottom = xAxisSelection.node().getBBox().height;
       xAxisSelection.attr("transform", "translate(0," + box.height + ")");
@@ -298,7 +355,7 @@
     })
       .attr("y", box.height)
       .style("fill", function(d) {
-        return service.getColor(config, d.s);
+        return acChartLogicProvider.getColor(config, d.s);
       })
       .attr("height", 0)
       .transition()
@@ -364,9 +421,13 @@
       .attr("y2", y(0))
       .style("stroke", "silver");
   }]);
-
-  service.addChart('line', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points) {
-    var service = this;
+  
+  /**
+   * Line Chart Definition
+   * Has Legend override
+   */
+  acChartLogicProvider.addChart('line', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points) {
+    var acChartLogicProvider = this;
     box.margin = {
       top: 0,
       right: 40,
@@ -388,7 +449,7 @@
     var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
+    acChartLogicProvider.filterXAxis(config, xAxis, x);
 
     var yAxis = d3.svg.axis()
       .scale(y)
@@ -452,7 +513,7 @@
       .call(xAxis);
 
     if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
+      acChartLogicProvider.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
       box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
       box.margin.bottom = xAxisSelection.node().getBBox().height;
       xAxisSelection.attr("transform", "translate(0," + box.height + ")");
@@ -471,7 +532,7 @@
       .append("path")
       .attr("class", "ac-line")
       .style("stroke", function(d, i) {
-        return service.getColor(config, i);
+        return acChartLogicProvider.getColor(config, i);
       })
       .attr("d", function(d) {
         return line(d.values);
@@ -518,8 +579,8 @@
           return y(d.y);
         })
         .attr("r", 3)
-        .style("fill", service.getColor(config, linedata.indexOf(value)))
-        .style("stroke", service.getColor(config, linedata.indexOf(value)))
+        .style("fill", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
+        .style("stroke", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
         .on("mouseover", (function(series) {
           return function(d) {
 
@@ -592,8 +653,11 @@
     }
   }]);
 
-  service.addChart('area', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
+  /**
+   * Area Chart Definition
+   */
+  acChartLogicProvider.addChart('area', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
     box.margin = {
       top: 0,
       right: 40,
@@ -615,7 +679,7 @@
     var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
+    acChartLogicProvider.filterXAxis(config, xAxis, x);
 
     var yAxis = d3.svg.axis()
       .scale(y)
@@ -678,7 +742,7 @@
       .call(xAxis);
 
     if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
+      acChartLogicProvider.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
       box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
       box.margin.bottom = xAxisSelection.node().getBBox().height;
       xAxisSelection.attr("transform", "translate(0," + box.height + ")");
@@ -711,7 +775,7 @@
         return area(d.values);
       })
       .style("fill", function(d, i) {
-        return service.getColor(config, i);
+        return acChartLogicProvider.getColor(config, i);
       })
       .style("opacity", "0.7");
 
@@ -719,9 +783,12 @@
       return Math.round(x(d)) + x.rangeBand() / 2;
     }
   }]);
-
-  service.addChart('point', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
+  
+  /**
+   * Point Chart Definition
+   */
+  acChartLogicProvider.addChart('point', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
     box.margin = {
       top: 0,
       right: 40,
@@ -743,7 +810,7 @@
     var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
+    acChartLogicProvider.filterXAxis(config, xAxis, x);
 
     var yAxis = d3.svg.axis()
       .scale(y)
@@ -797,7 +864,7 @@
       .call(xAxis);
 
     if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
+      acChartLogicProvider.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
       box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
       box.margin.bottom = xAxisSelection.node().getBBox().height;
       xAxisSelection.attr("transform", "translate(0," + box.height + ")");
@@ -831,8 +898,8 @@
           return y(d.y);
         })
         .attr("r", 3)
-        .style("fill", service.getColor(config, linedata.indexOf(value)))
-        .style("stroke", service.getColor(config, linedata.indexOf(value)))
+        .style("fill", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
+        .style("stroke", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
         .on("mouseover", (function(series) {
           return function(d) {
 
@@ -878,8 +945,12 @@
     }
   }]);
 
-  service.addChart('pie', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
+  /**
+   * Pie Chart Definition
+   * Has Legend override
+   */
+  acChartLogicProvider.addChart('pie', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
 
     var radius = Math.min(box.width, box.height) / 2;
     var svg = d3.select(box.chartContainer[0]).append("svg")
@@ -926,7 +997,7 @@
 
     path.append("path")
       .style("fill", function(d, i) {
-        return service.getColor(config, i);
+        return acChartLogicProvider.getColor(config, i);
       })
       .transition()
       .ease("linear")
@@ -995,20 +1066,20 @@
       };
     }
   }], ['config', 'box', 'series', 'points', function (config, box, series, points){
-      var service = this;
+      var acChartLogicProvider = this;
 
       var filteredPoints = points.filter(function (d){return d.y[0] > 0;});
 
       angular.forEach(filteredPoints, function(value, key) {
         box.legends.push({
           color: config.colors[key],
-          title: service.getBindableTextForLegend(config, value.x)
+          title: acChartLogicProvider.getBindableTextForLegend(config, value.x)
         });
       });
 
       box.yMaxData = filteredPoints.length;
   }]);
-
-  return service;
-
+  
+  
+  return acChartLogicProvider;
  });
