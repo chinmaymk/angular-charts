@@ -78,6 +78,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     var box = {
       height: 0,
       width: 0,
+      margin: {
+        top: 0,
+        right: 40,
+        bottom: 20,
+        left: 40
+      },
       chartContainer: null,
       legendContainer: null,
       yMaxData: null,
