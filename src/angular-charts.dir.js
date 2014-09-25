@@ -1,7 +1,7 @@
 /**
  * Main directive handling drawing of all charts
  */
-angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce, Utils, pieChart, barChart, lineChart, areaChart, pointChart) {
+angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce, Utils, pieChart, barChart, lineChart, areaChart, pointChart, pie3Chart) {
 
   /**
    * Main link function
@@ -132,14 +132,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         'bar': barChart,
         'line': lineChart,
         'area': areaChart,
-        'point': pointChart
+        'point': pointChart,
+        'pie3': pie3Chart
       };
       return charts[type];
     }
-
-
-
-
 
     /**
      * Adds data to legend
