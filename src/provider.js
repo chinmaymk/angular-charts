@@ -140,7 +140,16 @@
        */
       getDefaultColors: function(){
         return defaultColors;
-      }
+      }, 
+
+      /**
+       * Get available charts as array
+       *
+       * @return {Array}
+       */
+       getAvailableCharts: function (){
+        return Object.keys(chartFunctions);
+       }
     };
   }];
 
@@ -397,12 +406,15 @@
   acChartLogicProvider.rotateAxisLabels = function (config, box, y, xAxisSelection){
     if(config.xAxisLabelRotation == null || !config.xAxisLabelRotation)
       return;
+    var rotation = (config.xAxisLabelRotation>0)? -1 * config.xAxisLabelRotation:config.xAxisLabelRotation;
     //Rotate text by config degrees
     xAxisSelection.selectAll('text')
       .style("text-anchor", "end")
       .attr('dx', '-.8em')
       .attr('dy', '.15em')
-      .attr('transform', function (d){return "rotate(" + config.xAxisLabelRotation + ")"})
+      .attr('transform', function (d){
+        return "rotate(" + rotation + ")";
+      })
     ;
     //Recalculate chart height
     box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
@@ -415,18 +427,51 @@
 
     return this;
   }
+  /**
+   * Set stack data
+   *
+   * @param {Array} points
+   * @return this
+   */
+  acChartLogicProvider.setStackData = function (points) {
+    points.forEach(function (d, i){
+      var y0 = 0;
+      d.nicedata.forEach(function (nd, i) {
+        nd.y0 = y0;
+        nd.y1 = y0 += nd.y;
+      });
+      d.total = d.nicedata[d.nicedata.length - 1].y1;
+    });
+
+    return acChartLogicProvider;
+  }
+
+  /**
+   * Get Max stack value
+   * 
+   * @param {Array} points
+   * @return {Number}
+   */
+  acChartLogicProvider.getMaxStack = function (points){
+    return d3.max(points.map(function (d){
+      return d.total;
+    }));
+  }
 
   /**
    * Build and return graph object
    *
    * @return {Object}
    */
-  acChartLogicProvider.getGraph = function (config, box, x, y){
+  acChartLogicProvider.getGraph = function (config, box, x, y, horizontal){
 
     var graph = {};
 
     //Creates xAxis using scale var x
     graph.xAxis = d3.svg.axis().scale(x).orient("bottom");
+
+    if(horizontal)
+      graph.xAxis.orient('left');
 
     //Creates yAxis using scale var y
     graph.yAxis = d3.svg.axis()
@@ -434,6 +479,9 @@
       .orient("left")
       .ticks(5)
       .tickFormat(d3.format(config.yAxisTickFormat));
+
+    if(horizontal)
+      graph.yAxis.orient('bottom');
 
     //Limits xAxis label to config limit if set
     acChartLogicProvider.filterXAxis(config, graph.xAxis, x);
@@ -444,19 +492,51 @@
     //Draws the xAxis and saves the selection
     graph.xAxisSelection = graph.svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + box.height + ")")
-      .call(graph.xAxis);
+    ;
+    if(!horizontal)
+      graph.xAxisSelection.attr("transform", "translate(0," + box.height + ")")
+    graph.xAxisSelection.call(graph.xAxis);
 
     //Rotates labels and adjusts box height
-    acChartLogicProvider.rotateAxisLabels(config, box, y, graph.xAxisSelection);
+    if(!horizontal)
+      acChartLogicProvider.rotateAxisLabels(config, box, y, graph.xAxisSelection);
+
+    if(horizontal)
+      acChartLogicProvider.horizontalGraphMarginAdjust(config, box, y, graph.xAxisSelection);
 
     //Draws the yAxis
     graph.yAxisSelection = graph.svg.append("g")
       .attr("class", "y axis")
-      .call(graph.yAxis);
+    ;
+    if(horizontal)
+      graph.yAxisSelection.attr("transform", "translate(0," + box.height + ")")
+    graph.yAxisSelection.call(graph.yAxis);
       
     return graph;
   };
+
+  /**
+   * Rotates xAxis labels by config option
+   *
+   * @access config
+   * @param {[selection]}
+   */
+  acChartLogicProvider.horizontalGraphMarginAdjust = function (config, box, y, xAxisSelection){
+    
+    var newMargin = xAxisSelection.node().getBBox().width;
+
+    //Recalculate chart height
+    box.width = (box.width + box.margin.left) - newMargin;
+
+    box.margin.left = newMargin;
+
+    //Move x axis to new bottom of chart
+    xAxisSelection.attr("transform", "translate(" + newMargin + ", 0)");
+    //Redraw the yAxis scale to new height
+    y.range([newMargin, box.width]);
+
+    return this;
+  }
 
   /**
    * Bar Chart Definition
@@ -557,6 +637,121 @@
       .text(function(d) {
         return d.y;
       });
+    }
+
+    /**
+     * Draw one zero line in case negative values exist
+     */
+    graph.svg.append("line")
+      .attr("x1", box.width)
+      .attr("y1", y(0))
+      .attr("y2", y(0))
+      .style("stroke", "silver");
+
+  }]);
+
+  /**
+   * Bar Chart Definition
+   */
+  acChartLogicProvider.addChart('bar-stacked', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+
+    acChartLogicProvider.applyMargins(box);
+
+    // Sets all yData in a single array
+    var yData = acChartLogicProvider.getYData(points, series);
+    //Calculates maximum data series count
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+
+    acChartLogicProvider.setStackData(points);
+    var maxStacked = acChartLogicProvider.getMaxStack(points);
+
+    //Creates the x Scale
+    var x = d3.scale.ordinal()
+      .domain(points.map(function (d) {
+        //returns xAxis label
+        return d.x;
+      }))
+      .rangeRoundBands([0, box.width], 0.1)
+    ;
+
+    //Adds padding to top of Y axis
+    var padding = maxStacked * 0.20;
+
+    //Creates the y Scale
+    var y = d3.scale.linear()
+      .range([box.height, 10])
+      .domain([d3.min(yData), maxStacked + padding])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y);
+
+    //Add point data to x axis
+    var barGroups = graph.svg.selectAll(".state")
+      .data(points)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) {
+        return "translate(" + x(d.x) + ",0)";
+      });
+
+    //Draws series data
+    var bars = barGroups.selectAll("rect")
+      .data(function(d) {
+        return d.nicedata;
+      })
+      .enter().append("rect")
+      .attr("width", x.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("x", function(d, i) { return x(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
+
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
+      .attr("height", 0)
+      .attr("y", box.height)
+      .transition()
+      .ease("cubic-in-out")
+      .duration(config.isAnimate ? 1000 : 0)
+      .attr("y", function(d, i) { return y(d.y1); })
+      .attr("height", function(d) { return y(d.y0) - y(d.y1); });
+
+    /**
+     * Add events for tooltip
+     */
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
+
+    /**
+     * Create labels
+     */
+    if (config.labels) {
+      barGroups.selectAll('not-a-class')
+        .data(function(d) {
+          return d.nicedata.filter(function (nd){ return nd.y > 0; });
+        })
+        .enter().append("text")
+        .text(function(d) {
+          return d.y;
+        })
+        .each(function(d,i){
+          var width = this.getBBox().width;
+          var height = this.getBBox().height;
+          if(height > ( y(d.y1) - y(d.y0) )*-1 ){
+            d3.select(this).remove();
+            return;
+          }
+          d3.select(this)
+            .attr("x", function(d, i) {
+              return ( x.rangeBand(i)/2 ) - (width/2);
+            })
+            .attr("y", function(d) {
+              return y(d.y1) + height;
+            })
+          ;
+        })
+      ;
     }
 
     /**
@@ -943,6 +1138,210 @@
       });
 
       box.yMaxData = filteredPoints.length;
+  }]);
+
+  /**
+   * Slab Chart Definition
+   */
+  acChartLogicProvider.addChart('slab', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+
+    acChartLogicProvider.applyMargins(box);
+
+    
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    var padding = d3.max(yData) * 0.20;
+
+    var x = d3.scale.ordinal()
+      .domain(points.map(function (d) {
+        return d.x;
+      }))
+      .rangeRoundBands([0, box.height], 0.1)
+
+    var y = d3.scale.linear()
+      .range([0, box.width])
+      .domain([d3.min(yData), d3.max(yData) + padding])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y, true);
+    
+    var x0 = d3.scale.ordinal()
+      .domain(d3.range(yMaxPoints))
+      .rangeRoundBands([0, x.rangeBand()])
+    ;
+
+    var barGroups = graph.svg.selectAll(".state")
+      .data(points)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) {
+        return "translate(0, " + x(d.x) + ")";
+      });
+
+    var bars = barGroups.selectAll("rect")
+      .data(function(d) {
+        return d.nicedata;
+      })
+      .enter().append("rect")
+      .attr("height", x0.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("y", function(d, i) { return x0(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
+
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
+      .attr("width", 0)
+      .attr("x", y(0))
+      .transition()
+      .ease("cubic-in-out")
+      .duration(config.isAnimate ? 1000 : 0)
+      .attr("width", function(d) {
+        return Math.abs(y(d.y) - y(0));
+      });
+
+    /**
+     * Add events for tooltip
+     */
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
+
+    /**
+     * Create labels
+     */
+    if (config.labels) {
+      barGroups.selectAll('not-a-class')
+        .data(function(d) {
+          return d.nicedata;
+        })
+        .enter().append("text")
+        .attr("y", function(d, i) {
+          return x0.rangeBand() + x0(i);
+        })
+        .attr("x", function(d) {
+          return y(d.y);
+        })
+      .text(function(d) {
+        return d.y;
+      });
+    }
+
+    /**
+     * Draw one zero line in case negative values exist
+     */
+    graph.svg.append("line")
+      .attr("y1", box.height)
+      .attr("x1", y(0))
+      .attr("x2", y(0))
+      .style("stroke", "silver");
+  }]);
+
+  /**
+   * Slab-Stacked Chart Definition
+   */
+  acChartLogicProvider.addChart('slab-stacked', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+
+    acChartLogicProvider.applyMargins(box);
+
+    
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    
+
+    acChartLogicProvider.setStackData(points);
+    var maxStacked = acChartLogicProvider.getMaxStack(points);
+
+    var padding = maxStacked * 0.20;
+
+    var x = d3.scale.ordinal()
+      .domain(points.map(function (d) {
+        return d.x;
+      }))
+      .rangeRoundBands([0, box.height], 0.1)
+
+    var y = d3.scale.linear()
+      .range([0, box.width])
+      .domain([d3.min(yData), maxStacked + padding])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y, true);
+
+    var barGroups = graph.svg.selectAll(".state")
+      .data(points)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) {
+        return "translate(0, " + x(d.x) + ")";
+      });
+
+    var bars = barGroups.selectAll("rect")
+      .data(function(d) {
+        return d.nicedata;
+      })
+      .enter().append("rect")
+      .attr("height", x.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("y", function(d, i) { return x(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
+
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
+      .attr("width", 0)
+      .attr("x", y(0))
+      .transition()
+      .ease("cubic-in-out")
+      .duration(config.isAnimate ? 1000 : 0)
+      .attr("x", function (d){ return y(d.y0); })
+      .attr("width", function(d) { return y(d.y1) - y(d.y0); })
+    ;
+
+    /**
+     * Add events for tooltip
+     */
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
+
+    /**
+     * Create labels
+     */
+    if (config.labels) {
+      barGroups.selectAll('not-a-class')
+        .data(function(d) {
+          return d.nicedata.filter(function (nd){ return nd.y > 0; });
+        })
+        .enter().append("text")
+        .text(function(d) {
+          return d.y;
+        })
+        .each(function (d, i){
+          var width  = this.getBBox().width;
+          var height = this.getBBox().height;
+          if(width > y(d.y1) - y(d.y0)){
+            d3.select(this).remove();
+            return;
+          }
+          d3.select(this)
+            .attr("x", function(d, i) {
+              return y(d.y1) - width;
+            })
+            .attr("y", function(d) {
+              return (x.rangeBand() / 2) + height / 2;
+            });
+        })
+      ;
+    }
+
+    /**
+     * Draw one zero line in case negative values exist
+     */
+    graph.svg.append("line")
+      .attr("y1", box.height)
+      .attr("x1", y(0))
+      .attr("x2", y(0))
+      .style("stroke", "silver");
   }]);
   
   

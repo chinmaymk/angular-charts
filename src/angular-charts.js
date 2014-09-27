@@ -125,6 +125,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       prepareData();
       setHeightWidth();
       setContainers();
+      box.margin = {
+        top: 0,
+        right: 40,
+        bottom: 20,
+        left: 40
+      };
       acChartLogic.callChartFunction(chartType, config, box, domFunctions, series, points);
       setYMaxData();
       drawLegend();

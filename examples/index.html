@@ -20,12 +20,7 @@
 </head>
 <body ng-controller="MainController">
 
-	<select ng-model="chartType">
-		<option value="pie">pie</option>
-		<option value="bar">bar</option>
-		<option value="line">line</option>
-		<option value="point">point</option>
-		<option value="area">area</option>
+	<select ng-model="chartType" ng-options="type for type in availableCharts">
 	</select>
 
 	<span ng-show="chartType==='pie'">

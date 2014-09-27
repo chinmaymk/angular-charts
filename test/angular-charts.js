@@ -133,6 +133,20 @@ describe('angularCharts', function() {
 
   })
 
+  describe('bar-stacked', function() {
+
+    it('should change chartType to bar-stacked', function() {
+      $scope.chartType = 'bar-stacked';
+      compileChart();
+      $scope.$digest();
+    })
+
+    it('should have the same amount of graphic items as there are datas', function() {
+      expect(d3.selectAll('.ac-chart svg > g > g.g').size()).toEqual($scope.data.data.length)
+    })
+
+  })
+
   describe('lines', function() {
 
     it('should change chartType to line', function() {
@@ -189,6 +203,34 @@ describe('angularCharts', function() {
     it('should have the same amount of graphic items as there are datas', function() {
       expect(d3.selectAll('.ac-chart svg > g > g').size()).toEqual($scope.data.data.length)
     })
+  })
+
+  describe('slab', function() {
+
+    it('should change chartType to slab', function() {
+      $scope.chartType = 'slab';
+      compileChart();
+      $scope.$digest();
+    })
+
+    it('should have the same amount of graphic items as there are datas', function() {
+      expect(d3.selectAll('.ac-chart svg > g > g.g').size()).toEqual($scope.data.data.length)
+    })
+
+  })
+
+  describe('slab-stacked', function() {
+
+    it('should change chartType to slab-stacked', function() {
+      $scope.chartType = 'slab-stacked';
+      compileChart();
+      $scope.$digest();
+    })
+
+    it('should have the same amount of graphic items as there are datas', function() {
+      expect(d3.selectAll('.ac-chart svg > g > g.g').size()).toEqual($scope.data.data.length)
+    })
+
   })
 
   describe('styles', function() {
