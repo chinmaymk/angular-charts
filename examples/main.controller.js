@@ -37,7 +37,7 @@ function MainController($scope) {
 	$scope.chartType = 'pie3';
 
 	$scope.config1 = {
-		labels: false,
+		labels: true,
 		title: "Products",
 		legend: {
 			display: true,

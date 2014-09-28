@@ -1,16 +1,17 @@
 angular.module('angularCharts').factory('pie3Chart', function(Tooltips) {
+    var epsilonAngle = Math.PI / 3600;
+    var distFromCenter = 0.7;
 
     var  getPath = function(cx, cy, rx, ry, startA, endA, depth) {
-
-        // Rotate angles
-
+        // Rotate angles by 45 degree to nice view
         var start = startA - Math.PI/4;
         var end = endA - Math.PI/4;
 
-        if(start <= 0 && end <= 0) {
-                start += Math.PI*2;
-                end += Math.PI*2;
-        }
+        // Fix small sectors near 0
+//        if(start < 0 && end <= 0) {
+//                start += Math.PI*2;
+//                end += Math.PI*2;
+//        }
 
         var x1 = Math.sin(start) * rx + cx;
         var y1 = Math.cos(start) * ry + cy;
@@ -121,6 +122,7 @@ angular.module('angularCharts').factory('pie3Chart', function(Tooltips) {
         var colors      = svg.append('g');
         var shades      = svg.append('g');
         var interactive = svg.append('g');
+        var labels = svg.append('g');
 
 
     shades.append('ellipse')
@@ -152,7 +154,12 @@ angular.module('angularCharts').factory('pie3Chart', function(Tooltips) {
         start.push(v + start[i]);
     });
 
-    angular.forEach(chart.points, function(v, i){
+    angular.forEach(chart.points, function(v, i) {
+        if(ang[i] < epsilonAngle || chart.config.hideSmallerThan && ang[i] < chart.config.hideSmallerThan) {
+            return ;
+        }
+        ang[i] = Math.min(ang[i], Math.PI*2-epsilonAngle);
+
         colors.append('path')
             .attr('fill', getColor(i))
             .attr('stroke', getColor(i))
@@ -161,6 +168,23 @@ angular.module('angularCharts').factory('pie3Chart', function(Tooltips) {
         var segment = interactive.append('path')
             .attr('fill', 'rgba(255,255,255,0)')
             .attr('d', getPath(cx, cy, rx, ry, start[i], start[i]+ang[i], depth));
+
+        if(!!chart.config.labels) {
+            var a = start[i] + ang[i]/2 - Math.PI/4;
+
+            var x = Math.sin(a) * rx * distFromCenter + cx;
+            var y = Math.cos(a) * ry * distFromCenter + cy;
+
+            if(y<20) y=20;
+
+            labels.append('text')
+                .attr('class', 'ac-labels')
+                .text(v.y[0])
+                .attr("dy", ".35em")
+                .attr("text-anchor", a>0 && a < Math.PI/2?"start":"end")
+                .attr("x", x)
+                .attr("y", y);
+        }
 
         //Add listeners when transition is done
         segment.on("mouseover", function(d) {
