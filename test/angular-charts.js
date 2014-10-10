@@ -72,13 +72,20 @@ describe('angularCharts', function() {
     return $compile(body)($scope)
   }
 
-  it('should throw width/height error', function() {
-    expect(compileChart).toThrow()
+  var widthHeightError = new Error('Please set height and width for the chart element');
+
+  it('should throw width/height error by default', function() {
+    expect(compileChart).toThrow(widthHeightError)
   })
 
-  it('should throw width/height error', function() {
+  it('should not throw error if width/height are defined', function() {
     angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>')
-    expect(compileChart).not.toThrow()
+    expect(compileChart).not.toThrow(widthHeightError)
+  })
+
+  it('should not throw error if waitForHeightAndWidth is set to true', function() {
+    $scope.config.waitForHeightAndWidth = true
+    expect(compileChart).not.toThrow(widthHeightError)
   })
 
   it('should digest scope', function() {

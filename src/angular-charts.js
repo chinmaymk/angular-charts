@@ -95,16 +95,16 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
       isAnimate: true,
-      yAxisTickFormat: 's'
+      yAxisTickFormat: 's',
+      waitForHeightAndWidth: false
     };
+
+    prepareConfig();
 
     var totalWidth = element[0].clientWidth;
     var totalHeight = element[0].clientHeight;
 
-    if (totalHeight === 0 || totalWidth === 0) {
-      throw new Error('Please set height and width for the chart element');
-    }
-
+    validateHeightAndWidth();
 
     var data,
       series,
@@ -124,12 +124,29 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function init() {
+      if (!validateHeightAndWidth()) {
+          return;
+      }
       prepareData();
       setHeightWidth();
       setContainers();
       var chartFunc = getChartFunction(chartType);
       chartFunc();
       drawLegend();
+    }
+
+    /**
+     * Checks that the height and width are valid.
+     * It throws an exception unless the config key waitForHeightAndWidth is set to true
+     */
+    function validateHeightAndWidth() {
+      if (totalHeight && totalWidth) {
+        return true;
+      }
+      if (config.waitForHeightAndWidth) {
+        return false;
+      }
+      throw new Error('Please set height and width for the chart element');
     }
 
     /**
@@ -173,6 +190,15 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     }
 
     /**
+     * Merges the give configuration with the default configuration
+     */
+    function prepareConfig() {
+      if (scope.acConfig) {
+        angular.extend(config, scope.acConfig);
+      }
+    }
+
+    /**
      * Parses data from attributes
      * @return {[type]} [description]
      */
@@ -181,10 +207,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       chartType = scope.acChart;
       series = (data) ? data.series || [] : [];
       points = (data) ? data.data || [] : [];
-
-      if (scope.acConfig) {
-        angular.extend(config, scope.acConfig);
-      }
     }
 
     /**
