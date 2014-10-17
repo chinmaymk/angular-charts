@@ -801,7 +801,7 @@
       .data(linedata)
       .enter().append("g");
 
-    var path = point.attr("points", "points")
+    var path = point.attr("class", "path")
       .append("path")
       .attr("class", "ac-line")
       .style("stroke", function(d, i) {
@@ -840,11 +840,8 @@
      * @return {[type]}       [description]
      */
     angular.forEach(linedata, function(value, key) {
-      var points = graph.svg.selectAll('.circle')
-        .data(value.values)
-        .enter()
-        .append("circle")
-        .attr("cx", function(d) {
+      var points = graph.svg.selectAll('.circle').data(value.values).enter().append('g').attr('class', 'point');
+      var dots = points.append('circle').attr("cx", function(d) {
           return acChartLogicProvider.getX(x, d.x);
         })
         .attr("cy", function(d) {
@@ -859,14 +856,14 @@
 
       if (config.labels) {
         points.append("text")
+          .text(function(d) {
+            return d.y;
+          })
           .attr("x", function(d) {
-            return acChartLogicProvider.getX(x, d.x);
+            return acChartLogicProvider.getX(x, d.x) - (this.getBBox().width + box.width*0.01);
           })
           .attr("y", function(d) {
             return y(d.y);
-          })
-          .text(function(d) {
-            return d.y;
           })
         ;
       }
@@ -997,9 +994,8 @@
      * @return {[type]}       [description]
      */
     angular.forEach(linedata, function(value, key) {
-      var points = graph.svg.selectAll('.circle')
-        .data(value.values)
-        .enter()
+      var points = graph.svg.selectAll('.circle').data(value.values).enter().append('g').attr('class', 'point');
+      var dots = points
         .append("circle")
         .attr("cx", function(d) {
           return acChartLogicProvider.getX(x, d.x);
@@ -1016,14 +1012,14 @@
 
       if (config.labels) {
         points.append("text")
+          .text(function(d) {
+            return d.y;
+          })
           .attr("x", function(d) {
-            return acChartLogicProvider.getX(x, d.x);
+            return acChartLogicProvider.getX(x, d.x) - (this.getBBox().width + box.width*0.01);
           })
           .attr("y", function(d) {
             return y(d.y);
-          })
-          .text(function(d) {
-            return d.y;
           })
         ;
       }

@@ -72,13 +72,15 @@ describe('angularCharts', function() {
     return $compile(body)($scope)
   }
 
+  var sizeError = new Error('Please set height and width for the chart element');
+
   it('should throw width/height error', function() {
-    expect(compileChart).toThrow()
+    expect(compileChart).toThrow(sizeError)
   })
 
   it('should throw width/height error', function() {
     angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>')
-    expect(compileChart).not.toThrow()
+    expect(compileChart).not.toThrow(sizeError)
   })
 
   it('should digest scope', function() {
@@ -156,11 +158,11 @@ describe('angularCharts', function() {
     })
 
     it('should have the same amount of graphic items as there are series', function() {
-      expect(d3.selectAll('.ac-chart svg > g > g:not(.axis)').size()).toEqual($scope.data.series.length)
+      expect(d3.selectAll('.ac-chart svg > g > g.path').size()).toEqual($scope.data.series.length)
     })
 
     it('should have the same amount of circles as there are datas points', function() {
-      expect(d3.selectAll('.ac-chart svg > g > circle').size()).toEqual(numberOfPoints)
+      expect(d3.selectAll('.ac-chart svg > g > g.point').size()).toEqual(numberOfPoints)
     })
   })
 
@@ -174,7 +176,7 @@ describe('angularCharts', function() {
     })
 
     it('should have the same amount of circles as there are datas points', function() {
-      expect(d3.selectAll('.ac-chart svg > g > circle').size()).toEqual(numberOfPoints)
+      expect(d3.selectAll('.ac-chart svg > g > g.point').size()).toEqual(numberOfPoints)
     })
   })
 
