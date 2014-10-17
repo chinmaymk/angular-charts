@@ -8,34 +8,6 @@ angular.module('angularCharts', ['angularChartsTemplates']);
  */
 angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce, acChartLogic) {
 
-  var defaultColors = [
-    'rgb(255,153,0)',
-    'rgb(220,57,18)',
-    'rgb(70,132,238)',
-    'rgb(73,66,204)',
-    'rgb(0,128,0)',
-    'rgb(0, 169, 221)',
-    'steelBlue',
-    'rgb(0, 169, 221)',
-    'rgb(50, 205, 252)',
-    'rgb(70,132,238)',
-    'rgb(0, 169, 221)',
-    'rgb(5, 150, 194)',
-    'rgb(50, 183, 224)',
-    'steelBlue',
-    'rgb(2, 185, 241)',
-    'rgb(0, 169, 221)',
-    'steelBlue',
-    'rgb(0, 169, 221)',
-    'rgb(50, 205, 252)',
-    'rgb(70,132,238)',
-    'rgb(0, 169, 221)',
-    'rgb(5, 150, 194)',
-    'rgb(50, 183, 224)',
-    'steelBlue',
-    'rgb(2, 185, 241)'
-  ];
-
   /**
    * Utility function that gets the child that matches the classname
    * because Angular.element.children() doesn't take selectors
@@ -79,7 +51,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         position: 'left',
         htmlEnabled: false
       },
-      colors: defaultColors,
+      colors: acChartLogic.getDefaultColors(),
       innerRadius: 0, // Only on pie Charts
       lineLegend: 'lineEnd', // Only on line Charts
       lineCurveType: 'cardinal',
@@ -106,6 +78,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
     var box = {
       height: 0,
       width: 0,
+      margin: {
+        top: 0,
+        right: 40,
+        bottom: 20,
+        left: 40
+      },
       chartContainer: null,
       legendContainer: null,
       yMaxData: null,
@@ -147,6 +125,12 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       prepareData();
       setHeightWidth();
       setContainers();
+      box.margin = {
+        top: 0,
+        right: 40,
+        bottom: 20,
+        left: 40
+      };
       acChartLogic.callChartFunction(chartType, config, box, domFunctions, series, points);
       setYMaxData();
       drawLegend();

@@ -1,6 +1,6 @@
 angular.module('example', ['angularCharts']);
 
-function MainController($scope) {
+function MainController($scope, acChartLogic) {
 	$scope.data1 = {
 		series: ['Sales', 'Income', '<i>Expense</i>', 'Laptops', 'Keyboards'],
 		data: [{
@@ -57,4 +57,6 @@ function MainController($scope) {
 		},
 		lineLegend: 'traditional'
 	}
+
+	$scope.availableCharts = acChartLogic.getAvailableCharts();
 }

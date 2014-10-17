@@ -1,12 +1,72 @@
 /**
- * Chart Provider
+ * Singleton Chart Logic
+ *
+ * Provides an API for customizing and adding charts at the application level
  */
  angular.module('angularCharts').provider('acChartLogic', function(){
+  
+  /**
+   * Provider object
+   *
+   * @access private
+   * @type {Object}
+   */
+  var acChartLogicProvider = {};
 
-  var service = {};
-  var chartFunctions = [];
+  /**
+   * Stores chart functions
+   *
+   * @access private
+   * @type {Object}
+   */
+  var chartFunctions = {};
+  
+  /**
+   * angular $injector service
+   * Set when acChartLogic is injected into directive
+   *
+   * @access private
+   */
   var injector;
 
+  /**
+   * Beautiful default colors
+   *
+   * @type {Array}
+   */
+  var defaultColors = [
+    'rgb(255,153,0)',
+    'rgb(220,57,18)',
+    'rgb(70,132,238)',
+    'rgb(73,66,204)',
+    'rgb(0,128,0)',
+    'rgb(0, 169, 221)',
+    'steelBlue',
+    'rgb(0, 169, 221)',
+    'rgb(50, 205, 252)',
+    'rgb(70,132,238)',
+    'rgb(0, 169, 221)',
+    'rgb(5, 150, 194)',
+    'rgb(50, 183, 224)',
+    'steelBlue',
+    'rgb(2, 185, 241)',
+    'rgb(0, 169, 221)',
+    'steelBlue',
+    'rgb(0, 169, 221)',
+    'rgb(50, 205, 252)',
+    'rgb(70,132,238)',
+    'rgb(0, 169, 221)',
+    'rgb(5, 150, 194)',
+    'rgb(50, 183, 224)',
+    'steelBlue',
+    'rgb(2, 185, 241)'
+  ];
+
+  /**
+   * HTML Character replacement map
+   *
+   * @type {Object}
+   */
   var HTML_ENTITY_MAP = {
     "&": "&amp;",
     "<": "&lt;",
@@ -18,141 +78,36 @@
 
   /**
    * Utility function to check if parameter is $injector.invoke() able
+   * 
+   * @access private
    * @param {Function || array} subject
    * @return {Boolean}
    */
-   function isInvokable(subject){
-      var response = false;
-      
-      if(typeof subject == 'function' 
-        || ( ( typeof subject == 'array' || typeof subject == 'object' ) 
-              && typeof subject[subject.length - 1] == 'function') )
-        response = true;
-
-
-      return response;
-   }
-
-  /**
-   * Utility function to call when we run out of colors!
-   * @access config
-   * @return {String} Hexadecimal color
-   */
-  service.getRandomColor = function () {
-    var r = (Math.round(Math.random() * 127) + 127).toString(16);
-    var g = (Math.round(Math.random() * 127) + 127).toString(16);
-    var b = (Math.round(Math.random() * 127) + 127).toString(16);
-    return '#' + r + g + b;
-  }
-
-  /**
-   * Used to add chart functions by type
-   * @access config
-   * @return {Object} this
-   */
-  service.addChart = function (type, chartFunction, legendFunction){
-    if(!isInvokable(chartFunction)){
-        throw new Error('addChart expects parameter 2 to be function');
-    }
-
-    if(legendFunction != null && !isInvokable(legendFunction)){
-        console.log(legendFunction)
-        throw new Error('addChart expects parameter 3 if set to be function');
-      }
+  function isInvokable(subject){
+    var response = false;
     
-    chartFunctions[type] = {
-      chart: chartFunction,
-      legend: (legendFunction != null)? legendFunction : service.defaultLegend
-    };
-
-    return service;
-  };
-
-  /**
-   * Filters down the x axis labels if a limit is specified
-   * @access public
-   */
-  service.filterXAxis = function (config, xAxis, x){
-    var allTicks = x.domain();
-    if (config.xAxisMaxTicks && allTicks.length > config.xAxisMaxTicks) {
-      var mod = Math.ceil(allTicks.length / config.xAxisMaxTicks);
-      xAxis.tickValues(allTicks.filter(function(e, i) {
-        return (i % mod) === 0;
-      }));
-    }
-  };
-
-  /**
-   * Rotates xAxis labels by config option
-   * @param {[selection]}
-   */
-  service.rotateAxisLabels = function (config, selection){
-    selection
-      .style("text-anchor", "end")
-      .attr('dx', '-.8em')
-      .attr('dy', '.15em')
-      .attr('transform', function (d){return "rotate(" + config.xAxisLabelRotation + ")"});
-  }
-
-  /**
-   * Checks if index is available in color
-   * else returns a random color
-   * @param  {[type]} i [description]
-   * @return {[type]}   [description]
-   */
-  service.getColor = function (config, i) {
-    if (i < config.colors.length) {
-      return config.colors[i];
-    } else {
-      var color = service.getRandomColor();
-      config.colors.push(color);
-      return color;
-    }
-  }
-
-  /**
-   * Default Legend 
-   */
-  service.defaultLegend = function (config, box, series, points){
-    var service = this;
-
-    angular.forEach(series, function(value, key) {
-      box.legends.push({
-        color: config.colors[key],
-        title: service.getBindableTextForLegend(config, value)
-      });
-    });
-  };
-
-  service.defaultLegend['$inject'] = ['config', 'box', 'series', 'points'];
+    if(typeof subject == 'function' 
+      || ( ( typeof subject == 'array' || typeof subject == 'object' ) 
+            && typeof subject[subject.length - 1] == 'function') )
+      response = true;
 
 
-
-  service.escapeHtml = function (string) {
-    return String(string).replace(/[&<>"'\/]/g, function(char) {
-      return HTML_ENTITY_MAP[char];
-    });
-  }
-
-  service.getBindableTextForLegend = function (config, text) {
-    var returnText;
-    injector.invoke(['$sce', function($sce){
-      returnText = $sce.trustAsHtml(config.legend.htmlEnabled ? text : service.escapeHtml(text));
-    }], service);
-    return returnText;
+    return response;
   }
 
   /**
    * Public API when injected into anything but the module config
+   *
+   * @return {Object}
    */
-  service.$get = ['$injector', function($injector){
+  acChartLogicProvider.$get = ['$injector', function($injector){
 
-      //Provide later version of injector to service after all providers have been handled
+      //Provides usable version of injector to acChartLogicProvider
       injector = $injector;
 
       return {
       /**
-       * Invokes chart function injecting service as this
+       * Invokes chart function injecting acChartLogicProvider as this
        * @access public
        */
       callChartFunction: function (type, config, box, domFunctions, series, points){
@@ -171,113 +126,460 @@
           points: points
         };
 
-        $injector.invoke(chartFunctions[type].chart, service, localInjections);
+        $injector.invoke(chartFunctions[type].chart, acChartLogicProvider, localInjections);
 
         //Blank legends before calling function
         box.legends = [];
-        $injector.invoke(chartFunctions[type].legend, service, localInjections);
-      }
+        $injector.invoke(chartFunctions[type].legend, acChartLogicProvider, localInjections);
+      },
+
+      /**
+       * Retrieves default color list
+       *
+       * @return {Array}
+       */
+      getDefaultColors: function(){
+        return defaultColors;
+      }, 
+
+      /**
+       * Get available charts as array
+       *
+       * @return {Array}
+       */
+       getAvailableCharts: function (){
+        return Object.keys(chartFunctions);
+       }
     };
   }];
 
-  service.addChart('bar', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
-    /**
-     * Setup date attributes
-     * @type {Object}
-     */
-    box.margin = {
-      top: 0,
-      right: 20,
-      bottom: 30,
-      left: 40
+  /**
+   * Set default colors
+   *
+   * @param {Array} list
+   * @return acChartLogicProvider
+   */
+  acChartLogicProvider.setDefaultColors = function(list) {
+    if(!Array.isArray(list))
+      throw new Error('setDefaultColors expects an array');
+
+    defaultColors = list;
+
+    return acChartLogicProvider;
+  };
+
+  /**
+   * Utility function to call when we run out of colors!
+   * @access config
+   * @return {String} Hexadecimal color
+   */
+  acChartLogicProvider.getRandomColor = function () {
+    var r = (Math.round(Math.random() * 127) + 127).toString(16);
+    var g = (Math.round(Math.random() * 127) + 127).toString(16);
+    var b = (Math.round(Math.random() * 127) + 127).toString(16);
+    return '#' + r + g + b;
+  }
+
+  /**
+   * Used to add chart functions by type
+   * @access config
+   * @return {Object} acChartLogicProvider
+   */
+  acChartLogicProvider.addChart = function (type, chartFunction, legendFunction){
+    if(!isInvokable(chartFunction)){
+        throw new Error('addChart expects parameter 2 to be function');
+    }
+
+    if(legendFunction != null && !isInvokable(legendFunction)){
+        throw new Error('addChart expects parameter 3 if set to be function');
+      }
+    
+    chartFunctions[type] = {
+      chart: chartFunction,
+      legend: (legendFunction != null)? legendFunction : acChartLogicProvider.defaultLegend
     };
+
+    return acChartLogicProvider;
+  };
+
+  /**
+   * Checks if index is available in color
+   * else returns a random color
+   *
+   * @access config
+   * @param  {[type]} i [description]
+   * @return {[type]}   [description]
+   */
+  acChartLogicProvider.getColor = function (config, i) {
+    if (i < config.colors.length) {
+      return config.colors[i];
+    } else {
+      var color = acChartLogicProvider.getRandomColor();
+      config.colors.push(color);
+      return color;
+    }
+  }
+
+  /**
+   * Default Legend
+   *
+   * @access config
+   */
+  acChartLogicProvider.defaultLegend = function (config, box, series, points){
+    var acChartLogicProvider = this;
+
+    angular.forEach(series, function(value, key) {
+      box.legends.push({
+        color: config.colors[key],
+        title: acChartLogicProvider.getBindableTextForLegend(config, value)
+      });
+    });
+  };
+
+  /**
+   * Make defaultLegend injectable
+   */
+  acChartLogicProvider.defaultLegend['$inject'] = ['config', 'box', 'series', 'points'];
+
+  /**
+   * Escapes html to safe characters
+   *
+   * @access config
+   * @param {String} string
+   * @return {String}
+   */
+  acChartLogicProvider.escapeHtml = function (string) {
+    return String(string).replace(/[&<>"'\/]/g, function(char) {
+      return HTML_ENTITY_MAP[char];
+    });
+  }
+
+  /**
+   * Gets text for legend label
+   *
+   * @access config
+   * @param {Object} config
+   * @param {String} text
+   * @return {String}
+   */
+  acChartLogicProvider.getBindableTextForLegend = function (config, text) {
+    var $sce = injector.get('$sce');
+
+    return $sce.trustAsHtml(config.legend.htmlEnabled ? text : acChartLogicProvider.escapeHtml(text));
+  }
+
+  /**
+   * Binds domFunctions to events
+   * @access config
+   * @param {Object} config
+   * @param {Object} domFunctions
+   * @param {d3.selection} selection
+   * @param {object} tooltipConfig
+   */
+  acChartLogicProvider.bindTooltipEvents = function (config, domFunctions, selection){
+    selection.on("mouseover", function(d) {
+      domFunctions.makeToolTip({
+        index: d.x,
+        value: d.tooltip ? d.tooltip : d.y,
+        series: d.series
+      }, d, d3.event);
+    })
+    .on("mouseleave", function(d) {
+      domFunctions.removeToolTip();
+    })
+    .on("mousemove", function(d) {
+      domFunctions.updateToolTip(d, d3.event);
+    })
+    .on("click", function(d) {
+      domFunctions.click(d, d3.event);
+    });
+  };
+
+  acChartLogicProvider.applyMargins = function (box){
     box.width -= box.margin.left + box.margin.right;
     box.height -= box.margin.top + box.margin.bottom;
+  };
 
-    var x = d3.scale.ordinal()
-      .rangeRoundBands([0, box.width], 0.1);
+  acChartLogicProvider.getYMaxPoints = function (points){
+    return d3.max(points.map(function(d) { return d.y.length; }));
+  };
 
-    var y = d3.scale.linear()
-      .range([box.height, 10]);
-
-    var x0 = d3.scale.ordinal()
-      .rangeRoundBands([0, box.width], 0.1);
-
+  /**
+   * Gets yData and sets nicedata
+   *
+   * @param {Array} points
+   * @param {Array} series - for series string in nicedata
+   * @return {Array} yData;
+   */
+  acChartLogicProvider.getYData = function(points, series){
     var yData = [0];
 
-    points.forEach(function(d) {
+    points.forEach(function(d){
       d.nicedata = d.y.map(function(e, i) {
         yData.push(e);
-        return {
+        var nicedata = {
           x: d.x,
           y: e,
           s: i,
           tooltip: angular.isArray(d.tooltip) ? d.tooltip[i] : d.tooltip
         };
+        if(series != null){
+          nicedata.series = series[i];
+        }
+        return nicedata;
       });
     });
 
-    var yMaxPoints = d3.max(points.map(function(d) {
-      return d.y.length;
-    }));
+    return yData;
+  }
 
-    x.domain(points.map(function(d) {
-      return d.x;
-    }));
-    var padding = d3.max(yData) * 0.20;
-
-    y.domain([d3.min(yData), d3.max(yData) + padding]);
-
-    x0.domain(d3.range(yMaxPoints)).rangeRoundBands([0, x.rangeBand()]);
-
-    /**
-     * Create scales using d3
-     * @type {[type]}
-     */
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(10)
-      .tickFormat(d3.format(config.yAxisTickFormat));
-
-    /**
-     * Start drawing the chart!
-     * @type {[type]}
-     */
-    var svg = d3.select(box.chartContainer[0]).append("svg")
+  /**
+   * Draw SVG element
+   *
+   * @param {Array} box
+   * @return {d3.selection}
+   */
+  acChartLogicProvider.getSvg = function(box){
+    return d3.select(box.chartContainer[0]).append("svg")
       .attr("width", box.width + box.margin.left + box.margin.right)
       .attr("height", box.height + box.margin.top + box.margin.bottom)
       .append("g")
-      .attr("transform", "translate(" + box.margin.left + "," + box.margin.top + ")");
+      .attr("transform", "translate(" + box.margin.left + "," + box.margin.top + ")")
+    ;
+  }
 
-    var xAxisSelection = svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + box.height + ")")
-      .call(xAxis);
+  /**
+   * Get LineData
+   */
+  acChartLogicProvider.getLineData = function(points, series){
+    var lineData = [];
+    series.slice(0, this.getYMaxPoints(points)).forEach(function(value, index) {
+      var d = {};
+      d.series = value;
+      d.values = points.map(function(point) {
 
-    if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
-      box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
-      box.margin.bottom = xAxisSelection.node().getBBox().height;
-      xAxisSelection.attr("transform", "translate(0," + box.height + ")");
-      y.range([box.height, 10]);
+        if(point.nicedata[index] != null)
+          return point.nicedata[index];
+        else
+          return {
+          x: point.x,
+          y: 0
+        };
+
+      });
+      lineData.push(d);
+    });
+
+    return lineData;
+  }
+
+  /**
+   * Returns x point of line point
+   * @param  {[type]} d [description]
+   * @return {[type]}   [description]
+   */
+  acChartLogicProvider.getX = function (x, d) {
+    return Math.round(x(d)) + x.rangeBand() / 2;
+  }
+
+  /**
+   * Filters down the x axis labels if a limit is specified
+   *
+   * @access config
+   */
+  acChartLogicProvider.filterXAxis = function (config, xAxis, x){
+    var allTicks = x.domain();
+    if (config.xAxisMaxTicks && allTicks.length > config.xAxisMaxTicks) {
+      var mod = Math.ceil(allTicks.length / config.xAxisMaxTicks);
+      xAxis.tickValues(allTicks.filter(function(e, i) {
+        return (i % mod) === 0;
+      }));
     }
+  };
 
-    svg.append("g")
+  /**
+   * Rotates xAxis labels by config option
+   *
+   * @access config
+   * @param {[selection]}
+   */
+  acChartLogicProvider.rotateAxisLabels = function (config, box, y, xAxisSelection){
+    if(config.xAxisLabelRotation == null || !config.xAxisLabelRotation)
+      return;
+    var rotation = (config.xAxisLabelRotation>0)? -1 * config.xAxisLabelRotation:config.xAxisLabelRotation;
+    //Rotate text by config degrees
+    xAxisSelection.selectAll('text')
+      .style("text-anchor", "end")
+      .attr('dx', '-.8em')
+      .attr('dy', '.15em')
+      .attr('transform', function (d){
+        return "rotate(" + rotation + ")";
+      })
+    ;
+    //Recalculate chart height
+    box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
+    //Set new bottom margin value
+    box.margin.bottom = xAxisSelection.node().getBBox().height;
+    //Move x axis to new bottom of chart
+    xAxisSelection.attr("transform", "translate(0," + box.height + ")");
+    //Redraw the yAxis scale to new height
+    y.range([box.height, 10]);
+
+    return this;
+  }
+  /**
+   * Set stack data
+   *
+   * @param {Array} points
+   * @return this
+   */
+  acChartLogicProvider.setStackData = function (points) {
+    points.forEach(function (d, i){
+      var y0 = 0;
+      d.nicedata.forEach(function (nd, i) {
+        nd.y0 = y0;
+        nd.y1 = y0 += nd.y;
+      });
+      d.total = d.nicedata[d.nicedata.length - 1].y1;
+    });
+
+    return acChartLogicProvider;
+  }
+
+  /**
+   * Get Max stack value
+   * 
+   * @param {Array} points
+   * @return {Number}
+   */
+  acChartLogicProvider.getMaxStack = function (points){
+    return d3.max(points.map(function (d){
+      return d.total;
+    }));
+  }
+
+  /**
+   * Build and return graph object
+   *
+   * @return {Object}
+   */
+  acChartLogicProvider.getGraph = function (config, box, x, y, horizontal){
+
+    var graph = {};
+
+    //Creates xAxis using scale var x
+    graph.xAxis = d3.svg.axis().scale(x).orient("bottom");
+
+    if(horizontal)
+      graph.xAxis.orient('left');
+
+    //Creates yAxis using scale var y
+    graph.yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .ticks(5)
+      .tickFormat(d3.format(config.yAxisTickFormat));
+
+    if(horizontal)
+      graph.yAxis.orient('bottom');
+
+    //Limits xAxis label to config limit if set
+    acChartLogicProvider.filterXAxis(config, graph.xAxis, x);
+
+    //Draws the SVG element
+    graph.svg = acChartLogicProvider.getSvg(box);
+
+    //Draws the xAxis and saves the selection
+    graph.xAxisSelection = graph.svg.append("g")
+      .attr("class", "x axis")
+    ;
+    if(!horizontal)
+      graph.xAxisSelection.attr("transform", "translate(0," + box.height + ")")
+    graph.xAxisSelection.call(graph.xAxis);
+
+    //Rotates labels and adjusts box height
+    if(!horizontal)
+      acChartLogicProvider.rotateAxisLabels(config, box, y, graph.xAxisSelection);
+
+    if(horizontal)
+      acChartLogicProvider.horizontalGraphMarginAdjust(config, box, y, graph.xAxisSelection);
+
+    //Draws the yAxis
+    graph.yAxisSelection = graph.svg.append("g")
       .attr("class", "y axis")
-      .call(yAxis);
+    ;
+    if(horizontal)
+      graph.yAxisSelection.attr("transform", "translate(0," + box.height + ")")
+    graph.yAxisSelection.call(graph.yAxis);
+      
+    return graph;
+  };
 
-    /**
-     * Add bars
-     * @type {[type]}
-     */
-    var barGroups = svg.selectAll(".state")
+  /**
+   * Rotates xAxis labels by config option
+   *
+   * @access config
+   * @param {[selection]}
+   */
+  acChartLogicProvider.horizontalGraphMarginAdjust = function (config, box, y, xAxisSelection){
+    
+    var newMargin = xAxisSelection.node().getBBox().width;
+
+    //Recalculate chart height
+    box.width = (box.width + box.margin.left) - newMargin;
+
+    box.margin.left = newMargin;
+
+    //Move x axis to new bottom of chart
+    xAxisSelection.attr("transform", "translate(" + newMargin + ", 0)");
+    //Redraw the yAxis scale to new height
+    y.range([newMargin, box.width]);
+
+    return this;
+  }
+
+  /**
+   * Bar Chart Definition
+   */
+  acChartLogicProvider.addChart('bar', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+
+    acChartLogicProvider.applyMargins(box);
+
+    // Sets all yData in a single array
+    var yData = acChartLogicProvider.getYData(points, series);
+
+    //Calculates maximum data series count
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+
+    //Creates the x Scale
+    var x = d3.scale.ordinal()
+      .domain(points.map(function (d) {
+        //returns xAxis label
+        return d.x;
+      }))
+      .rangeRoundBands([0, box.width], 0.1)
+    ;
+
+    //Adds padding to top of Y axis
+    var padding = d3.max(yData) * 0.20;
+
+    //Creates the y Scale
+    var y = d3.scale.linear()
+      .range([box.height, 10])
+      .domain([d3.min(yData), d3.max(yData) + padding])
+    ;
+
+    // Creates the scale for series bars inside x Scale
+    var x0 = d3.scale.ordinal()
+      .domain(d3.range(yMaxPoints))
+      .rangeRoundBands([0, x.rangeBand()])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y);
+
+    //Add point data to x axis
+    var barGroups = graph.svg.selectAll(".state")
       .data(points)
       .enter().append("g")
       .attr("class", "g")
@@ -285,22 +587,23 @@
         return "translate(" + x(d.x) + ",0)";
       });
 
+    //Draws series data
     var bars = barGroups.selectAll("rect")
       .data(function(d) {
         return d.nicedata;
       })
-      .enter().append("rect");
+      .enter().append("rect")
+      .attr("width", x0.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("x", function(d, i) { return x0(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
 
-    bars.attr("width", x0.rangeBand());
-
-    bars.attr("x", function(d, i) {
-      return x0(i);
-    })
-      .attr("y", box.height)
-      .style("fill", function(d) {
-        return service.getColor(config, d.s);
-      })
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
       .attr("height", 0)
+      .attr("y", box.height)
       .transition()
       .ease("cubic-in-out")
       .duration(config.isAnimate ? 1000 : 0)
@@ -310,29 +613,11 @@
       .attr("height", function(d) {
         return Math.abs(y(d.y) - y(0));
       });
+
     /**
      * Add events for tooltip
-     * @param  {[type]} d [description]
-     * @return {[type]}   [description]
      */
-    bars.on("mouseover", function(d) {
-
-      domFunctions.makeToolTip({
-        index: d.x,
-        value: d.tooltip ? d.tooltip : d.y,
-        series: series[d.s]
-      }, d, d3.event);
-
-    })
-      .on("mouseleave", function(d) {
-        domFunctions.removeToolTip();
-      })
-      .on("mousemove", function(d) {
-        domFunctions.updateToolTip(d, d3.event);
-      })
-      .on("click", function(d) {
-        domFunctions.click(d, d3.event);
-      });
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
 
     /**
      * Create labels
@@ -347,9 +632,8 @@
           return x0(i);
         })
         .attr("y", function(d) {
-          return box.height - Math.abs(y(d.y) - y(0));
+          return box.height - Math.abs(y(d.y) - y(0)) - 5;
         })
-      // .attr("transform", "rotate(270)")
       .text(function(d) {
         return d.y;
       });
@@ -358,120 +642,170 @@
     /**
      * Draw one zero line in case negative values exist
      */
-    svg.append("line")
+    graph.svg.append("line")
       .attr("x1", box.width)
       .attr("y1", y(0))
       .attr("y2", y(0))
       .style("stroke", "silver");
+
   }]);
 
-  service.addChart('line', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points) {
-    var service = this;
-    box.margin = {
-      top: 0,
-      right: 40,
-      bottom: 20,
-      left: 40
-    };
-    box.width -= box.margin.left + box.margin.right;
-    box.height -= box.margin.top + box.margin.bottom;
+  /**
+   * Bar Chart Definition
+   */
+  acChartLogicProvider.addChart('bar-stacked', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
 
+    acChartLogicProvider.applyMargins(box);
+
+    // Sets all yData in a single array
+    var yData = acChartLogicProvider.getYData(points, series);
+    //Calculates maximum data series count
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+
+    acChartLogicProvider.setStackData(points);
+    var maxStacked = acChartLogicProvider.getMaxStack(points);
+
+    //Creates the x Scale
     var x = d3.scale.ordinal()
-      .domain(points.map(function(d) {
+      .domain(points.map(function (d) {
+        //returns xAxis label
         return d.x;
       }))
-      .rangeRoundBands([0, box.width]);
+      .rangeRoundBands([0, box.width], 0.1)
+    ;
+
+    //Adds padding to top of Y axis
+    var padding = maxStacked * 0.20;
+
+    //Creates the y Scale
+    var y = d3.scale.linear()
+      .range([box.height, 10])
+      .domain([d3.min(yData), maxStacked + padding])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y);
+
+    //Add point data to x axis
+    var barGroups = graph.svg.selectAll(".state")
+      .data(points)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) {
+        return "translate(" + x(d.x) + ",0)";
+      });
+
+    //Draws series data
+    var bars = barGroups.selectAll("rect")
+      .data(function(d) {
+        return d.nicedata;
+      })
+      .enter().append("rect")
+      .attr("width", x.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("x", function(d, i) { return x(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
+
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
+      .attr("height", 0)
+      .attr("y", box.height)
+      .transition()
+      .ease("cubic-in-out")
+      .duration(config.isAnimate ? 1000 : 0)
+      .attr("y", function(d, i) { return y(d.y1); })
+      .attr("height", function(d) { return y(d.y0) - y(d.y1); });
+
+    /**
+     * Add events for tooltip
+     */
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
+
+    /**
+     * Create labels
+     */
+    if (config.labels) {
+      barGroups.selectAll('not-a-class')
+        .data(function(d) {
+          return d.nicedata.filter(function (nd){ return nd.y > 0; });
+        })
+        .enter().append("text")
+        .text(function(d) {
+          return d.y;
+        })
+        .each(function(d,i){
+          var width = this.getBBox().width;
+          var height = this.getBBox().height;
+          if(height > ( y(d.y1) - y(d.y0) )*-1 ){
+            d3.select(this).remove();
+            return;
+          }
+          d3.select(this)
+            .attr("x", function(d, i) {
+              return ( x.rangeBand(i)/2 ) - (width/2);
+            })
+            .attr("y", function(d) {
+              return y(d.y1) + height;
+            })
+          ;
+        })
+      ;
+    }
+
+    /**
+     * Draw one zero line in case negative values exist
+     */
+    graph.svg.append("line")
+      .attr("x1", box.width)
+      .attr("y1", y(0))
+      .attr("y2", y(0))
+      .style("stroke", "silver");
+
+  }]);
+  
+  /**
+   * Line Chart Definition
+   * Has Legend override
+   */
+  acChartLogicProvider.addChart('line', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points) {
+    var acChartLogicProvider = this;
+    
+    acChartLogicProvider.applyMargins(box);
+
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    var linedata = acChartLogicProvider.getLineData(points, series);
+    var padding = d3.max(yData) * 0.20;
+
+    var x = d3.scale.ordinal()
+      .domain(points.map(function(d) { return d.x; }))
+      .rangeRoundBands([0, box.width])
+    ;
 
     var y = d3.scale.linear()
-      .range([box.height, 10]);
+      .range([box.height, 10])
+      .domain([d3.min(yData), d3.max(yData) + padding])
+    ;
 
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(5)
-      .tickFormat(d3.format(config.yAxisTickFormat));
+    var graph = acChartLogicProvider.getGraph(config, box, x, y);
 
     var line = d3.svg.line()
       .interpolate(config.lineCurveType)
-      .x(function(d) {
-        return getX(d.x);
-      })
-      .y(function(d) {
-        return y(d.y);
-      });
+      .x(function(d) { return acChartLogicProvider.getX(x, d.x); })
+      .y(function(d) { return y(d.y); })
+    ;    
 
-    var yData = [0];
-    var linedata = [];
-
-    points.forEach(function(d) {
-      d.y.map(function(e) {
-        yData.push(e);
-      });
-    });
-
-    var yMaxPoints = d3.max(points.map(function(d) {
-      return d.y.length;
-    }));
-
-    series.slice(0, yMaxPoints).forEach(function(value, index) {
-      var d = {};
-      d.series = value;
-      d.values = points.map(function(point) {
-        return point.y.map(function(e) {
-          return {
-            x: point.x,
-            y: e,
-            tooltip: point.tooltip
-          };
-        })[index] || {
-          x: points[index].x,
-          y: 0
-        };
-      });
-      linedata.push(d);
-    });
-
-    var svg = d3.select(box.chartContainer[0]).append("svg")
-      .attr("width", box.width + box.margin.left + box.margin.right)
-      .attr("height", box.height + box.margin.top + box.margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + box.margin.left + "," + box.margin.top + ")");
-
-    var padding = d3.max(yData) * 0.20;
-
-    y.domain([d3.min(yData), d3.max(yData) + padding]);
-
-    var xAxisSelection = svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + box.height + ")")
-      .call(xAxis);
-
-    if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
-      box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
-      box.margin.bottom = xAxisSelection.node().getBBox().height;
-      xAxisSelection.attr("transform", "translate(0," + box.height + ")");
-      y.range([box.height, 10]);
-    }
-
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
-
-    var point = svg.selectAll(".points")
+    var point = graph.svg.selectAll(".points")
       .data(linedata)
       .enter().append("g");
 
-    var path = point.attr("points", "points")
+    var path = point.attr("class", "path")
       .append("path")
       .attr("class", "ac-line")
       .style("stroke", function(d, i) {
-        return service.getColor(config, i);
+        return acChartLogicProvider.getColor(config, i);
       })
       .attr("d", function(d) {
         return line(d.values);
@@ -506,52 +840,32 @@
      * @return {[type]}       [description]
      */
     angular.forEach(linedata, function(value, key) {
-      var points = svg.selectAll('.circle')
-        .data(value.values)
-        .enter();
-
-      points.append("circle")
-        .attr("cx", function(d) {
-          return getX(d.x);
+      var points = graph.svg.selectAll('.circle').data(value.values).enter().append('g').attr('class', 'point');
+      var dots = points.append('circle').attr("cx", function(d) {
+          return acChartLogicProvider.getX(x, d.x);
         })
         .attr("cy", function(d) {
           return y(d.y);
         })
         .attr("r", 3)
-        .style("fill", service.getColor(config, linedata.indexOf(value)))
-        .style("stroke", service.getColor(config, linedata.indexOf(value)))
-        .on("mouseover", (function(series) {
-          return function(d) {
+        .style("fill", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
+        .style("stroke", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
+      ;
 
-            domFunctions.makeToolTip({
-              index: d.x,
-              value: d.tooltip ? d.tooltip : d.y,
-              series: series
-            }, d, d3.event);
-
-          };
-        })(value.series))
-        .on("mouseleave", function(d) {
-          domFunctions.removeToolTip(d, d3.event);
-        })
-        .on("mousemove", function(d) {
-          domFunctions.updateToolTip(d, d3.event);
-        })
-        .on("click", function(d) {
-          domFunctions.click(d, d3.event);
-        });
+        acChartLogicProvider.bindTooltipEvents(config, domFunctions, points);
 
       if (config.labels) {
         points.append("text")
+          .text(function(d) {
+            return d.y;
+          })
           .attr("x", function(d) {
-            return getX(d.x);
+            return acChartLogicProvider.getX(x, d.x) - (this.getBBox().width + box.width*0.01);
           })
           .attr("y", function(d) {
             return y(d.y);
           })
-          .text(function(d) {
-            return d.y;
-          });
+        ;
       }
     });
 
@@ -568,23 +882,13 @@
           };
         })
         .attr("transform", function(d) {
-          return "translate(" + getX(d.value.x) + "," + y(d.value.y) + ")";
+          return "translate(" + acChartLogicProvider.getX(x, d.value.x) + "," + y(d.value.y) + ")";
         })
         .attr("x", 3)
         .text(function(d) {
           return d.name;
         });
     }
-
-    /**
-     * Returns x point of line point
-     * @param  {[type]} d [description]
-     * @return {[type]}   [description]
-     */
-    function getX(d) {
-      return Math.round(x(d)) + x.rangeBand() / 2;
-    }
-
     return linedata;
   }], ['config', 'box', 'series', 'points', function (config, box, series, points){
     if(config.lineLegend == "traditional"){
@@ -592,111 +896,47 @@
     }
   }]);
 
-  service.addChart('area', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
-    box.margin = {
-      top: 0,
-      right: 40,
-      bottom: 20,
-      left: 40
-    };
-    box.width -= box.margin.left + box.margin.right;
-    box.height -= box.margin.top + box.margin.bottom;
+  /**
+   * Area Chart Definition
+   */
+  acChartLogicProvider.addChart('area', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+    
+    acChartLogicProvider.applyMargins(box);
+
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    var linedata = acChartLogicProvider.getLineData(points, series);
+    var padding = d3.max(yData) * 0.20;
 
     var x = d3.scale.ordinal()
       .domain(points.map(function(d) {
         return d.x;
       }))
-      .rangePoints([0, box.width]);
+      .rangePoints([0, box.width])
+    ;
 
     var y = d3.scale.linear()
-      .range([box.height, 10]);
+      .range([box.height, 10])
+      .domain([d3.min(yData), d3.max(yData) + padding])
+    ;
 
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(5)
-      .tickFormat(d3.format(config.yAxisTickFormat));
+    var graph = acChartLogicProvider.getGraph(config, box, x, y);
 
     d3.svg.line()
       .interpolate(config.lineCurveType)
-      .x(function(d) {
-        return getX(d.x);
-      })
-      .y(function(d) {
-        return y(d.y);
-      });
+      .x(function(d) { return acChartLogicProvider.getX(x, d.x); })
+      .y(function(d) { return y(d.y); })
+    ;
 
-    var yData = [0];
-    var linedata = [];
-
-    points.forEach(function(d) {
-      d.y.map(function(e) {
-        yData.push(e);
-      });
-    });
-
-    var yMaxPoints = d3.max(points.map(function(d) {
-      return d.y.length;
-    }));
-
-    series.slice(0, yMaxPoints).forEach(function(value, index) {
-      var d = {};
-      d.series = value;
-      d.values = points.map(function(point) {
-        return point.y.map(function(e) {
-          return {
-            x: point.x,
-            y: e
-          };
-        })[index] || {
-          x: points[index].x,
-          y: 0
-        };
-      });
-      linedata.push(d);
-    });
-
-    var svg = d3.select(box.chartContainer[0]).append("svg")
-      .attr("width", box.width + box.margin.left + box.margin.right)
-      .attr("height", box.height + box.margin.top + box.margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + box.margin.left + "," + box.margin.top + ")");
-
-    var padding = d3.max(yData) * 0.20;
-
-    y.domain([d3.min(yData), d3.max(yData) + padding]);
-
-    var xAxisSelection = svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + box.height + ")")
-      .call(xAxis);
-
-    if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
-      box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
-      box.margin.bottom = xAxisSelection.node().getBBox().height;
-      xAxisSelection.attr("transform", "translate(0," + box.height + ")");
-      y.range([box.height, 10]);
-    }
-
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
-
-    var point = svg.selectAll(".points")
+    var point = graph.svg.selectAll(".points")
       .data(linedata)
       .enter().append("g");
 
     var area = d3.svg.area()
       .interpolate('basis')
       .x(function(d) {
-        return getX(d.x);
+        return acChartLogicProvider.getX(x, d.x);
       })
       .y0(function() {
         return y(0);
@@ -711,104 +951,39 @@
         return area(d.values);
       })
       .style("fill", function(d, i) {
-        return service.getColor(config, i);
+        return acChartLogicProvider.getColor(config, i);
       })
       .style("opacity", "0.7");
-
-    function getX(d) {
-      return Math.round(x(d)) + x.rangeBand() / 2;
-    }
   }]);
+  
+  /**
+   * Point Chart Definition
+   */
+  acChartLogicProvider.addChart('point', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+    
+    acChartLogicProvider.applyMargins(box);
 
-  service.addChart('point', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
-    box.margin = {
-      top: 0,
-      right: 40,
-      bottom: 20,
-      left: 40
-    };
-    box.width -= box.margin.left - box.margin.right;
-    box.height -= box.margin.top - box.margin.bottom;
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    var linedata = acChartLogicProvider.getLineData(points, series);
+    var padding = d3.max(yData) * 0.20;
 
     var x = d3.scale.ordinal()
       .domain(points.map(function(d) {
         return d.x;
       }))
-      .rangeRoundBands([0, box.width]);
+      .rangeRoundBands([0, box.width])
+    ;
 
     var y = d3.scale.linear()
-      .range([box.height, 10]);
+      .range([box.height, 10])
+      .domain([d3.min(yData), d3.max(yData) + padding])
+    ;
 
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-    service.filterXAxis(config, xAxis, x);
+    var graph = acChartLogicProvider.getGraph(config, box, x, y);
 
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(5)
-      .tickFormat(d3.format(config.yAxisTickFormat));
-
-    var yData = [0];
-    var linedata = [];
-
-    points.forEach(function(d) {
-      d.y.map(function(e, i) {
-        yData.push(e);
-      });
-    });
-
-    var yMaxPoints = d3.max(points.map(function(d) {
-      return d.y.length;
-    }));
-
-    series.slice(0, yMaxPoints).forEach(function(value, index) {
-      var d = {};
-      d.series = value;
-      d.values = points.map(function(point) {
-        return point.y.map(function(e) {
-          return {
-            x: point.x,
-            y: e
-          };
-        })[index] || {
-          x: points[index].x,
-          y: 0
-        };
-      });
-      linedata.push(d);
-    });
-
-    var svg = d3.select(box.chartContainer[0]).append("svg")
-      .attr("width", box.width + box.margin.left + box.margin.right)
-      .attr("height", box.height + box.margin.top + box.margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + box.margin.left + "," + box.margin.top + ")");
-
-    var padding = d3.max(yData) * 0.20;
-
-    y.domain([d3.min(yData), d3.max(yData) + padding]);
-
-    var xAxisSelection = svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + box.height + ")")
-      .call(xAxis);
-
-    if(config.xAxisLabelRotation){
-      service.rotateAxisLabels(config, xAxisSelection.selectAll("text")); //Call before getting measurements
-      box.height = (box.height + box.margin.bottom) - xAxisSelection.node().getBBox().height;
-      box.margin.bottom = xAxisSelection.node().getBBox().height;
-      xAxisSelection.attr("transform", "translate(0," + box.height + ")");
-      y.range([box.height, 10]);
-    }
-
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
-
-    svg.selectAll(".points")
+    graph.svg.selectAll(".points")
       .data(linedata)
       .enter().append("g");
 
@@ -819,74 +994,51 @@
      * @return {[type]}       [description]
      */
     angular.forEach(linedata, function(value, key) {
-      var points = svg.selectAll('.circle')
-        .data(value.values)
-        .enter();
-
-      points.append("circle")
+      var points = graph.svg.selectAll('.circle').data(value.values).enter().append('g').attr('class', 'point');
+      var dots = points
+        .append("circle")
         .attr("cx", function(d) {
-          return getX(d.x);
+          return acChartLogicProvider.getX(x, d.x);
         })
         .attr("cy", function(d) {
           return y(d.y);
         })
         .attr("r", 3)
-        .style("fill", service.getColor(config, linedata.indexOf(value)))
-        .style("stroke", service.getColor(config, linedata.indexOf(value)))
-        .on("mouseover", (function(series) {
-          return function(d) {
+        .style("fill", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
+        .style("stroke", acChartLogicProvider.getColor(config, linedata.indexOf(value)))
+      ;
 
-            domFunctions.makeToolTip({
-              index: d.x,
-              value: d.tooltip ? d.tooltip : d.y,
-              series: series
-            }, d, d3.event);
-
-          };
-        })(value.series))
-        .on("mouseleave", function(d) {
-          domFunctions.removeToolTip(d, d3.event);
-        })
-        .on("mousemove", function(d) {
-          domFunctions.updateToolTip(d, d3.event);
-        })
-        .on("click", function(d) {
-          domFunctions.click(d, d3.event);
-        });
+      acChartLogicProvider.bindTooltipEvents(config, domFunctions, points);
 
       if (config.labels) {
         points.append("text")
+          .text(function(d) {
+            return d.y;
+          })
           .attr("x", function(d) {
-            return getX(d.x);
+            return acChartLogicProvider.getX(x, d.x) - (this.getBBox().width + box.width*0.01);
           })
           .attr("y", function(d) {
             return y(d.y);
           })
-          .text(function(d) {
-            return d.y;
-          });
+        ;
       }
     });
-
-    /**
-     * Returns x point of line point
-     * @param  {[type]} d [description]
-     * @return {[type]}   [description]
-     */
-    function getX(d) {
-      return Math.round(x(d)) + x.rangeBand() / 2;
-    }
   }]);
 
-  service.addChart('pie', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
-    var service = this;
+  /**
+   * Pie Chart Definition
+   * Has Legend override
+   */
+  acChartLogicProvider.addChart('pie', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
 
     var radius = Math.min(box.width, box.height) / 2;
-    var svg = d3.select(box.chartContainer[0]).append("svg")
-      .attr("width", box.width)
-      .attr("height", box.height)
-      .append("g")
-      .attr("transform", "translate(" + box.width / 2 + "," + box.height / 2 + ")");
+
+    var svg = acChartLogicProvider.getSvg(box)
+      .attr("transform", "translate(" + box.width / 2 + "," + box.height / 2 + ")") //Override margin translate in getSvg()
+    ;
+
     var innerRadius = 0;
 
     if (config.innerRadius) {
@@ -919,6 +1071,12 @@
     var path = svg.selectAll(".arc")
       .data(pie(points).filter(function (d){
         return d.value > 0;
+      }).map(function(d){
+        // pie() puts existing data into data property, events need this
+        d.x = d.data.x;
+        d.y = d.data.y[0];
+        d.tooltip = d.data.tooltip;
+        return d;
       }))
       .enter().append("g");
 
@@ -926,7 +1084,7 @@
 
     path.append("path")
       .style("fill", function(d, i) {
-        return service.getColor(config, i);
+        return acChartLogicProvider.getColor(config, i);
       })
       .transition()
       .ease("linear")
@@ -937,38 +1095,7 @@
         //avoid firing multiple times
         if (!complete) {
           complete = true;
-
-          //Add listeners when transition is done
-          path.on("mouseover", function(d) {
-
-            domFunctions.makeToolTip({
-              value: d.data.tooltip ? d.data.tooltip : d.data.y[0]
-            }, d, d3.event);
-
-            d3.select(this)
-              .select('path')
-              .transition()
-              .duration(200)
-              .style("stroke", "white")
-              .style("stroke-width", "2px");
-          })
-            .on("mouseleave", function(d) {
-              d3.select(this)
-                .select('path')
-                .transition()
-                .duration(200)
-                .style("stroke", "")
-                .style("stroke-width", "");
-
-              domFunctions.removeToolTip(d, d3.event);
-            })
-            .on("mousemove", function(d) {
-              domFunctions.updateToolTip(d, d3.event);
-            })
-            .on("click", function(d) {
-              domFunctions.click(d, d3.event);
-            });
-
+          acChartLogicProvider.bindTooltipEvents(config, domFunctions, path);
         }
       });
 
@@ -995,20 +1122,225 @@
       };
     }
   }], ['config', 'box', 'series', 'points', function (config, box, series, points){
-      var service = this;
+      var acChartLogicProvider = this;
 
       var filteredPoints = points.filter(function (d){return d.y[0] > 0;});
 
       angular.forEach(filteredPoints, function(value, key) {
         box.legends.push({
           color: config.colors[key],
-          title: service.getBindableTextForLegend(config, value.x)
+          title: acChartLogicProvider.getBindableTextForLegend(config, value.x)
         });
       });
 
       box.yMaxData = filteredPoints.length;
   }]);
 
-  return service;
+  /**
+   * Slab Chart Definition
+   */
+  acChartLogicProvider.addChart('slab', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+
+    acChartLogicProvider.applyMargins(box);
+
+    
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    var padding = d3.max(yData) * 0.20;
+
+    var x = d3.scale.ordinal()
+      .domain(points.map(function (d) {
+        return d.x;
+      }))
+      .rangeRoundBands([0, box.height], 0.1)
+
+    var y = d3.scale.linear()
+      .range([0, box.width])
+      .domain([d3.min(yData), d3.max(yData) + padding])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y, true);
+    
+    var x0 = d3.scale.ordinal()
+      .domain(d3.range(yMaxPoints))
+      .rangeRoundBands([0, x.rangeBand()])
+    ;
+
+    var barGroups = graph.svg.selectAll(".state")
+      .data(points)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) {
+        return "translate(0, " + x(d.x) + ")";
+      });
+
+    var bars = barGroups.selectAll("rect")
+      .data(function(d) {
+        return d.nicedata;
+      })
+      .enter().append("rect")
+      .attr("height", x0.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("y", function(d, i) { return x0(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
+
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
+      .attr("width", 0)
+      .attr("x", y(0))
+      .transition()
+      .ease("cubic-in-out")
+      .duration(config.isAnimate ? 1000 : 0)
+      .attr("width", function(d) {
+        return Math.abs(y(d.y) - y(0));
+      });
+
+    /**
+     * Add events for tooltip
+     */
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
+
+    /**
+     * Create labels
+     */
+    if (config.labels) {
+      barGroups.selectAll('not-a-class')
+        .data(function(d) {
+          return d.nicedata;
+        })
+        .enter().append("text")
+        .attr("y", function(d, i) {
+          return x0.rangeBand() + x0(i);
+        })
+        .attr("x", function(d) {
+          return y(d.y);
+        })
+      .text(function(d) {
+        return d.y;
+      });
+    }
+
+    /**
+     * Draw one zero line in case negative values exist
+     */
+    graph.svg.append("line")
+      .attr("y1", box.height)
+      .attr("x1", y(0))
+      .attr("x2", y(0))
+      .style("stroke", "silver");
+  }]);
+
+  /**
+   * Slab-Stacked Chart Definition
+   */
+  acChartLogicProvider.addChart('slab-stacked', ['config', 'box', 'domFunctions', 'series', 'points', function (config, box, domFunctions, series, points){
+    var acChartLogicProvider = this;
+
+    acChartLogicProvider.applyMargins(box);
+
+    
+    var yData = acChartLogicProvider.getYData(points, series);
+    var yMaxPoints = acChartLogicProvider.getYMaxPoints(points);
+    
+
+    acChartLogicProvider.setStackData(points);
+    var maxStacked = acChartLogicProvider.getMaxStack(points);
+
+    var padding = maxStacked * 0.20;
+
+    var x = d3.scale.ordinal()
+      .domain(points.map(function (d) {
+        return d.x;
+      }))
+      .rangeRoundBands([0, box.height], 0.1)
+
+    var y = d3.scale.linear()
+      .range([0, box.width])
+      .domain([d3.min(yData), maxStacked + padding])
+    ;
+
+    var graph = acChartLogicProvider.getGraph(config, box, x, y, true);
+
+    var barGroups = graph.svg.selectAll(".state")
+      .data(points)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) {
+        return "translate(0, " + x(d.x) + ")";
+      });
+
+    var bars = barGroups.selectAll("rect")
+      .data(function(d) {
+        return d.nicedata;
+      })
+      .enter().append("rect")
+      .attr("height", x.rangeBand())//Sets bar width based on series scale (x0)
+      .attr("y", function(d, i) { return x(i); })//Sets x position based on series scale (x0)
+      .style("fill", function(d) { return acChartLogicProvider.getColor(config, d.s); })//Sets bar color
+    ;
+
+    /**
+     * Animate bar height from 0% to 100%
+     */
+    bars
+      .attr("width", 0)
+      .attr("x", y(0))
+      .transition()
+      .ease("cubic-in-out")
+      .duration(config.isAnimate ? 1000 : 0)
+      .attr("x", function (d){ return y(d.y0); })
+      .attr("width", function(d) { return y(d.y1) - y(d.y0); })
+    ;
+
+    /**
+     * Add events for tooltip
+     */
+    acChartLogicProvider.bindTooltipEvents(config, domFunctions, bars);
+
+    /**
+     * Create labels
+     */
+    if (config.labels) {
+      barGroups.selectAll('not-a-class')
+        .data(function(d) {
+          return d.nicedata.filter(function (nd){ return nd.y > 0; });
+        })
+        .enter().append("text")
+        .text(function(d) {
+          return d.y;
+        })
+        .each(function (d, i){
+          var width  = this.getBBox().width;
+          var height = this.getBBox().height;
+          if(width > y(d.y1) - y(d.y0)){
+            d3.select(this).remove();
+            return;
+          }
+          d3.select(this)
+            .attr("x", function(d, i) {
+              return y(d.y1) - width;
+            })
+            .attr("y", function(d) {
+              return (x.rangeBand() / 2) + height / 2;
+            });
+        })
+      ;
+    }
+
+    /**
+     * Draw one zero line in case negative values exist
+     */
+    graph.svg.append("line")
+      .attr("y1", box.height)
+      .attr("x1", y(0))
+      .attr("x2", y(0))
+      .style("stroke", "silver");
+  }]);
+  
+  
+  return acChartLogicProvider;
 
  });

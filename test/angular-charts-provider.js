@@ -123,5 +123,21 @@ describe('angularCharts', function (){
 		expect(service).toEqual(chartsProvider);
 	});
 
+	it('should get default color list', function (){
+		expect(chartLogic.getDefaultColors().length).toBeGreaterThan(0);
+	});
+
+	it('should set default color list', function (){
+		var list = [
+			1,
+			2
+		];
+		chartsProvider.setDefaultColors(list);
+		expect(chartLogic.getDefaultColors()).toEqual(list);
+	});
+
+	it('should get an exception for list not being array', function (){
+		expect(function (){chartsProvider.setDefaultColors(1)}).toThrow(new Error('setDefaultColors expects an array'));
+	});
 
 });
