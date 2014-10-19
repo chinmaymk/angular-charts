@@ -268,7 +268,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       }));
       var padding = d3.max(yData) * 0.20;
 
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      y.domain([d3.min(yData), (parseInt(d3.max(yData)) + parseInt(padding])));
 
       x0.domain(d3.range(yMaxPoints)).rangeRoundBands([0, x.rangeBand()]);
 
@@ -485,7 +485,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       var padding = d3.max(yData) * 0.20;
 
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      y.domain([d3.min(yData), (parseInt(d3.max(yData)) + parseInt(padding])));
 
       svg.append("g")
         .attr("class", "x axis")
@@ -715,7 +715,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       var padding = d3.max(yData) * 0.20;
 
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      y.domain([d3.min(yData), (parseInt(d3.max(yData)) + parseInt(padding])));
 
       svg.append("g")
         .attr("class", "x axis")
@@ -949,7 +949,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
       var padding = d3.max(yData) * 0.20;
 
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      y.domain([d3.min(yData), (parseInt(d3.max(yData)) + parseInt(padding])));
 
       svg.append("g")
         .attr("class", "x axis")
