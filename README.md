@@ -54,7 +54,7 @@ Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 
 ```js            
  var config = {
-  title: '', // chart title
+  title: '', // chart title. If this is false, no title element will be created.
   tooltips: true,
   labels: false, // labels on data points
   // exposed events 
