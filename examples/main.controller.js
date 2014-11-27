@@ -23,27 +23,28 @@ function MainController($scope) {
 		series: ['<em>500</em> Keyboards', '<em>105</em> Laptops', '<em>100</em> TVs'],
 		data: [{
 			x: "Sales",
-			y: [100, 500, 0],
+			y: [120, 500, 0],
 			tooltip: "this is tooltip"
 		}, {
 			x: "Income",
-			y: [300, 100, 100]
+			y: [30, 100, 100]
 		}, {
 			x: "Expense",
-			y: [351, 50, 25]
+			y: [30, 50, 25]
 		}]
 	}
 
-	$scope.chartType = 'bar';
+	$scope.chartType = 'pie3';
 
 	$scope.config1 = {
-		labels: false,
+		labels: true,
 		title: "Products",
 		legend: {
 			display: true,
 			position: 'left'
 		},
-		innerRadius: 0
+		innerRadius: 0,
+        depth: 100
 	};
 
 	$scope.config2 = {
