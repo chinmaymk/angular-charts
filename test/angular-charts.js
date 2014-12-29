@@ -5,28 +5,25 @@ describe('angularCharts', function() {
   // load the charts code
   beforeEach(module('angularCharts'));
 
-  beforeEach(inject(function (_$rootScope_, _$compile_) {
+  beforeEach(inject(function(_$rootScope_, _$compile_) {
     $scope = _$rootScope_
     $compile = _$compile_
 
 
     $scope.data = {
       series: ['Sales', 'Income', 'Expense'],
-      data : [{
-        x : "Sales",
-        y: [100,500, 0],
-        tooltip:"this is tooltip"
-      },
-      {
-        x : "Not Sales",
+      data: [{
+        x: "Sales",
+        y: [100, 500, 0],
+        tooltip: "this is tooltip"
+      }, {
+        x: "Not Sales",
         y: [300, 100, 100]
-      },
-      {
-        x : "Tax",
+      }, {
+        x: "Tax",
         y: [351]
-      },
-      {
-        x : "Not Tax",
+      }, {
+        x: "Not Tax",
         y: [54, 0, 879]
       }]
     }
@@ -35,10 +32,10 @@ describe('angularCharts', function() {
 
     $scope.config = {
       labels: true,
-      title : "Not Products",
-      legend : {
-        display:true,
-        position:'left'
+      title: "Not Products",
+      legend: {
+        display: true,
+        position: 'left'
       }
     }
 
@@ -48,13 +45,13 @@ describe('angularCharts', function() {
     //just counting number of points in the data scope
     numberOfPoints = 0
 
-    for(var i in $scope.data.data) {
+    for (var i in $scope.data.data) {
 
-      for(var j in $scope.data.data[i]) {
+      for (var j in $scope.data.data[i]) {
 
-        if(typeof $scope.data.data[i][j] == 'object') {
+        if (typeof $scope.data.data[i][j] == 'object') {
 
-          if($scope.data.data[i][j].indexOf(0) === -1)
+          if ($scope.data.data[i][j].indexOf(0) === -1)
             numberOfPoints += $scope.data.data[i][j].length + 1
           else
             numberOfPoints += $scope.data.data[i][j].length
@@ -64,21 +61,28 @@ describe('angularCharts', function() {
 
   }))
 
-// load the templates
-// beforeEach(module('tpl/tabs.html', 'tpl/pane.html'));
+  // load the templates
+  // beforeEach(module('tpl/tabs.html', 'tpl/pane.html'));
 
 
   var compileChart = function() {
     return $compile(body)($scope)
   }
 
-  it('should throw width/height error', function() {
-    expect(compileChart).toThrow()
+  var widthHeightError = new Error('Please set height and width for the chart element');
+
+  it('should throw width/height error by default', function() {
+    expect(compileChart).toThrow(widthHeightError)
   })
 
   it('should not throw width/height error if the chart has a width/height', function() {
     angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>')
-    expect(compileChart).not.toThrow()
+    expect(compileChart).not.toThrow(widthHeightError)
+  })
+
+  it('should not throw error if waitForHeightAndWidth is set to true', function() {
+    $scope.config.waitForHeightAndWidth = true
+    expect(compileChart).not.toThrow(widthHeightError)
   })
 
   it('should digest scope', function() {
@@ -95,7 +99,7 @@ describe('angularCharts', function() {
 
     expect($legendItems.length).toEqual($scope.data.series.length)
 
-    for(var i in $scope.data.series) {
+    for (var i in $scope.data.series) {
       expect($legendItems[i].querySelector('.ng-binding').innerText).toEqual($scope.data.series[i])
     }
 
