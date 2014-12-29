@@ -76,7 +76,7 @@ describe('angularCharts', function() {
     expect(compileChart).toThrow()
   })
 
-  it('should throw width/height error', function() {
+  it('should not throw width/height error if the chart has a width/height', function() {
     angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>')
     expect(compileChart).not.toThrow()
   })
@@ -87,10 +87,6 @@ describe('angularCharts', function() {
 
     $chart = document.getElementById('chart')
     $chart_childrens = angular.element($chart).children()
-  })
-
-  it('should have the right DOM title', function() {
-    expect($chart.querySelector('.ac-title').innerText).toEqual('Not Products')
   })
 
   it('should have the right elements in the legend', function() {
@@ -209,4 +205,32 @@ describe('angularCharts', function() {
 
   })
 
+  describe('title', function() {
+    beforeEach(function() {
+      angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>');
+      $scope.chartType = 'area';
+    });
+
+    it('should set the title in the title element', function() {
+      $scope.config.title = 'My Title';
+
+      compileChart();
+      $scope.$digest();
+
+      $chart = document.getElementById('chart')
+      expect($chart.querySelectorAll('.ac-title').length).toBe(1);
+      expect($chart.querySelector('.ac-title').innerText).toEqual('My Title')
+    });
+
+    it('should not have a title element if the title is false', function() {
+      $scope.config.title = false;
+
+      compileChart();
+      $scope.$digest();
+
+      $chart = document.getElementById('chart');
+      expect($chart.querySelectorAll('.ac-title').length).toBe(0);
+    });
+
+  });
 })
