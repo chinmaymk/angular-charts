@@ -1,6 +1,6 @@
 {
   "name": "angular-charts",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "angular directives for common charts using d3, for more information visit",
   "main": "Gruntfile.js",
   "dependencies": {},
