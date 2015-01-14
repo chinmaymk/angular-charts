@@ -177,7 +177,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * Creates appropriate DOM structure for legend + chart
      */
     function setContainers() {
-      var container = $templateCache.get('angularChartsTemplate_' + config.legend.position);
+      var container = $templateCache.get('angularChartsTemplate_' + config.legend.position || 'left');
       element.html(container); //http://stackoverflow.com/a/17883151
       $compile(element.contents())(scope);
 
