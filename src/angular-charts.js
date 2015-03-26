@@ -247,12 +247,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * Setup date attributes
        * @type {Object}
        */
-      var margin = {
+      var margin = angular.extend({
         top: 0,
         right: 20,
         bottom: 30,
         left: 40
-      };
+      }, config.margin);
+
       width -= margin.left + margin.right;
       height -= margin.top + margin.bottom;
 
@@ -430,12 +431,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function lineChart() {
-      var margin = {
+      var margin = angular.extend({
         top: 0,
         right: 40,
         bottom: 20,
         left: 40
-      };
+      }, config.margin);
+      
       width -= margin.left + margin.right;
       height -= margin.top + margin.bottom;
 
@@ -655,12 +657,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      * @return {[type]} [description]
      */
     function areaChart() {
-      var margin = {
+      var margin = angular.extend({
         top: 0,
         right: 40,
         bottom: 20,
         left: 40
-      };
+      }, config.margin);
+
       width -= margin.left + margin.right;
       height -= margin.top + margin.bottom;
 
@@ -903,12 +906,13 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
 
 
     function pointChart() {
-      var margin = {
+      var margin = angular.extend({
         top: 0,
         right: 40,
         bottom: 20,
         left: 40
-      };
+      }, config.margin);
+
       width -= margin.left - margin.right;
       height -= margin.top - margin.bottom;
 
