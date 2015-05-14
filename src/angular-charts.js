@@ -1169,7 +1169,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      *  @param defaultDomain Domain limit defined in config object
      */      
     function getDomain(data, defaultDomain){
-      var minVal, maxVal, padding;
+      var minVal, maxVal, padding = 0;
       if (defaultDomain.length === 2){
         minVal  = Number(defaultDomain[0]);
         maxVal  = Number(defaultDomain[1]);
