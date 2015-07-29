@@ -89,13 +89,20 @@ module.exports = function(grunt) {
             }
           ]
         }
-      },
+      }
     },
     copy: {
       bowerPreRelease: {
         files: [
           { src: 'dist/angular-charts.js', dest: 'dist/angular-charts.tmp.js' },
           { src: 'dist/angular-charts.min.js', dest: 'dist/angular-charts.min.tmp.js' }
+        ]
+      },
+      npmPreRelease: {
+        files: [
+          { src: 'package.json', dest: 'dist/' },
+          { src: 'LICENSE', dest: 'dist/' },
+          { src: 'README.md', dest: 'dist/' }
         ]
       }
     },
@@ -109,6 +116,12 @@ module.exports = function(grunt) {
           "git commit -am 'release <%= pkg.version %>'",
           'git tag <%= pkg.version %>'
         ].join('&&')
+      },
+      npmRelease: {
+        command: [
+          'cd dist',
+          'npm publish'
+        ].join('&&')
       }
     }
   });
@@ -117,6 +130,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['ngmin', 'htmlmin', 'html2js', 'csso', 'css2js', 'concat', 'uglify', 'clean', 'karma']);
   grunt.registerTask('release', ['karma', 'prompt', 'bowerValidateRelease']);
+  grunt.registerTask('publishToNpm', ['clean', 'concat', 'uglify', 'copy:npmPreRelease', 'shell:npmRelease']);
 
   grunt.registerTask('bowerValidateRelease', 'Make sure that we really want to release!', function() {
     if(grunt.config('release') === true) {

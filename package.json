@@ -3,7 +3,10 @@
   "version": "0.2.7",
   "description": "angular directives for common charts using d3, for more information visit",
   "main": "Gruntfile.js",
-  "dependencies": {},
+  "dependencies": {
+    "angular": ">=1.2.x",
+    "d3": "~3.3.10"
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "*",
