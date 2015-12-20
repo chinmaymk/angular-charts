@@ -684,15 +684,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .ticks(5)
         .tickFormat(d3.format(config.yAxisTickFormat));
 
-      d3.svg.line()
-        .interpolate(config.lineCurveType)
-        .x(function(d) {
-          return getX(d.x);
-        })
-        .y(function(d) {
-          return y(d.y);
-        });
-
       var yData = [0];
       var linedata = [];
 
