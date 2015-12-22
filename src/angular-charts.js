@@ -105,7 +105,7 @@ angular.module('angularCharts').directive('acChart', [
               extendBottom: 0 // number of px, if any to extend bottom margin to accomodate rotated labels
           }
         };
-      prepareConfig();
+
       var totalWidth = element[0].clientWidth;
       var totalHeight = element[0].clientHeight;
       validateHeightAndWidth();
@@ -119,10 +119,10 @@ angular.module('angularCharts').directive('acChart', [
      * @return {[type]} [description]
      */
       function init() {
+        prepareConfig();
         if (!validateHeightAndWidth()) {
           return;
         }
-        prepareConfig();
         prepareData();
         setHeightWidth();
         setContainers();
