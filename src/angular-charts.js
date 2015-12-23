@@ -98,14 +98,9 @@ angular.module('angularCharts').directive('acChart', [
           lineCurveType: 'cardinal',
           isAnimate: true,
           yAxisTickFormat: 's',
-          waitForHeightAndWidth: false,
-          xAxisRotateLabels: {
-              rotate: false, // boolean, default to false. true rotates x-axis labels by n degrees
-              degrees: 0,// number of degrees to rotate x-axis label
-              extendBottom: 0 // number of px, if any to extend bottom margin to accomodate rotated labels
-          }
+          waitForHeightAndWidth: false
         };
-
+      prepareConfig();
       var totalWidth = element[0].clientWidth;
       var totalHeight = element[0].clientHeight;
       validateHeightAndWidth();
@@ -123,6 +118,7 @@ angular.module('angularCharts').directive('acChart', [
         if (!validateHeightAndWidth()) {
           return;
         }
+        
         prepareData();
         setHeightWidth();
         setContainers();
@@ -170,6 +166,7 @@ angular.module('angularCharts').directive('acChart', [
      * Creates appropriate DOM structure for legend + chart
      */
       function setContainers() {
+        //prepareConfig();
         var container = $templateCache.get('angularChartsTemplate_' + config.legend.position);
         element.html(container);
         //http://stackoverflow.com/a/17883151
@@ -237,7 +234,7 @@ angular.module('angularCharts').directive('acChart', [
         var margin = {
             top: 0,
             right: 20,
-            bottom: 30 + (config.xAxisRotateLabels.rotate ? config.xAxisRotateLabels.extendBottom : 0),
+            bottom: 150,
             left: 40
           };
         width -= margin.left + margin.right;
@@ -294,11 +291,7 @@ angular.module('angularCharts').directive('acChart', [
        * @type {[type]}
        */
         var svg = d3.select(chartContainer[0]).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        if (config.xAxisRotateLabels.rotate) {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('y', 0).attr('x', 9).attr('dy', '.35em').attr('transform', 'rotate(' + config.xAxisRotateLabels.degrees + ')').style('text-anchor', 'start');
-        } else {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
-        }
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('y', 0).attr('x', 9).attr('dy', '.35em').attr('transform', 'rotate(90)').style('text-anchor', 'start');
         svg.append('g').attr('class', 'y axis').call(yAxis);
         /**
        * Add bars
@@ -370,7 +363,7 @@ angular.module('angularCharts').directive('acChart', [
         var margin = {
             top: 0,
             right: 40,
-            bottom: 20 + (config.xAxisRotateLabels.rotate ? config.xAxisRotateLabels.extendBottom : 0),
+            bottom: 20,
             left: 40
           };
         width -= margin.left + margin.right;
@@ -427,11 +420,7 @@ angular.module('angularCharts').directive('acChart', [
           d3.min(yData),
           d3.max(yData) + padding
         ]);
-        if (config.xAxisRotateLabels.rotate) {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('y', 0).attr('x', 9).attr('dy', '.35em').attr('transform', 'rotate(' + config.xAxisRotateLabels.degrees + ')').style('text-anchor', 'start');
-        } else {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
-        }
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
         var path = point.attr('points', 'points').append('path').attr('class', 'ac-line').style('stroke', function (d, i) {
@@ -527,7 +516,7 @@ angular.module('angularCharts').directive('acChart', [
         var margin = {
             top: 0,
             right: 40,
-            bottom: 20 + (config.xAxisRotateLabels.rotate ? config.xAxisRotateLabels.extendBottom : 0),
+            bottom: 20,
             left: 40
           };
         width -= margin.left + margin.right;
@@ -587,11 +576,7 @@ angular.module('angularCharts').directive('acChart', [
           d3.min(yData),
           d3.max(yData) + padding
         ]);
-        if (config.xAxisRotateLabels.rotate) {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('y', 0).attr('x', 9).attr('dy', '.35em').attr('transform', 'rotate(' + config.xAxisRotateLabels.degrees + ')').style('text-anchor', 'start');
-        } else {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
-        }
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         var point = svg.selectAll('.points').data(linedata).enter().append('g');
         var area = d3.svg.area().interpolate('basis').x(function (d) {
@@ -684,7 +669,7 @@ angular.module('angularCharts').directive('acChart', [
         var margin = {
             top: 0,
             right: 40,
-            bottom: 20 + (config.xAxisRotateLabels.rotate ? config.xAxisRotateLabels.extendBottom : 0),
+            bottom: 20,
             left: 40
           };
         width -= margin.left - margin.right;
@@ -735,11 +720,7 @@ angular.module('angularCharts').directive('acChart', [
           d3.min(yData),
           d3.max(yData) + padding
         ]);
-        if (config.xAxisRotateLabels.rotate) {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis).selectAll('text').attr('y', 0).attr('x', 9).attr('dy', '.35em').attr('transform', 'rotate(' + config.xAxisRotateLabels.degrees + ')').style('text-anchor', 'start');
-        } else {
-          svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
-        }
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
         svg.append('g').attr('class', 'y axis').call(yAxis);
         svg.selectAll('.points').data(linedata).enter().append('g');
         /**
@@ -906,16 +887,14 @@ angular.module('angularCharts').directive('acChart', [
       scope.$watch(function () {
         return {
           w: element[0].clientWidth,
-          h: element[0].clientHeight,
+          h: element[0].clientHeight
         };
       }, function (newvalue) {
         totalWidth = newvalue.w;
         totalHeight = newvalue.h;
-
         init();
       }, true);
     }
-
     return {
       restrict: 'EA',
       link: link,
@@ -930,8 +909,7 @@ angular.module('angularCharts').directive('acChart', [
 ]);
 (function () {
     // styles.min.css
-    var cssText = "" +
-".angular-charts-template .axis path,.angular-charts-template .axis line{fill:none;stroke:#333}.angular-charts-template .ac-title{font-weight:700;font-size:1.2em}.angular-charts-template .ac-chart{float:left;width:75%}.angular-charts-template .ac-line{fill:none;stroke-width:2px}.angular-charts-template table{float:left;max-width:25%;list-style:none;margin:0;padding:0}.angular-charts-template td[ng-bind]{display:inline-block}.angular-charts-template .ac-legend-box{border-radius:5px;height:15px;width:15px}.ac-tooltip{display:block;position:absolute;border:2px solid rgba(51,51,51,.9);background-color:rgba(22,22,22,.7);border-radius:5px;padding:5px;color:#fff}";
+    var cssText = ".angular-charts-template .axis path,.angular-charts-template .axis line{fill:none;stroke:#333}.angular-charts-template .ac-title{font-weight:700;font-size:1.2em}.angular-charts-template .ac-chart{float:left;width:75%}.angular-charts-template .ac-line{fill:none;stroke-width:2px}.angular-charts-template table{float:left;max-width:25%;list-style:none;margin:0;padding:0}.angular-charts-template td[ng-bind]{display:inline-block}.angular-charts-template .ac-legend-box{border-radius:5px;height:15px;width:15px}.ac-tooltip{display:block;position:absolute;border:2px solid rgba(51,51,51,.9);background-color:rgba(22,22,22,.7);border-radius:5px;padding:5px;color:#fff}";
     // cssText end
 
     var styleEl = document.createElement("style");
@@ -942,7 +920,7 @@ angular.module('angularCharts').directive('acChart', [
         }
     } else {
         try {
-            styleEl.innerHTML = cssText
+            styleEl.innerHTML = cssText;
         } catch(e) {
             styleEl.innerText = cssText;
         }
