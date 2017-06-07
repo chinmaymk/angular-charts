@@ -96,6 +96,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       lineCurveType: 'cardinal',
       isAnimate: true,
       yAxisTickFormat: 's',
+      yAxisDomain: [],
       waitForHeightAndWidth: false
     };
 
@@ -288,9 +289,9 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       x.domain(points.map(function(d) {
         return d.x;
       }));
-      var padding = d3.max(yData) * 0.20;
 
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      var result = getDomain(yData, config.yAxisDomain);
+       y.domain(result);
 
       x0.domain(d3.range(yMaxPoints)).rangeRoundBands([0, x.rangeBand()]);
 
@@ -505,9 +506,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var padding = d3.max(yData) * 0.20;
-
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      var result = getDomain(yData, config.yAxisDomain);
+       y.domain(result);
 
       svg.append("g")
         .attr("class", "x axis")
@@ -735,9 +735,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var padding = d3.max(yData) * 0.20;
-
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      var result = getDomain(yData, config.yAxisDomain);
+       y.domain(result);
 
       svg.append("g")
         .attr("class", "x axis")
@@ -969,9 +968,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var padding = d3.max(yData) * 0.20;
-
-      y.domain([d3.min(yData), d3.max(yData) + padding]);
+      var result = getDomain(yData, config.yAxisDomain);
+       y.domain(result);
 
       svg.append("g")
         .attr("class", "x axis")
@@ -1162,6 +1160,27 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
         return color;
       }
     }
+
+    /**
+     *  Return an Array with the domain limit, based on config object
+     *  or according to the axis dataset
+     *
+     *  @param data          Tha data to be represented
+     *  @param defaultDomain Domain limit defined in config object
+     */      
+    function getDomain(data, defaultDomain){
+      var minVal, maxVal, padding = 0;
+      if (defaultDomain.length === 2){
+        minVal  = Number(defaultDomain[0]);
+        maxVal  = Number(defaultDomain[1]);
+      }else{
+        minVal  = d3.min(data);
+        maxVal  = d3.max(data);
+        padding = maxVal * 0.2;                  
+      }
+
+      return [minVal, maxVal + padding];
+    }     
 
     var w = angular.element($window);
     var resizePromise = null;
