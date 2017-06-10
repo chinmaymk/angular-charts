@@ -96,7 +96,8 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       lineCurveType: 'cardinal',
       isAnimate: true,
       yAxisTickFormat: 's',
-      waitForHeightAndWidth: false
+      waitForHeightAndWidth: false,
+      xAxisRotation: 0
     };
 
     prepareConfig();
@@ -322,7 +323,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) {
+            return "rotate(" + config.xAxisRotation +")"
+        });
 
       svg.append("g")
         .attr("class", "y axis")
@@ -512,7 +520,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) {
+            return "rotate(" + config.xAxisRotation +")"
+        });
 
       svg.append("g")
         .attr("class", "y axis")
@@ -742,7 +757,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) {
+            return "rotate(" + config.xAxisRotation +")"
+        });
 
       svg.append("g")
         .attr("class", "y axis")
@@ -976,7 +998,14 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) {
+            return "rotate(" + config.xAxisRotation +")"
+        });
 
       svg.append("g")
         .attr("class", "y axis")

@@ -191,7 +191,7 @@ describe('angularCharts', function() {
     })
   })
 
-  describe('styles', function() {
+  xdescribe('styles', function() {
 
     it('should add styles to the document', function() {
       var styleElements = document.querySelectorAll('style');
