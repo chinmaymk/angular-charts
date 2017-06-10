@@ -6,7 +6,7 @@ angular.module('angularCharts', ['angularChartsTemplates']);
 /**
  * Main directive handling drawing of all charts
  */
-angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce) {
+angular.module('angularCharts').directive('acChart', function($templateCache, $compile, $rootElement, $window, $timeout, $sce, $interpolate) {
 
   var defaultColors = [
     'rgb(255,153,0)',
@@ -77,7 +77,6 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
    * @return {[type]}         [description]
    */
   function link(scope, element, attrs) {
-
     var config = {
       title: '',
       tooltips: true,
@@ -178,6 +177,11 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
      */
     function setContainers() {
       var container = $templateCache.get('angularChartsTemplate_' + config.legend.position);
+      if (typeof container === 'string') {
+        var start = /\{\{/g;
+        var end = /\}\}/g;
+        container = container.replace(start, $interpolate.startSymbol()).replace(end, $interpolate.endSymbol());
+      }
       element.html(container); //http://stackoverflow.com/a/17883151
       $compile(element.contents())(scope);
 

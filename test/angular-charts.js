@@ -237,4 +237,37 @@ describe('angularCharts', function() {
     });
 
   });
+
+  describe('$interpolate symbols', function() {
+    beforeEach(function() {
+      angular.element(document.body).append('<style type="text/css">#chart { width:150px; height: 300px}</style>');
+      $scope.chartType = 'area';
+      angular.module('angularCharts').config(['$interpolateProvider', function($interpolateProvider) {
+          $interpolateProvider.startSymbol('[[');
+          $interpolateProvider.endSymbol(']]');
+        }]);
+    });
+
+    it('should change symbols of interpolation to [[ & ]]', function() {
+      $scope.config.title = 'My Title';
+
+      compileChart();
+      $scope.$digest();
+
+      $chart = document.getElementById('chart')
+      expect($chart.querySelectorAll('.ac-title').length).toBe(1);
+      expect($chart.querySelector('.ac-title').innerText).toEqual('My Title')
+    });
+
+    it('should not have a title element if the title is false', function() {
+      $scope.config.title = false;
+
+      compileChart();
+      $scope.$digest();
+
+      $chart = document.getElementById('chart');
+      expect($chart.querySelectorAll('.ac-title').length).toBe(0);
+    });
+
+  });
 })
