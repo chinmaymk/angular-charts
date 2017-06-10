@@ -131,7 +131,7 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
       setHeightWidth();
       setContainers();
       var chartFunc = getChartFunction(chartType);
-      chartFunc();
+      if(chartFunc) chartFunc();
       drawLegend();
     }
 
