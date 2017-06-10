@@ -2,7 +2,7 @@ angular.module('example', ['angularCharts']);
 
 function MainController($scope) {
 	$scope.data1 = {
-		series: ['Sales', 'Income', '<i>Expense</i>', 'Laptops', 'Keyboards'],
+		series: ['Sales', 'Income', 'Expense', 'Laptops', 'Keyboards'],
 		data: [{
 			x: "Sales",
 			y: [100, 500, 0],
