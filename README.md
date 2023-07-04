@@ -1,4 +1,6 @@
 ## Features
+=======
+
 1. One click chart change
 2. Tiny - 4.4kb minified and gzipped
 3. Auto tooltips
