@@ -1,7 +1,6 @@
-This project is deprecated.
----
+## Features
+=======
 
-##Features
 1. One click chart change
 2. Tiny - 4.4kb minified and gzipped
 3. Auto tooltips
@@ -12,7 +11,7 @@ This project is deprecated.
 
 [Download](https://github.com/chinmaymk/angular-charts/releases) | [Playground](http://plnkr.co/edit/T9J7bz?p=preview) | [Contribute](#contribute)
 
-##Installation
+## Installation
 Grab the latest zip from [releases](https://github.com/chinmaymk/angular-charts/releases), copy ```angular-charts.min.js``` to web root, and refer it from page.
 
 ```html
@@ -41,7 +40,7 @@ Refer all dependencies in your page in right order
 <script src='./bower_components/angular-charts/dist/angular-charts.min.js' type='text/javascript'></script>
 ```
 
-##Configuration
+## Configuration
 Directive syntax
 
 ```html
@@ -50,10 +49,10 @@ Directive syntax
 **Note:** chartType, data and config are properties of scope. Not the actual values.
 
 
-###ac-chart  - string
+### ac-chart  - string
 Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 
-###ac-config - object
+### ac-config - object
 
 ```js
  var config = {
@@ -84,7 +83,7 @@ Allowed values - `'pie', 'bar', 'line', 'point', 'area'`
 };
 ```
 
-###ac-data - object
+### ac-data - object
 
 Entire data structure looks like this
 ```js
@@ -122,7 +121,7 @@ var dataPoint = {
 ```
 **Note:** series and data are arrays
 
-##Events
+## Events
 Three events are exposed via config object.
 
 ```js
@@ -158,7 +157,7 @@ To run tests:
 
     grunt karma
 
-##Got suggestions ?
+## Got suggestions ?
 Feel free to submit a pull request, file an issue, or get in touch on twitter [@_chinmaymk](https://twitter.com/_chinmaymk)
 
 License - MIT.
