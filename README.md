@@ -146,8 +146,6 @@ Some things to follow
 3. Avoid any changes in data format
 4. Keep backwards compatibility
 
-**Note**: Please don't send any PRs until you see this. I'm refactoring angular-charts.
-
     git clone git@github.com:chinmaymk/angular-charts.git
     npm install
     bower install
