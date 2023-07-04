@@ -398,19 +398,18 @@ angular.module('angularCharts').directive('acChart', function($templateCache, $c
        * Create labels
        */
       if (config.labels) {
-        barGroups.selectAll('not-a-class')
-          .data(function(d) {
-            return d.nicedata;
-          })
-          .enter().append("text")
-          .attr("x", function(d, i) {
-            return x0(i);
-          })
-          .attr("y", function(d) {
-            return height - Math.abs(y(d.y) - y(0));
-          })
-        // .attr("transform", "rotate(270)")
-        .text(function(d) {
+        const isCentered = config.labelsCentered;
+        const barWidth = x0.rangeBand()/2;
+        console.log(config);
+        barGroups.selectAll('not-a-class').data(function (d) {
+          return d.nicedata;
+        }).enter().append('text').attr('x', function (d, i) {
+          return x0(i) + (isCentered ? barWidth : 0);
+        }).attr('y', function (d) {
+          return height - Math.abs(y(d.y) - y(0));
+        }).attr('text-anchor', function (d) {
+          return isCentered ? "middle" : "start";
+        }).text(function (d) {
           return d.y;
         });
       }
